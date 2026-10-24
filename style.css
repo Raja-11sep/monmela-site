@@ -72,7 +72,7 @@ th { color: var(--muted); font-weight: 600; font-size: 13px; text-transform: upp
 .table-wrap { overflow-x: auto; }
 
 /* Home page tiles */
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 20px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 20px; }
 .tile {
   display: block; padding: 18px; border: 1px solid var(--line); border-radius: 18px;
   text-decoration: none; color: var(--ink); background: var(--bg);
