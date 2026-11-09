@@ -71,8 +71,6 @@ th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--lin
 th { color: var(--muted); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .03em; }
 .table-wrap { overflow-x: auto; }
 
-footer { max-width: 820px; margin: 0 auto; padding: 0 20px 40px; color: var(--muted); font-size: 14px; text-align: center; }
-footer nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; margin-bottom: 8px; }
 
 /* Language: show only the chosen one (set by site.js on <html data-lang>) */
 html[data-lang="en"] [lang="bn"].l, html[data-lang="bn"] [lang="en"].l { display: none !important; }
@@ -87,10 +85,9 @@ body.home { font-size: 17px; }
 }
 
 /* Sections stretch full width; this padding keeps their content in a 1040px column. */
-.home section { padding: 72px max(20px, calc((100% - 1040px) / 2)); }
+.home section { padding: 72px max(20px, calc((100% - 1120px) / 2)); }
 body.home main { max-width: none; margin: 0; padding: 0; }
-body.home .top { background: var(--primary-deep); }
-body.home .top-inner { max-width: 1080px; }
+body.home .top-inner { max-width: 1120px; }
 
 /* Intro: deep teal, text left, Venn right (stacks on phones) */
 .home .intro { background: var(--primary-deep); color: #fff; padding-top: 32px; }
@@ -172,7 +169,6 @@ html[data-lang="bn"] .steps li::before { content: counter(step, bengali); }
 .faq details[open] summary::after { transform: rotate(45deg); }
 .faq details p { margin: 0 0 20px; color: var(--muted); max-width: 36em; }
 
-body.home footer { max-width: 1080px; padding-top: 40px; border-top: 1px solid var(--line); }
 
 /* Tablets and phones */
 @media (max-width: 860px) {
@@ -222,3 +218,125 @@ body.home footer { max-width: 1080px; padding-top: 40px; border-top: 1px solid v
 /* Install steps: five short ones, so narrower columns that wrap on their own */
 .dl .steps ol { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 28px; }
 .dl .steps li p { color: var(--ink); }
+
+/* ================================================================
+   Site footer (all pages): dotted Kolkata skyline, then three columns
+   ================================================================ */
+.site-foot { margin-top: 40px; background: #F3EEE3; color: var(--muted); font-size: 15px; }
+.skyline { display: block; width: 100%; height: clamp(90px, 14vw, 200px); background: var(--bg); }
+.foot-inner {
+  max-width: 1120px; margin: 0 auto; padding: 40px 20px 8px;
+  display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 32px;
+}
+.site-foot .brand { color: var(--ink); }
+.site-foot h2, .site-foot h2 :lang(bn) {
+  margin: 0 0 10px; font-family: "Inter", "Hind Siliguri", sans-serif;
+  font-size: 15px; font-weight: 600; line-height: 1.4; letter-spacing: 0; color: var(--ink);
+}
+.site-foot p { margin: 0 0 6px; }
+.site-foot ul { list-style: none; margin: 0; padding: 0; }
+.site-foot li { margin: 0 0 6px; }
+.foot-brand p { margin-top: 12px; max-width: 22em; }
+.site-foot .foot-base { max-width: 1120px; margin: 0 auto; padding: 20px 20px 32px; border-top: 1px solid #E2D9C6; font-size: 14px; }
+@media (max-width: 760px) { .foot-inner { grid-template-columns: 1fr; gap: 24px; } }
+
+/* ================================================================
+   Light sticky header (home, download): links + Download button
+   ================================================================ */
+.top-light {
+  position: sticky; top: 0; z-index: 20; color: var(--ink);
+  background: rgba(251, 248, 243, .88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.top-light .brand, .top-light .brand:hover { color: var(--ink); }
+.top-light .brand svg circle:first-child { fill: var(--tint); }
+.top-light .lang-switch { background: var(--tint); }
+.top-light .lang-switch button { color: var(--primary-deep); }
+.top-light .lang-switch button[aria-pressed="true"] { background: var(--primary-deep); color: #fff; }
+.top-nav { display: flex; gap: 28px; font-size: 15px; font-weight: 500; }
+.top-nav a { color: var(--ink); text-decoration: none; }
+.top-nav a:hover { color: var(--primary); }
+.top-end { display: flex; align-items: center; gap: 12px; }
+.btn-small { padding: 9px 18px; font-size: 15px; }
+@media (max-width: 900px) { .top-nav { display: none; } }
+@media (max-width: 480px) { .top-cta { display: none; } }
+
+/* ================================================================
+   Home: illustrated hero
+   ================================================================ */
+.home .hero-k {
+  display: grid; grid-template-columns: minmax(0, 4.6fr) minmax(0, 7.4fr); align-items: end;
+  padding: 0 0 0 max(20px, calc((100% - 1120px) / 2)); overflow: hidden;
+  background: linear-gradient(var(--bg) 70%, #F3EEE3);
+}
+.hero-k-text { padding: clamp(40px, 7vw, 96px) 24px clamp(40px, 6vw, 88px) 0; align-self: center; }
+.hero-k h1 { font-size: clamp(44px, 6.4vw, 88px); line-height: 1.02; margin: 0 0 24px; color: var(--ink); }
+html[data-lang="bn"] .hero-k h1 { line-height: 1.16; }
+.hero-k .lede { color: var(--muted); font-size: clamp(17px, 1.5vw, 20px); max-width: 26em; }
+.hero-note { margin: 20px 0 0; font-size: 15px; color: var(--muted); }
+.btn-quiet { color: var(--primary-deep); border: 1.5px solid var(--primary); }
+.btn-quiet:hover { background: var(--tint); color: var(--primary-deep); }
+.hero-k-art { align-self: end; margin-right: 0; }
+.hero-art {
+  display: block; width: 120%; max-width: none; margin-left: -14%; height: auto;
+  /* soft left and bottom edges, so the scene melts into the page */
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 18%), linear-gradient(to top, transparent, #000 9%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent, #000 18%), linear-gradient(to top, transparent, #000 9%);
+  mask-composite: intersect;
+}
+
+/* The load moment: the two suns slide together, then their overlap lights up (the logo). */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-art .sun { animation: sun-in 1.4s cubic-bezier(.2, .7, .2, 1) both; }
+  .hero-art .sun-left { --from: -70px; }
+  .hero-art .sun-right { --from: 70px; }
+  .hero-art .sun-lens { animation: fill-in .7s ease-out 1.25s both; }
+  @keyframes sun-in { from { transform: translateX(var(--from)); opacity: .3; } to { transform: none; opacity: 1; } }
+}
+
+/* Interest chips, styled like quiz answers, sliding slowly */
+.home .chips { padding: 48px 0 56px; background: #F3EEE3; overflow: hidden; }
+.chips-lead { margin: 0 0 24px; padding: 0 max(20px, calc((100% - 1120px) / 2)); font-size: clamp(18px, 2vw, 22px); color: var(--ink); }
+.chip-row { overflow: hidden; padding: 6px 0; }
+.chip-track { display: flex; width: max-content; }
+.chip-set { display: flex; gap: 12px; padding-right: 12px; }
+.chip {
+  white-space: nowrap; padding: 12px 22px; border-radius: 999px; font-size: 18px; font-weight: 500;
+  background: #fff; border: 1.5px solid #D5E6E2; color: var(--ink);
+}
+.chip.on { background: var(--primary-deep); border-color: var(--primary-deep); color: #fff; }
+.chip.on::before { content: "✓ "; color: var(--accent); }
+@media (prefers-reduced-motion: no-preference) {
+  .chip-track { animation: slide 60s linear infinite; }
+  .chip-row.reverse .chip-track { animation-direction: reverse; animation-duration: 70s; }
+  .chip-row:hover .chip-track { animation-play-state: paused; }
+  @keyframes slide { to { transform: translateX(-50%); } }
+}
+
+/* Match: the Venn on deep teal */
+.home .match { background: var(--primary-deep); color: #fff; }
+.match-inner { display: grid; grid-template-columns: 1fr 1.1fr; gap: 48px; align-items: center; }
+.home .match h2 { color: #fff; }
+.match-text p { color: var(--tint); font-size: 19px; max-width: 26em; margin: -12px 0 0; }
+
+/* Download panel */
+.home .cta { padding-top: 24px; padding-bottom: 24px; }
+.cta-panel {
+  position: relative; overflow: hidden; border-radius: 28px; background: var(--primary-deep); color: #fff;
+  padding: clamp(36px, 6vw, 72px); display: grid; grid-template-columns: 1.3fr 1fr; align-items: center; gap: 24px;
+}
+.home .cta h2 { color: #fff; font-size: clamp(38px, 5.6vw, 72px); margin-bottom: 16px; }
+.cta-text p { color: var(--tint); font-size: 19px; margin: 0 0 28px; max-width: 26em; }
+.rings-art { width: 100%; max-width: 380px; justify-self: end; }
+
+@media (max-width: 860px) {
+  .home .hero-k { grid-template-columns: 1fr; padding-right: max(20px, calc((100% - 1120px) / 2)); }
+  .hero-k-text { padding: 40px 0 8px; }
+  .hero-k-art { margin: 0 calc(-1 * max(20px, calc((100% - 1120px) / 2))); }
+  .hero-art { width: 130%; margin-left: -15%;
+    -webkit-mask-image: linear-gradient(to top, transparent, #000 9%); mask-image: linear-gradient(to top, transparent, #000 9%); }
+  .match-inner, .cta-panel { grid-template-columns: 1fr; }
+  .rings-art { max-width: 240px; justify-self: center; }
+  .chip { font-size: 16px; padding: 10px 18px; }
+}
