@@ -71,18 +71,126 @@ th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--lin
 th { color: var(--muted); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .03em; }
 .table-wrap { overflow-x: auto; }
 
-/* Home page tiles */
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 20px; }
-.tile {
-  display: block; padding: 18px; border: 1px solid var(--line); border-radius: 18px;
-  text-decoration: none; color: var(--ink); background: var(--bg);
-}
-.tile:hover { border-color: var(--primary); color: var(--ink); }
-.tile strong { display: block; color: var(--primary-deep); font-size: 17px; margin-bottom: 2px; }
-.tile span { color: var(--muted); font-size: 14px; }
-
 footer { max-width: 820px; margin: 0 auto; padding: 0 20px 40px; color: var(--muted); font-size: 14px; text-align: center; }
 footer nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; margin-bottom: 8px; }
 
 /* Language: show only the chosen one (set by site.js on <html data-lang>) */
 html[data-lang="en"] [lang="bn"].l, html[data-lang="bn"] [lang="en"].l { display: none !important; }
+
+/* ================================================================
+   Home page (body.home). One bold element: the Venn diagram in the
+   intro. Everything else stays quiet: plain lists, thin rules.
+   ================================================================ */
+body.home { font-size: 17px; }
+.home h1, .home h2, .home h1 :lang(bn), .home h2 :lang(bn) {
+  font-family: "Tiro Bangla", Georgia, serif; font-weight: 400; letter-spacing: -.01em;
+}
+
+/* Sections stretch full width; this padding keeps their content in a 1040px column. */
+.home section { padding: 72px max(20px, calc((100% - 1040px) / 2)); }
+body.home main { max-width: none; margin: 0; padding: 0; }
+body.home .top { background: var(--primary-deep); }
+body.home .top-inner { max-width: 1080px; }
+
+/* Intro: deep teal, text left, Venn right (stacks on phones) */
+.home .intro { background: var(--primary-deep); color: #fff; padding-top: 32px; }
+.intro-inner { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center; }
+.intro h1 { font-size: clamp(36px, 5.6vw, 60px); line-height: 1.12; margin: 0 0 20px; max-width: 12em; }
+html[data-lang="bn"] .intro h1 { line-height: 1.15; }
+.lede { font-size: 18px; color: var(--tint); max-width: 32em; margin: 0 0 28px; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.btn {
+  display: inline-block; padding: 13px 24px; border-radius: 999px;
+  font-weight: 600; text-decoration: none;
+}
+.btn-primary { background: var(--accent); color: var(--ink); }
+.btn-primary:hover { background: #FFC13D; color: var(--ink); }
+/* Not a link yet: shows where the app will be. */
+.store {
+  display: inline-block; padding: 12px 20px; border-radius: 999px;
+  border: 1.5px solid rgba(255, 255, 255, .45); font-size: 15px; font-weight: 500;
+}
+.not-dating { margin: 20px 0 0; font-size: 15px; color: rgba(255, 255, 255, .72); }
+.home a:focus-visible, .home button:focus-visible, .home summary:focus-visible {
+  outline: 3px solid var(--accent); outline-offset: 3px;
+}
+
+/* The Venn: two people's answers; the marigold overlap is what they share. */
+.venn { margin: 0; }
+.venn svg { display: block; width: 100%; max-width: 480px; margin: 0 auto; overflow: visible; }
+.venn text { text-anchor: middle; font-family: "Hind Siliguri", "Inter", sans-serif; }
+.venn .ring { fill: rgba(255, 255, 255, .06); stroke: rgba(255, 255, 255, .9); stroke-width: 2; }
+.venn .lens circle { fill: var(--accent); }
+.venn .who text { fill: #fff; font-size: 15px; font-weight: 600; }
+.venn .side text { fill: #BFE3DD; font-size: 15px; }
+.venn .shared text { fill: var(--ink); font-size: 15px; font-weight: 600; }
+.venn .score text { fill: var(--primary-deep); font-size: 20px; font-weight: 700; }
+.venn figcaption { margin-top: 14px; text-align: center; font-size: 15px; color: rgba(255, 255, 255, .72); }
+
+/* The single load moment: the rings slide together, then the overlap fills in. */
+@media (prefers-reduced-motion: no-preference) {
+  .venn .ring { transform-box: fill-box; animation: ring-in .9s cubic-bezier(.2, .7, .2, 1) both; }
+  .venn .ring-left { --from: -46px; }
+  .venn .ring-right { --from: 46px; }
+  .venn .lens, .venn .shared, .venn .score { animation: fill-in .5s ease-out .85s both; }
+  @keyframes ring-in { from { transform: translateX(var(--from)); } to { transform: none; } }
+  @keyframes fill-in { from { opacity: 0; } to { opacity: 1; } }
+}
+
+/* How it works: a real sequence, so numbered (Bengali digits in Bengali) */
+.home h2 { font-size: clamp(30px, 4vw, 40px); line-height: 1.2; margin: 0 0 32px; color: var(--primary-deep); }
+.steps ol { list-style: none; margin: 0; padding: 0; counter-reset: step;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+.steps li { counter-increment: step; border-top: 2px solid var(--primary); padding-top: 16px; }
+.steps li::before {
+  content: counter(step); display: block; margin-bottom: 8px;
+  font: 44px/1 "Tiro Bangla", Georgia, serif; color: var(--primary);
+}
+html[data-lang="bn"] .steps li::before { content: counter(step, bengali); }
+.steps h3 { font-size: 19px; margin: 0 0 6px; }
+.steps p { margin: 0; color: var(--muted); }
+
+/* Safety: tinted band, heading left, list right */
+.home .safety { background: var(--tint); display: grid; grid-template-columns: 1fr 2fr; gap: 48px; }
+.safety-head p { margin: -16px 0 0; color: var(--muted); }
+.safety ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; }
+.safety li { display: flex; gap: 14px; align-items: flex-start; padding: 16px 0; border-top: 1px solid #C7E4DF; }
+.safety li p { margin: 0; }
+.icon { flex: none; width: 26px; height: 26px; margin-top: 2px;
+  fill: none; stroke: var(--primary); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.icon text { fill: var(--primary); stroke: none; font: 700 7.5px "Inter", sans-serif; }
+
+/* Questions: native <details>, so it works without JavaScript */
+.home .faq { display: grid; grid-template-columns: 1fr 2fr; column-gap: 48px; align-items: start; }
+.faq h2 { grid-row: span 6; }
+.faq details { border-top: 1px solid var(--line); }
+.faq details:last-child { border-bottom: 1px solid var(--line); }
+.faq summary {
+  list-style: none; cursor: pointer; padding: 18px 40px 18px 0; position: relative;
+  font-weight: 600; font-size: 18px;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after {
+  content: "+"; position: absolute; right: 4px; top: 12px;
+  font-size: 28px; font-weight: 400; color: var(--primary); transition: transform .2s;
+}
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq details p { margin: 0 0 20px; color: var(--muted); max-width: 36em; }
+
+body.home footer { max-width: 1080px; padding-top: 40px; border-top: 1px solid var(--line); }
+
+/* Tablets and phones */
+@media (max-width: 860px) {
+  .home section { padding-top: 56px; padding-bottom: 56px; }
+  .intro-inner, .home .safety { grid-template-columns: 1fr; gap: 32px; }
+  .home .faq { grid-template-columns: 1fr; }
+  .faq h2 { grid-row: auto; margin-bottom: 24px; }
+  .steps ol { grid-template-columns: 1fr 1fr; }
+  .venn svg { max-width: 400px; }
+}
+@media (max-width: 560px) {
+  .home .intro { padding-top: 20px; }
+  .steps ol, .safety ul { grid-template-columns: 1fr; }
+  .steps ol { gap: 24px; }
+  .safety-head p { margin-top: -16px; }
+}
