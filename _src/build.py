@@ -6,7 +6,7 @@
 import hashlib
 import pathlib
 
-from art import hero_art, rings_art, skyline_footer
+from art import alpana_tile, hero_art, rings_stitched
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent      # the site folder (built files go here)
 PAGES = pathlib.Path(__file__).resolve().parent / "pages"  # legal page bodies
@@ -35,6 +35,11 @@ NAV = [
     ("child-safety.html", "Child safety", "শিশু সুরক্ষা"),
     ("download.html", "Download app", "অ্যাপ ডাউনলোড"),
 ]
+
+
+def bn_num(n):
+    """A number in Bengali digits, e.g. 4 -> ৪."""
+    return str(n).translate(str.maketrans("0123456789", "০১২৩৪৫৬৭৮৯"))
 
 
 def both(en: str, bn: str, tag: str = "span", cls: str = "") -> str:
@@ -107,7 +112,7 @@ def header(on_home=False):
 def footer():
     links = "".join(f'<li><a href="{href}">{both(en, bn)}</a></li>' for href, en, bn in NAV)
     return f"""<footer class="site-foot">
-  {skyline_footer()}
+  <div class="alpana" aria-hidden="true"></div>
   <div class="foot-inner">
     <div class="foot-brand">
       <a class="brand" href="./">{LOGO}{both("Mon Mela", "মনমেলা")}</a>
@@ -233,7 +238,7 @@ def phone(key, cls="", lazy=True, alt=True):
 
 
 def home():
-    # How it works: each step names the app screen the phone shows while that step is in view.
+    # How it works: four app screens in a row (a swipeable row on phones), then one line about chatting.
     steps = [
         ("welcome", "Sign in with Google", "Google দিয়ে লগইন",
          "One tap, no password. We never post anything for you.",
@@ -242,26 +247,15 @@ def home():
          "Adda, a study partner, a gym buddy, the Puja gang: pick up to five.",
          "আড্ডা, পড়ার সঙ্গী, জিমের সঙ্গী, পুজোর দল: পাঁচটা পর্যন্ত বেছে নিন।"),
         ("quiz", "Answer the friendship quiz", "বন্ধুত্বের কুইজ",
-         "Twelve easy questions about weekends, food, music and festivals. Your answers stay private; they only work out your match %.",
-         "ছুটির দিন, খাবার, গান আর উৎসব নিয়ে বারোটা সহজ প্রশ্ন। উত্তর গোপন থাকে, শুধু মিলের % হিসেব হয়।"),
+         "Twelve easy questions. Your answers stay private; they only work out your match %.",
+         "বারোটা সহজ প্রশ্ন। উত্তর গোপন থাকে, শুধু মিলের % হিসেব হয়।"),
         ("picks", "Meet today's picks", "আজকের মানুষেরা",
-         "New people every morning, 15 at a time, each with a match % and why you match.",
-         "প্রতিদিন সকালে নতুন মানুষ, একবারে ১৫ জন, সঙ্গে মিলের % আর কেন মিল।"),
-        ("picks", "Connect, then chat", "কানেক্ট, তারপর চ্যাট",
-         "Send a request. The chat opens only when both of you say yes.",
-         "অনুরোধ পাঠান। দুজনেই রাজি হলে তবেই চ্যাট খোলে।"),
+         "New people every morning, each with a match % and why you match.",
+         "প্রতিদিন সকালে নতুন মানুষ, সঙ্গে মিলের % আর কেন মিল।"),
     ]
-    order = list(dict.fromkeys(k for k, *_ in steps))          # each screen once, in step order
-    # Phones only: each step shows its screen, unless it's the same screen as the step before.
     steps_html = "".join(
-        f'<li class="how-step" data-screen="{k}"><h3>{both(t_en, t_bn)}</h3><p>{both(d_en, d_bn)}</p>'
-        f'{phone(k, "phone-inline") if i == 0 or steps[i - 1][0] != k else ""}</li>'
-        for i, (k, t_en, t_bn, d_en, d_bn) in enumerate(steps))
-    # Desktop: one sticky phone; home.js swaps the screen as you scroll. First screen shows without JS.
-    sticky = "".join(
-        f'<img src="{SCREENS[k][0]}" alt="{SCREENS[k][1]}" width="720" height="1520" data-screen="{k}"'
-        f'{" class=" + chr(34) + "is-on" + chr(34) if i == 0 else ""}>'
-        for i, k in enumerate(order))
+        f'<li class="how-item">{phone(k)}<div class="how-cap"><h3>{both(t_en, t_bn)}</h3><p>{both(d_en, d_bn)}</p></div></li>'
+        for k, t_en, t_bn, d_en, d_bn in steps)
 
     safety = [
         ("chat", "Nobody can message you unless you accept their request.",
@@ -307,22 +301,17 @@ def home():
         f'<details><summary>{both(q_en, q_bn)}</summary><p>{both(a_en, a_bn)}</p></details>'
         for q_en, q_bn, a_en, a_bn in faq)
 
-    # Interests, drawn like the app's quiz answers; "on" = a picked answer.
-    chips_a = [("Adda", "আড্ডা", 1), ("Rabindrasangeet", "রবীন্দ্রসংগীত", 0), ("Biryani", "বিরিয়ানি", 0),
-               ("Pandal hopping", "ঠাকুর দেখা", 1), ("Football", "ফুটবল", 0), ("Hill trips", "পাহাড়", 0),
-               ("Books", "বই", 1), ("Phuchka", "ফুচকা", 0), ("Films", "সিনেমা", 0), ("Morning walks", "ভোরের হাঁটা", 1),
-               ("Cricket", "ক্রিকেট", 0), ("Poetry", "কবিতা", 0)]
-    chips_b = [("Study partner", "পড়ার সঙ্গী", 1), ("Photography", "ছবি তোলা", 0), ("Sea trips", "সমুদ্র", 0),
-               ("Chai", "চা", 1), ("Theatre", "থিয়েটার", 0), ("Board games", "বোর্ড গেম", 0), ("Coding", "কোডিং", 1),
-               ("Drawing", "আঁকা", 0), ("Trekking", "ট্রেকিং", 0), ("Durga Puja", "দুর্গাপুজো", 1),
-               ("Music", "গান", 0), ("Quiz nights", "কুইজ", 0)]
-
-    def chip_row(items, reverse=False):
-        one = "".join(f'<span class="chip{" on" if on else ""}">{both(en, bn)}</span>' for en, bn, on in items)
-        # Two copies side by side; the track slides by exactly one copy, so the loop is seamless.
-        return (f'<div class="chip-row{" reverse" if reverse else ""}"><div class="chip-track">'
-                f'<div class="chip-set">{one}</div><div class="chip-set" aria-hidden="true">{one}</div>'
-                f'</div></div>')
+    # Interests: tappable chips styled like the app's own; a few start picked. home.js updates the count.
+    interests = [("Adda", "আড্ডা", 1), ("Study partner", "পড়ার সঙ্গী", 1), ("Rabindrasangeet", "রবীন্দ্রসংগীত", 0),
+                 ("Pandal hopping", "ঠাকুর দেখা", 1), ("Biryani", "বিরিয়ানি", 0), ("Football", "ফুটবল", 0),
+                 ("Hill trips", "পাহাড়", 0), ("Books", "বই", 0), ("Phuchka", "ফুচকা", 0), ("Films", "সিনেমা", 0),
+                 ("Morning walks", "ভোরের হাঁটা", 0), ("Cricket", "ক্রিকেট", 0), ("Photography", "ছবি তোলা", 0),
+                 ("Chai", "চা", 1), ("Theatre", "থিয়েটার", 0), ("Board games", "বোর্ড গেম", 0), ("Coding", "কোডিং", 0),
+                 ("Trekking", "ট্রেকিং", 0)]
+    chips_html = "".join(
+        f'<button type="button" class="chip" aria-pressed="{"true" if on else "false"}">{both(en, bn)}</button>'
+        for en, bn, on in interests)
+    picked = sum(on for *_, on in interests)
 
     html = f"""{head("Mon Mela · Friends who think like you", "মনমেলা · মনের মতো বন্ধু",
                     "A free, Bengali-first friendship app for adults in West Bengal. Matched by your answers, safe by design.",
@@ -344,11 +333,11 @@ def home():
   <div class="hero-k-art">{hero_art()}</div>
 </section>
 
-<section class="chips" aria-labelledby="chips-lead">
-  <p class="chips-lead" id="chips-lead">{both("Adda, study, Puja, the hills: pick what you love, meet people who picked the same.",
-                                           "আড্ডা, পড়াশোনা, পুজো, পাহাড়: যা ভালোবাসেন বেছে নিন, দেখা হোক তাঁদের সঙ্গে যাঁরা একই জিনিস বেছেছেন।")}</p>
-  {chip_row(chips_a)}
-  {chip_row(chips_b, reverse=True)}
+<section class="interests" aria-labelledby="int-h">
+  <h2 id="int-h">{both("What do you love?", "আপনার কী ভালো লাগে?")}</h2>
+  <p class="int-lede">{both("Tap a few, just like in the app.", "অ্যাপের মতোই, কয়েকটা বেছে নিন।")}</p>
+  <div class="chip-board" role="group" aria-label="Interests">{chips_html}</div>
+  <p class="chip-count" aria-live="polite"><span class="l" lang="en"><b class="n">{picked}</b> picked. Mon Mela suggests people whose answers match yours.</span><span class="l" lang="bn"><b class="n">{bn_num(picked)}</b>টা বেছেছেন। মনমেলা দেখায় তাঁদের, যাঁদের উত্তর আপনার সঙ্গে মেলে।</span></p>
 </section>
 
 <main class="home-main">
@@ -365,12 +354,9 @@ def home():
 
   <section class="how" aria-labelledby="how">
     <h2 id="how">{both("How it works", "কীভাবে কাজ করে")}</h2>
-    <div class="how-grid">
-      <ol class="how-steps">{steps_html}</ol>
-      <div class="how-stage">
-        <div class="phone phone-sticky"><div class="screen">{sticky}</div></div>
-      </div>
-    </div>
+    <ol class="how-row">{steps_html}</ol>
+    <p class="how-then">{icon("chat")}<span>{both("<b>Then connect.</b> The chat opens only when both of you say yes.",
+                                                  "<b>তারপর কানেক্ট।</b> দুজনেই রাজি হলে তবেই চ্যাট খোলে।")}</span></p>
   </section>
 
   <section class="safety" aria-labelledby="safe">
@@ -385,15 +371,15 @@ def home():
   <section class="cta" aria-labelledby="cta-h">
     <div class="cta-panel">
       <div class="cta-text">
-        <h2 id="cta-h">{both("Ready for some adda?", "আড্ডা হবে নাকি?")}</h2>
+        <h2 id="cta-h">{both("Start your next adda.", "শুরু হোক নতুন আড্ডা।")}</h2>
         <p>{both("Free, in Bengali and English, for adults across West Bengal.",
                  "বিনামূল্যে, বাংলা আর ইংরেজিতে, সারা পশ্চিমবঙ্গের প্রাপ্তবয়স্কদের জন্য।")}</p>
-        <div class="actions">{get_app_button()}</div>
+        <div class="actions">{get_app_button("btn btn-dark")}</div>
       </div>
       <div class="cta-art" aria-hidden="true">
-        {rings_art()}
-        {phone("looking", "phone-back", alt=False)}
-        {phone("picks", "phone-front", alt=False)}
+        {rings_stitched()}
+        {phone("looking", "phone-b", alt=False)}
+        {phone("picks", "phone-a", alt=False)}
       </div>
     </div>
   </section>
@@ -560,6 +546,7 @@ def download():
     (ROOT / "download.html").write_text(html, encoding="utf-8")
 
 
+(ROOT / "img" / "alpana.svg").write_text(alpana_tile(), encoding="utf-8")
 home()
 download()
 page("privacy.html", "Privacy Policy", "প্রাইভেসি পলিসি",

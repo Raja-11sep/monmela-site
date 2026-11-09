@@ -1,25 +1,31 @@
-// Home page, "How it works": on wide screens one phone stays in view (CSS sticky) while the
-// steps scroll past. Whichever step crosses the middle of the screen becomes active, and the
-// phone shows that step's app screen. Without this file, the phone simply shows the first screen.
+// Home page, "What do you love?": the interest chips can be tapped on and off, like in the app,
+// and the line under them counts how many are picked (in English and Bengali digits).
+// Without this file the chips simply show the starting picks.
 (function () {
-  document.addEventListener('DOMContentLoaded', function () {
-    var section = document.querySelector('.how');
-    if (!section || !('IntersectionObserver' in window)) return;
-    var steps = section.querySelectorAll('.how-step');
-    var screens = section.querySelectorAll('.phone-sticky img');
-    section.classList.add('js-how'); // turns on the dim/bright styling of steps
+  var BN_DIGITS = '০১২৩৪৫৬৭৮৯';
+  function bengali(n) {
+    return String(n).replace(/[0-9]/g, function (d) { return BN_DIGITS[d]; });
+  }
 
-    function activate(step) {
-      steps.forEach(function (s) { s.classList.toggle('is-active', s === step); });
-      var key = step.getAttribute('data-screen');
-      screens.forEach(function (img) { img.classList.toggle('is-on', img.getAttribute('data-screen') === key); });
+  document.addEventListener('DOMContentLoaded', function () {
+    var board = document.querySelector('.chip-board');
+    if (!board) return;
+    var chips = board.querySelectorAll('.chip');
+    var en = document.querySelector('.chip-count [lang="en"] .n');
+    var bn = document.querySelector('.chip-count [lang="bn"] .n');
+
+    function updateCount() {
+      var picked = board.querySelectorAll('.chip[aria-pressed="true"]').length;
+      if (en) en.textContent = picked;
+      if (bn) bn.textContent = bengali(picked);
     }
 
-    // A thin band across the middle of the viewport: a step is "current" while it overlaps it.
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) { if (e.isIntersecting) activate(e.target); });
-    }, { rootMargin: '-45% 0px -45% 0px' });
-    steps.forEach(function (s) { observer.observe(s); });
-    activate(steps[0]);
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        var on = chip.getAttribute('aria-pressed') === 'true';
+        chip.setAttribute('aria-pressed', String(!on));
+        updateCount();
+      });
+    });
   });
 })();

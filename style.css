@@ -95,7 +95,7 @@ h1 :lang(bn), h2 :lang(bn) { font-family: var(--display); }
 
 /* ---------------------------------------------------------------- footer (every page) */
 .site-foot { background: var(--sand); color: var(--muted); font-size: 15px; }
-.skyline { display: block; width: 100%; height: clamp(80px, 13vw, 190px); background: var(--bg); }
+.alpana { height: 56px; background: var(--primary-deep) url("img/alpana.svg") repeat-x center / auto 56px; }
 .foot-inner {
   max-width: var(--page); margin: 0 auto; padding: 40px 20px 8px;
   display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 32px;
@@ -149,67 +149,50 @@ body.home { font-size: 17px; }
 .home section h2 { font-size: clamp(32px, 4.4vw, 52px); line-height: 1.12; margin: 0 0 36px; color: var(--primary-deep); }
 @media (max-width: 860px) { .home section { padding-top: 60px; padding-bottom: 60px; } }
 
-/* ---------- hero: Kolkata sunset illustration */
+/* ---------- hero: text, and an arched window onto the Hooghly (kantha-stitched frame) */
 .home .hero-k {
-  display: grid; grid-template-columns: minmax(0, 4.6fr) minmax(0, 7.4fr); align-items: end;
-  padding: 0 0 0 var(--gutter); overflow: hidden;
-  background: linear-gradient(var(--bg) 65%, var(--sand));
+  display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); align-items: center; gap: 48px;
+  padding: clamp(40px, 6vw, 80px) var(--gutter) clamp(56px, 7vw, 96px);
 }
-.hero-k-text { align-self: center; padding: clamp(48px, 7vw, 104px) 24px clamp(48px, 6vw, 96px) 0; }
-.hero-k h1 { font-size: clamp(44px, 6.2vw, 86px); line-height: 1.03; margin: 0 0 24px; color: var(--ink); }
+.hero-k h1 { font-size: clamp(44px, 6vw, 84px); line-height: 1.03; margin: 0 0 24px; color: var(--ink); }
 html[data-lang="bn"] .hero-k h1 { line-height: 1.18; }
-.hero-k .lede { color: var(--muted); font-size: clamp(17px, 1.5vw, 20px); max-width: 24em; margin: 0 0 30px; }
+.hero-k .lede { color: var(--muted); font-size: clamp(17px, 1.5vw, 20px); max-width: 27em; margin: 0 0 30px; }
 .hero-note { margin: 20px 0 0; font-size: 15px; color: var(--muted); }
-.hero-k-art { align-self: end; min-width: 0; }
-.hero-art {
-  display: block; width: 120%; max-width: none; height: auto; margin-left: -14%;
-  /* soft left and bottom edges, so the scene melts into the page */
-  -webkit-mask-image: linear-gradient(to right, transparent 2%, #000 22%), linear-gradient(to top, transparent, #000 8%);
-  -webkit-mask-composite: source-in;
-  mask-image: linear-gradient(to right, transparent 2%, #000 22%), linear-gradient(to top, transparent, #000 8%);
-  mask-composite: intersect;
-}
-/* The load moment: the two suns slide together, then their overlap lights up (the logo). */
+.hero-k-art { justify-self: end; width: min(100%, 500px); }
+.hero-art { display: block; width: 100%; height: auto; filter: drop-shadow(0 30px 34px rgba(15, 76, 71, .2)); }
+/* The load moment: the logo's two rings slide together, then their overlap lights up. */
 @media (prefers-reduced-motion: no-preference) {
   .hero-art .sun { animation: sun-in 1.4s cubic-bezier(.2, .7, .2, 1) both; }
-  .hero-art .sun-left { --from: -70px; }
-  .hero-art .sun-right { --from: 70px; }
+  .hero-art .sun-left { --from: -60px; }
+  .hero-art .sun-right { --from: 60px; }
   .hero-art .sun-lens { animation: fade-in .7s ease-out 1.25s both; }
   @keyframes sun-in { from { transform: translateX(var(--from)); opacity: .3; } to { transform: none; opacity: 1; } }
   @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 }
 @media (max-width: 860px) {
-  .home .hero-k { grid-template-columns: 1fr; padding-right: var(--gutter); }
-  .hero-k-text { padding: 44px 0 4px; }
-  .hero-k-art { margin: 0 calc(-1 * var(--gutter)); overflow: hidden; }
-  .hero-art {
-    width: 132%; margin-left: -16%;
-    -webkit-mask-image: linear-gradient(to top, transparent, #000 8%); mask-image: linear-gradient(to top, transparent, #000 8%);
-  }
+  .home .hero-k { grid-template-columns: 1fr; gap: 36px; padding-top: 40px; }
+  .hero-k-art { justify-self: center; width: min(100%, 400px); }
 }
 @media (max-width: 480px) {
   .hero-k .actions .btn { flex: 1 1 100%; }
 }
 
-/* ---------- interest chips (look like the app's answer chips), sliding slowly */
-.home .chips { padding: 52px 0 60px; background: var(--sand); overflow: hidden; }
-.chips-lead { margin: 0 0 24px; padding: 0 var(--gutter); font-size: clamp(18px, 2vw, 22px); color: var(--ink); }
-.chip-row { overflow: hidden; padding: 6px 0; }
-.chip-track { display: flex; width: max-content; }
-.chip-set { display: flex; gap: 12px; padding-right: 12px; }
+/* ---------- interests: tappable chips, styled like the app's own */
+.home .interests { background: var(--sand); text-align: center; }
+.home .interests h2 { margin-bottom: 10px; }
+.int-lede { margin: 0 0 30px; color: var(--muted); font-size: 18px; }
+.chip-board { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; max-width: 920px; margin: 0 auto; }
 .chip {
-  white-space: nowrap; padding: 12px 22px; border-radius: 999px; font-size: 18px; font-weight: 500;
-  background: #fff; box-shadow: inset 0 0 0 1.5px #D5E6E2; color: var(--ink);
+  padding: 12px 20px; border: 0; border-radius: 999px; cursor: pointer;
+  font: 500 17px/1.25 var(--sans); color: var(--ink); background: #fff; box-shadow: inset 0 0 0 1.5px #D6E2DF;
+  transition: background-color .15s, box-shadow .15s, color .15s;
 }
-.chip.on { background: var(--primary-deep); box-shadow: none; color: #fff; }
-.chip.on::before { content: "✓ "; color: var(--accent); }
-@media (prefers-reduced-motion: no-preference) {
-  .chip-track { animation: slide 60s linear infinite; }
-  .chip-row.reverse .chip-track { animation-direction: reverse; animation-duration: 70s; }
-  .chip-row:hover .chip-track { animation-play-state: paused; }
-  @keyframes slide { to { transform: translateX(-50%); } }
-}
-@media (max-width: 860px) { .chip { font-size: 16px; padding: 10px 18px; } }
+.chip:hover { box-shadow: inset 0 0 0 1.5px var(--primary); }
+.chip[aria-pressed="true"] { background: var(--tint); color: var(--primary-deep); box-shadow: inset 0 0 0 2px var(--primary); }
+.chip[aria-pressed="true"]::before { content: "✓ "; font-weight: 700; }
+.chip-count { margin: 26px 0 0; color: var(--muted); }
+.chip-count b { color: var(--primary-deep); font-size: 19px; }
+@media (max-width: 560px) { .chip { font-size: 15px; padding: 10px 16px; } .chip-board { gap: 10px; } }
 
 /* ---------- match: the Venn diagram on deep teal */
 .home .match { background: var(--primary-deep); color: #fff; }
@@ -231,25 +214,25 @@ html[data-lang="bn"] .hero-k h1 { line-height: 1.18; }
   .venn svg { max-width: 400px; }
 }
 
-/* ---------- how it works: steps scroll past one sticky phone (wide screens);
-              on phones each step shows its own small phone */
-.home .how { overflow: clip; }
-.how-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 380px); gap: 64px; }
-.how-steps { list-style: none; margin: 0; padding: 0; counter-reset: how; }
-.how-step {
-  counter-increment: how; min-height: 62vh; padding: 32px 0;
-  display: flex; flex-direction: column; justify-content: center; border-top: 1px solid var(--line);
+/* ---------- how it works: four app screens in a row; a swipeable row on phones */
+.how-row {
+  list-style: none; margin: 0; padding: 0; counter-reset: how;
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(20px, 3vw, 40px);
 }
-.how-step:first-child { border-top: 0; }
-.how-step::before { content: counter(how); font: 64px/1 var(--display); color: var(--primary); margin-bottom: 12px; }
-html[data-lang="bn"] .how-step::before { content: counter(how, bengali); }
-.how-step h3, .how-step h3 :lang(bn) {
-  font-family: var(--display); font-weight: 400; font-size: clamp(28px, 3.2vw, 40px);
-  line-height: 1.15; margin: 0 0 12px; color: var(--ink);
+.how-item { counter-increment: how; }
+.how-item .phone { width: min(100%, 250px); margin: 0 auto 24px; }
+.how-cap h3, .how-cap h3 :lang(bn) {
+  display: flex; align-items: flex-start; gap: 10px; margin: 0 0 6px;
+  font: 600 19px/1.35 var(--sans); color: var(--ink);
 }
-.how-step p { margin: 0; font-size: 19px; color: var(--muted); max-width: 28em; }
-.js-how .how-step { opacity: .3; transition: opacity .35s ease; }
-.js-how .how-step.is-active { opacity: 1; }
+.how-cap h3 :lang(bn) { font-family: "Hind Siliguri", var(--sans); }
+.how-cap h3::before {
+  content: counter(how); flex: none; display: inline-grid; place-items: center; width: 30px; height: 30px;
+  margin-top: -2px; border-radius: 50%; background: var(--primary-deep); color: #fff; font: 600 15px/1 var(--sans);
+}
+html[data-lang="bn"] .how-cap h3::before { content: counter(how, bengali); font-family: "Hind Siliguri", var(--sans); }
+.how-cap p { margin: 0 0 0 40px; color: var(--muted); font-size: 16px; }
+.how-then { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 48px auto 0; font-size: 18px; }
 
 /* Phone frame around an app screenshot */
 .phone {
@@ -262,25 +245,15 @@ html[data-lang="bn"] .how-step::before { content: counter(how, bengali); }
   transform: translateX(-50%); border-radius: 50%; background: var(--ink);
 }
 .phone img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.phone-inline { display: none; }
-
-/* The sticky phone, with the logo's two circles behind it */
-.phone-sticky { position: sticky; top: 104px; z-index: 0; width: clamp(240px, 34vh, 330px); margin-left: auto; }
-.phone-sticky .screen img { position: absolute; inset: 0; opacity: 0; transition: opacity .45s ease; }
-.phone-sticky .screen img.is-on { opacity: 1; }
-.phone-sticky::before, .phone-sticky::after { content: ""; position: absolute; z-index: -1; border-radius: 50%; aspect-ratio: 1; }
-.phone-sticky::before { width: 150%; left: -70%; top: 22%; background: var(--tint); }
-.phone-sticky::after {
-  width: 120%; right: -40%; top: 6%; opacity: .7;
-  background: radial-gradient(circle, var(--accent) 1.8px, transparent 2.3px) 0 0 / 10px 10px;
-}
 @media (max-width: 860px) {
-  .how-grid { grid-template-columns: 1fr; gap: 0; }
-  .how-stage { display: none; }
-  .how-step { min-height: 0; padding: 36px 0; }
-  .js-how .how-step { opacity: 1; }
-  .how-step::before { font-size: 52px; }
-  .phone-inline { display: block; width: min(250px, 66vw); margin: 28px auto 0; }
+  .how-row {
+    grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: min(74%, 280px);
+    overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 var(--gutter);
+    margin: 0 calc(-1 * var(--gutter)); padding: 4px var(--gutter) 18px;
+  }
+  .how-item { scroll-snap-align: start; }
+  .how-item .phone { width: 100%; }
+  .how-then { justify-content: flex-start; margin-top: 32px; }
 }
 
 /* ---------- safety */
@@ -298,29 +271,34 @@ html[data-lang="bn"] .how-step::before { content: counter(how, bengali); }
 @media (max-width: 860px) { .home .safety { grid-template-columns: 1fr; gap: 24px; } }
 @media (max-width: 560px) { .safety ul { grid-template-columns: 1fr; } }
 
-/* ---------- download panel: headline, button, two phones rising from the bottom edge */
+/* ---------- download panel: soft marigold, a stitched border, two upright phones rising from the bottom */
 .home .cta { padding-top: 32px; padding-bottom: 32px; }
 .cta-panel {
   --pad: clamp(32px, 6vw, 72px);
-  position: relative; overflow: hidden; border-radius: 28px; color: #fff;
-  background: radial-gradient(120% 140% at 85% 100%, #17736C 0%, var(--primary-deep) 45%, var(--teal-night) 100%);
+  position: relative; overflow: hidden; border-radius: 28px; background: #FBE4A6; color: var(--ink);
   padding: var(--pad); display: grid; grid-template-columns: 1.15fr 1fr; align-items: center; gap: 24px;
 }
-.home .cta h2 { color: #fff; font-size: clamp(40px, 5.6vw, 72px); margin-bottom: 16px; }
+.cta-panel::before {               /* kantha-style running stitch just inside the edge */
+  content: ""; position: absolute; inset: 12px; border: 2.5px dashed rgba(17, 94, 89, .45); border-radius: 20px;
+  pointer-events: none;
+}
+.home .cta h2 { color: var(--primary-deep); font-size: clamp(40px, 5.4vw, 70px); margin-bottom: 16px; }
 .cta-text { position: relative; z-index: 1; }
-.cta-text p { color: var(--tint); font-size: 19px; margin: 0 0 28px; max-width: 24em; }
+.cta-text p { color: #5A5137; font-size: 19px; margin: 0 0 28px; max-width: 24em; }
+.btn-dark { background: var(--primary-deep); color: #fff; box-shadow: 0 10px 22px -12px rgba(15, 76, 71, .8); }
+.btn-dark:hover { background: var(--teal-night); color: #fff; }
 .cta-art { position: relative; align-self: stretch; min-height: 400px; margin: calc(-1 * var(--pad)) 0; }
-.rings-art { position: absolute; width: 112%; max-width: none; right: -18%; top: 4%; }
+.rings-art { position: absolute; width: 100%; right: -4%; top: 8%; }
 .cta-art .phone { position: absolute; padding: 7px; border-radius: 34px; }
 .cta-art .phone .screen { border-radius: 28px; }
-.cta-art .phone-back { width: 46%; right: 46%; bottom: -26%; transform: rotate(-8deg); }
-.cta-art .phone-front { width: 50%; right: 6%; bottom: -14%; transform: rotate(6deg); }
+.cta-art .phone-a { width: 42%; right: 8%; bottom: -14%; }
+.cta-art .phone-b { width: 38%; right: 48%; bottom: -30%; }
 @media (max-width: 860px) {
   .cta-panel { grid-template-columns: 1fr; }
   .cta-art { min-height: 300px; margin: 8px calc(-1 * var(--pad)) calc(-1 * var(--pad)); }
-  .rings-art { width: 90%; right: -4%; top: 0; }
-  .cta-art .phone-back { width: 40%; right: 47%; bottom: -30%; }
-  .cta-art .phone-front { width: 44%; right: 8%; bottom: -18%; }
+  .rings-art { width: 84%; right: 8%; top: 4%; }
+  .cta-art .phone-a { width: 40%; right: 10%; bottom: -20%; }
+  .cta-art .phone-b { width: 36%; right: 50%; bottom: -34%; }
 }
 
 /* ---------- questions (native <details>, works without JavaScript) */

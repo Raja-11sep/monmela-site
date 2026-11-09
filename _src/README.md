@@ -15,7 +15,7 @@ This rewrites `index.html`, `download.html` and the four legal pages in the site
 | File | What it holds |
 |---|---|
 | `_src/build.py` | Page layouts, all home/download text (English + Bengali), header/footer, settings |
-| `_src/art.py` | The illustrations (Howrah Bridge hero, dotted skyline, rings), drawn as SVG |
+| `_src/art.py` | The illustrations (arched Howrah Bridge window with kites, alpana border, stitched rings), drawn as SVG |
 | `_src/pages/*.html` | Legal page bodies (privacy, terms, delete account, child safety) |
 | `_src/tools/prep_screens.py` | Turns app screenshots into `img/app-*.webp` (cleans the status bar, blurs photos) |
 | `style.css`, `site.js`, `home.js`, `download.js` | Styles and the small scripts (edited directly) |
