@@ -21,6 +21,10 @@ EMAIL = "monmela.team@gmail.com"
 #   Then every download button goes to Google Play and /download redirects there (APK no longer offered).
 APK_FILE = "app/mon-mela.apk"
 PLAY_URL = ""
+# Closed test on Google Play (until launch): testers join the group, then become testers and install.
+# Empty both to hide the Google Play steps and offer only the APK.
+TEST_GROUP_URL = "https://groups.google.com/g/mon-mela-testers"
+TEST_JOIN_URL = "https://play.google.com/apps/testing/com.monmela.app"
 
 LOGO = """<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="#fff"/>
 <circle cx="19" cy="24" r="9" fill="none" stroke="#0F766E" stroke-width="3.2"/>
@@ -447,7 +451,22 @@ def download():
     ]
     steps_html = "".join(f"<li><p>{both(en, bn)}</p></li>" for en, bn in steps)
 
+    # Google Play test: two numbered steps (shown while TEST_JOIN_URL is set)
+    play_steps = ""
+    if TEST_JOIN_URL:
+        play_steps = f"""<ol class="play-steps">
+        <li><span>{both("Join the Mon Mela testers group", "মনমেলা টেস্টার গ্রুপে যোগ দিন")}</span>
+          <a class="btn btn-primary" href="{TEST_GROUP_URL}">{both("Join group", "গ্রুপে যোগ দিন")}</a></li>
+        <li><span>{both("Become a tester, then install from Google Play", "টেস্টার হন, তারপর Google Play থেকে ইনস্টল করুন")}</span>
+          <a class="btn btn-primary" href="{TEST_JOIN_URL}">{both("Become a tester", "টেস্টার হন")}</a></li>
+      </ol>"""
+
     help_items = [
+        ("Google Play says the app isn't available", "Google Play বলছে অ্যাপটি পাওয়া যাচ্ছে না",
+         "Join the group with the same Gmail that's signed in to your phone's Play Store, then open the second link again. "
+         "Right after joining it can take 15–30 minutes.",
+         "ফোনের Play Store-এ যে Gmail আছে, সেটা দিয়েই গ্রুপে যোগ দিন, তারপর দ্বিতীয় লিংকটা আবার খুলুন। "
+         "যোগ দেওয়ার পর ১৫–৩০ মিনিট লাগতে পারে।"),
         ("Chrome says the file might be harmful", "Chrome বলছে ফাইলটি ক্ষতিকর হতে পারে",
          'Chrome says this about every app downloaded outside the Play Store. Tap "Download anyway".',
          'Play Store-এর বাইরে থেকে নামানো সব অ্যাপের ক্ষেত্রেই Chrome এটা বলে। "Download anyway" চাপুন।'),
@@ -486,8 +505,8 @@ def download():
     <div>
       <h1>{both("Mon Mela for your Android phone", "আপনার অ্যান্ড্রয়েড ফোনে মনমেলা")}</h1>
       <p class="lede">{both(
-          "Free. Needs Android 7 or newer. Signed by Google Play: the same app our testers get there.",
-          "বিনামূল্যে। Android 7 বা তার নতুন ভার্সন লাগবে। Google Play-র সই করা: টেস্টাররা সেখানে যে অ্যাপ পান, সেটাই।")}</p>
+          "Free. Mon Mela is in testing on Google Play: join in two steps, using the same Gmail as your phone's Play Store.",
+          "বিনামূল্যে। মনমেলা এখন Google Play-তে টেস্টিংয়ে: দুই ধাপে যোগ দিন, ফোনের Play Store-এ যে Gmail আছে সেটাই দিয়ে।")}</p>
 
       <!-- Shown by download.js inside Instagram/Facebook-style in-app browsers -->
       <div class="dl-note" id="inapp" hidden>
@@ -506,8 +525,10 @@ def download():
                  "মনমেলা এখন শুধু অ্যান্ড্রয়েডে। iPhone ভার্সন পরে আসবে।")}</p>
       </div>
 
-      <div id="get">
-        <a class="btn btn-primary btn-big" id="apk" href="{APK_FILE}" download="mon-mela.apk">{both("Download APK", "ডাউনলোড APK")}</a>
+      {play_steps}
+      <div id="get"{' class="apk-alt"' if TEST_JOIN_URL else ''}>
+        {('<p class="dl-meta">' + both("Can't use Google Play?", "Google Play চালাতে পারছেন না?") + '</p>') if TEST_JOIN_URL else ''}
+        <a class="btn {'btn-ghost' if TEST_JOIN_URL else 'btn-primary btn-big'}" id="apk" href="{APK_FILE}" download="mon-mela.apk">{both("Download APK", "ডাউনলোড APK")}</a>
         <p class="dl-meta">{both("Android app", "অ্যান্ড্রয়েড অ্যাপ")}<span id="apk-size"></span></p>
       </div>
       <!-- Shown by download.js if the APK isn't on the site yet, instead of a broken button -->
@@ -530,7 +551,7 @@ def download():
 
 <main class="home-main">
   <section class="steps" aria-labelledby="install">
-    <h2 id="install">{both("Installing it", "কীভাবে ইনস্টল করবেন")}</h2>
+    <h2 id="install">{both("Installing the APK", "APK কীভাবে ইনস্টল করবেন")}</h2>
     <ol>{steps_html}</ol>
   </section>
 

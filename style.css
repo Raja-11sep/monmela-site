@@ -364,3 +364,20 @@ html[data-lang="bn"] .steps li::before { content: counter(step, bengali); }
   .intro-inner { grid-template-columns: 1fr; gap: 40px; }
   .dl-visual { width: min(240px, 70vw); }
 }
+
+/* Download page: Google Play test, two numbered steps; the APK becomes a small fallback */
+.play-steps { list-style: none; margin: 0 0 26px; padding: 0; counter-reset: ps; display: grid; gap: 12px; max-width: 34em; }
+.play-steps li {
+  counter-increment: ps; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 14px 16px 14px 56px; position: relative; border-radius: 16px; background: rgba(255, 255, 255, .09);
+}
+.play-steps li::before {
+  content: counter(ps); position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--accent); color: var(--ink); font: 700 15px/1 var(--sans);
+}
+html[data-lang="bn"] .play-steps li::before { content: counter(ps, bengali); }
+.play-steps .btn { flex: none; padding: 10px 18px; font-size: 15px; }
+.apk-alt { margin-top: 4px; }
+.apk-alt .dl-meta:first-child { margin: 0 0 8px; }
+@media (max-width: 480px) { .play-steps li { flex-direction: column; align-items: flex-start; } }
