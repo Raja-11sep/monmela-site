@@ -227,8 +227,8 @@ SCREENS = {
                 "কী খুঁজছেন বেছে নেওয়া: আড্ডা, পড়ার সঙ্গী, জিম, খাওয়াদাওয়া"),
     "quiz": ("img/app-quiz.webp", "Friendship quiz: all 12 questions answered",
              "বন্ধুত্বের কুইজ: ১২টা প্রশ্নেরই উত্তর দেওয়া"),
-    "picks": ("img/app-picks.webp", "Today's picks: a suggestion with 35% match and why you match",
-              "আজকের মানুষ: ৩৫% মিল আর কেন মিল"),
+    "picks": ("img/app-picks.webp", "Today's picks: a suggestion with 82% match and why you match",
+              "আজকের মানুষ: ৮২% মিল আর কেন মিল"),
 }
 
 
@@ -238,7 +238,7 @@ def phone(key, cls="", lazy=True, alt=True):
     loading = ' loading="lazy"' if lazy else ""
     alt_text = alt_en if alt else ""
     return (f'<div class="phone {cls}"><div class="screen">'
-            f'<img src="{src}" alt="{alt_text}" width="720" height="1520"{loading}></div></div>')
+            f'<img src="{asset(src)}" alt="{alt_text}" width="720" height="1520"{loading}></div></div>')  # ?v= → new screenshot shows at once
 
 
 def home():
