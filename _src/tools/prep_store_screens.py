@@ -105,7 +105,9 @@ def web(im):
     return out.crop((0, 0, im.width, NAV)).resize((720, 1520), Image.LANCZOS)
 
 
-for key, file in [("looking", "app-looking-for"), ("picks", "app-picks")]:
+for key, file in [("looking", "app-looking-for"), ("picks", "app-picks"), ("requests", "app-requests"),
+                  ("chats", "app-chats"), ("verify", "app-verify"), ("filters", "app-filters"),
+                  ("safety", "app-safety")]:
     web(screens[key]).save(WEB_OUT / f"{file}.webp", "WEBP", quality=82, method=6)
 
 

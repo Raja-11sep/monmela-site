@@ -256,6 +256,25 @@ html[data-lang="bn"] .how-cap h3::before { content: counter(how, bengali); font-
   .how-then { justify-content: flex-start; margin-top: 32px; }
 }
 
+/* ---------- inside the app: five more screens; a swipeable row below 1100 px */
+.tour-row {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(18px, 2.4vw, 32px);
+}
+.tour-item .phone { width: min(100%, 220px); margin: 0 auto 20px; }
+.tour-item h3, .tour-item h3 :lang(bn) { margin: 0 0 4px; font: 600 18px/1.35 var(--sans); color: var(--ink); }
+.tour-item h3 :lang(bn) { font-family: "Hind Siliguri", var(--sans); }
+.tour-item p { margin: 0; color: var(--muted); font-size: 15px; }
+@media (max-width: 1100px) {
+  .tour-row {
+    grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: min(64%, 240px);
+    overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 var(--gutter);
+    margin: 0 calc(-1 * var(--gutter)); padding: 4px var(--gutter) 18px;
+  }
+  .tour-item { scroll-snap-align: start; }
+  .tour-item .phone { width: 100%; }
+}
+
 /* ---------- safety */
 .home .safety { background: var(--tint); display: grid; grid-template-columns: 1fr 2fr; gap: 48px; }
 .safety-head p { margin: -20px 0 0; color: var(--muted); font-size: 18px; }

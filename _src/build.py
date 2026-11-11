@@ -11,8 +11,8 @@ from art import alpana_tile, hero_art, rings_stitched
 ROOT = pathlib.Path(__file__).resolve().parent.parent      # the site folder (built files go here)
 PAGES = pathlib.Path(__file__).resolve().parent / "pages"  # legal page bodies
 SITE = "https://monmela.in"
-UPDATED_EN = "7 November 2026"
-UPDATED_BN = "৭ নভেম্বর ২০২৬"
+UPDATED_EN = "11 November 2026"
+UPDATED_BN = "১১ নভেম্বর ২০২৬"
 EMAIL = "monmela.team@gmail.com"
 
 # Android app download (monmela.in/download).
@@ -229,6 +229,16 @@ SCREENS = {
              "বন্ধুত্বের কুইজ: ১২টা প্রশ্নেরই উত্তর দেওয়া"),
     "picks": ("img/app-picks.webp", "Today's picks: a suggestion with 82% match and why you match",
               "আজকের মানুষ: ৮২% মিল আর কেন মিল"),
+    # "Inside the app" row (names, photos and messages blurred by tools/prep_store_screens.py)
+    "requests": ("img/app-requests.webp", "A friend request with a short hello, and Accept or Decline",
+                 "ছোট শুভেচ্ছা সহ বন্ধুত্বের অনুরোধ, মানুন বা না বলুন"),
+    "chats": ("img/app-chats.webp", "The Chats tab with three friends", "তিনজন বন্ধুর সঙ্গে চ্যাটের তালিকা"),
+    "verify": ("img/app-verify.webp", "Photo verification: copy a pose in a quick selfie",
+               "ছবি যাচাই: একটা ভঙ্গি নকল করে সেলফি"),
+    "filters": ("img/app-filters.webp", "Who to suggest: age range and same-gender-only switch",
+                "কাকে সাজেস্ট করা হবে: বয়স আর শুধু নিজের লিঙ্গ"),
+    "safety": ("img/app-safety.webp", "Safety and account settings: verification, safety tips, blocked people, pause",
+               "নিরাপত্তা আর অ্যাকাউন্ট: যাচাই, টিপস, ব্লক, পজ"),
 }
 
 
@@ -260,6 +270,28 @@ def home():
     steps_html = "".join(
         f'<li class="how-item">{phone(k)}<div class="how-cap"><h3>{both(t_en, t_bn)}</h3><p>{both(d_en, d_bn)}</p></div></li>'
         for k, t_en, t_bn, d_en, d_bn in steps)
+
+    # Inside the app: five more screens, no numbers (they're not steps).
+    tour = [
+        ("requests", "Requests with a hello", "শুভেচ্ছা সহ অনুরোধ",
+         "Accept or decline. Nobody can message you until you say yes.",
+         "মানবেন কি না, আপনার ইচ্ছে। আপনি রাজি না হলে কেউ মেসেজ করতে পারে না।"),
+        ("chats", "Chat with your friends", "বন্ধুদের সঙ্গে চ্যাট",
+         "Talk only with people who said yes to you, and you to them.",
+         "শুধু তাঁদের সঙ্গে কথা, যাঁরা আপনাকে আর আপনি যাঁদের হ্যাঁ বলেছেন।"),
+        ("verify", "Get photo verified", "ছবি যাচাই করুন",
+         "One quick selfie earns the ✓ badge. Only our team sees it.",
+         "একটা সেলফিতেই ✓ ব্যাজ। সেলফি শুধু আমাদের টিম দেখে।"),
+        ("filters", "You choose who you see", "কাকে দেখবেন, আপনিই ঠিক করুন",
+         "Set an age range, or meet only people of your own gender.",
+         "বয়সের সীমা ঠিক করুন, বা শুধু নিজের লিঙ্গের মানুষের সঙ্গে আলাপ।"),
+        ("safety", "Safety in your hands", "নিরাপত্তা আপনার হাতে",
+         "Block anyone, pause your profile, read the safety tips.",
+         "যে কাউকে ব্লক, প্রোফাইল পজ, নিরাপত্তার টিপস।"),
+    ]
+    tour_html = "".join(
+        f'<li class="tour-item">{phone(k)}<h3>{both(t_en, t_bn)}</h3><p>{both(d_en, d_bn)}</p></li>'
+        for k, t_en, t_bn, d_en, d_bn in tour)
 
     safety = [
         ("chat", "Nobody can message you unless you accept their request.",
@@ -361,6 +393,11 @@ def home():
     <ol class="how-row">{steps_html}</ol>
     <p class="how-then">{icon("chat")}<span>{both("<b>Then connect.</b> The chat opens only when both of you say yes.",
                                                   "<b>তারপর কানেক্ট।</b> দুজনেই রাজি হলে তবেই চ্যাট খোলে।")}</span></p>
+  </section>
+
+  <section class="tour" aria-labelledby="tour">
+    <h2 id="tour">{both("Inside the app", "অ্যাপের ভেতরে")}</h2>
+    <ul class="tour-row">{tour_html}</ul>
   </section>
 
   <section class="safety" aria-labelledby="safe">
