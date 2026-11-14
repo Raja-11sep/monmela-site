@@ -31,7 +31,7 @@ TEST_JOIN_URL = "https://play.google.com/apps/testing/com.monmela.app"
 
 # Our social pages: linked in the footer and listed in the structured data ("sameAs"),
 # which tells Google these pages belong to the same Mon Mela.
-INSTAGRAM_URL = "https://www.instagram.com/monmelaapp/"
+INSTAGRAM_URL = "https://www.instagram.com/monmela.in/"
 FACEBOOK_URL = "https://www.facebook.com/profile.php?id=61596312788249"
 
 LOGO = """<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="#fff"/>
