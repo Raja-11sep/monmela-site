@@ -108,14 +108,18 @@ h1 :lang(bn), h2 :lang(bn) { font-family: var(--display); }
 .site-foot ul { list-style: none; margin: 0; padding: 0; }
 .site-foot li { margin: 0 0 6px; }
 .foot-brand p { margin-top: 12px; max-width: 22em; }
-/* Instagram / Facebook: round buttons under the tagline. */
-.site-foot .social { display: flex; gap: 10px; margin-top: 14px; }
-.social a {
-  display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
-  background: #fff; color: var(--primary-deep); border: 1px solid #E2D9C6;
+/* Instagram / Facebook: round buttons in each brand's own colours, under the tagline. */
+.site-foot .follow { margin: 18px 0 0; font-weight: 600; color: var(--ink); }
+.site-foot .social { display: flex; gap: 12px; margin-top: 10px; }
+.site-foot .social a {
+  display: inline-grid; place-items: center; width: 48px; height: 48px; border-radius: 50%;
+  color: #fff; transition: transform .15s ease, box-shadow .15s ease;
 }
-.social a:hover, .social a:focus-visible { background: var(--primary-deep); color: #fff; }
-.social svg { width: 20px; height: 20px; }
+.site-foot .social a.ig { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+.site-foot .social a.fb { background: #1877F2; }
+.site-foot .social a:hover, .site-foot .social a:focus-visible { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.18); }
+.social svg { width: 26px; height: 26px; }
+@media (prefers-reduced-motion: reduce) { .social a { transition: none; } .social a:hover { transform: none; } }
 .site-foot .foot-base {
   max-width: var(--page); margin: 0 auto; padding: 20px 20px 32px;
   border-top: 1px solid #E2D9C6; font-size: 14px;

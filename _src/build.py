@@ -135,11 +135,11 @@ FACEBOOK_ICON = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 8h2.5
 
 def social_links():
     """Round Instagram / Facebook buttons. rel="me" says the pages are ours."""
-    items = [(INSTAGRAM_URL, "Mon Mela on Instagram", INSTAGRAM_ICON),
-             (FACEBOOK_URL, "Mon Mela on Facebook", FACEBOOK_ICON)]
+    items = [(INSTAGRAM_URL, "ig", "Mon Mela on Instagram", INSTAGRAM_ICON),
+             (FACEBOOK_URL, "fb", "Mon Mela on Facebook", FACEBOOK_ICON)]
     return '<p class="social">' + "".join(
-        f'<a href="{url}" target="_blank" rel="noopener me" aria-label="{label}" title="{label}">{svg}</a>'
-        for url, label, svg in items) + "</p>"
+        f'<a class="{cls}" href="{url}" target="_blank" rel="noopener me" aria-label="{label}" title="{label}">{svg}</a>'
+        for url, cls, label, svg in items) + "</p>"
 
 
 def footer():
@@ -150,6 +150,7 @@ def footer():
     <div class="foot-brand">
       <a class="brand" href="./">{LOGO}{both("Mon Mela", "মনমেলা")}</a>
       <p>{both("Friends who think like you, across West Bengal.", "মনের মতো বন্ধু, সারা পশ্চিমবঙ্গে।")}</p>
+      <p class="follow">{both("Follow us", "আমাদের ফলো করুন")}</p>
       {social_links()}
     </div>
     <div>
