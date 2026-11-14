@@ -3,8 +3,11 @@
 #   - Home and download pages: written here, bilingual piece by piece.
 #   - Legal pages: _src/pages/<name>.en.html + <name>.bn.html inside the standard card layout.
 #   - _src/ is not published: GitHub Pages (Jekyll) skips folders that start with "_".
+import datetime
 import hashlib
+import json
 import pathlib
+import re
 
 from art import alpana_tile, hero_art, rings_stitched
 
@@ -25,6 +28,11 @@ PLAY_URL = ""
 # Empty both to hide the Google Play steps and offer only the APK.
 TEST_GROUP_URL = "https://groups.google.com/g/mon-mela-testers"
 TEST_JOIN_URL = "https://play.google.com/apps/testing/com.monmela.app"
+
+# Our social pages: linked in the footer and listed in the structured data ("sameAs"),
+# which tells Google these pages belong to the same Mon Mela.
+INSTAGRAM_URL = "https://www.instagram.com/monmelaapp/"
+FACEBOOK_URL = "https://www.facebook.com/profile.php?id=61596312788249"
 
 LOGO = """<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="#fff"/>
 <circle cx="19" cy="24" r="9" fill="none" stroke="#0F766E" stroke-width="3.2"/>
@@ -74,6 +82,10 @@ def head(title_en, title_bn, description, path="", extra=""):
 <meta name="theme-color" content="#115E59">
 <link rel="canonical" href="{SITE}/{path}">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="Mon Mela">
+<meta property="og:locale" content="en_IN">
+<meta property="og:locale:alternate" content="bn_IN">
+<meta name="twitter:card" content="summary_large_image">
 <meta property="og:title" content="{title_en}">
 <meta property="og:description" content="{description}">
 <meta property="og:url" content="{SITE}/{path}">
@@ -113,6 +125,23 @@ def header(on_home=False):
 </div></header>"""
 
 
+# Simple outline icons for the social links (drawn here, so no third-party scripts load).
+INSTAGRAM_ICON = ('<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" '
+                  'fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" '
+                  'stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.3" fill="currentColor"/></svg>')
+FACEBOOK_ICON = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 8h2.5V4.5H14c-2.5 0-4 1.6-4 4.2V11H7.5v3.5H10V21h3.5'
+                 'v-6.5H16l.5-3.5h-3V9c0-.6.4-1 1-1z" fill="currentColor"/></svg>')
+
+
+def social_links():
+    """Round Instagram / Facebook buttons. rel="me" says the pages are ours."""
+    items = [(INSTAGRAM_URL, "Mon Mela on Instagram", INSTAGRAM_ICON),
+             (FACEBOOK_URL, "Mon Mela on Facebook", FACEBOOK_ICON)]
+    return '<p class="social">' + "".join(
+        f'<a href="{url}" target="_blank" rel="noopener me" aria-label="{label}" title="{label}">{svg}</a>'
+        for url, label, svg in items) + "</p>"
+
+
 def footer():
     links = "".join(f'<li><a href="{href}">{both(en, bn)}</a></li>' for href, en, bn in NAV)
     return f"""<footer class="site-foot">
@@ -121,6 +150,7 @@ def footer():
     <div class="foot-brand">
       <a class="brand" href="./">{LOGO}{both("Mon Mela", "মনমেলা")}</a>
       <p>{both("Friends who think like you, across West Bengal.", "মনের মতো বন্ধু, সারা পশ্চিমবঙ্গে।")}</p>
+      {social_links()}
     </div>
     <div>
       <h2>{both("Write to us", "আমাদের লিখুন")}</h2>
@@ -352,9 +382,9 @@ def home():
         for en, bn, on in interests)
     picked = sum(on for *_, on in interests)
 
-    html = f"""{head("Mon Mela · Friends who think like you", "মনমেলা · মনের মতো বন্ধু",
-                    "A free, Bengali-first friendship app for adults in West Bengal. Matched by your answers, safe by design.",
-                    "", script("home.js"))}
+    # Title and description: the words people actually search for (Bengali friendship app,
+    # Kolkata, West Bengal, adda), in under ~60 and ~155 characters so Google shows them whole.
+    html = f"""{head(HOME_TITLE_EN, HOME_TITLE_BN, HOME_DESCRIPTION, "", script("home.js") + home_schema(faq))}
 <body class="home">
 {header(on_home=True)}
 <section class="hero-k">
@@ -441,6 +471,86 @@ def home():
 
 
 # ------------------------------------------------------------ app download
+
+HOME_TITLE_EN = "Mon Mela – Bengali Friendship App for Kolkata &amp; West Bengal"
+HOME_TITLE_BN = "মনমেলা – কলকাতা ও পশ্চিমবঙ্গের বন্ধুত্বের অ্যাপ"
+HOME_DESCRIPTION = ("Mon Mela (মনমেলা) is a free Bengali friendship app for Kolkata and West Bengal. "
+                    "Meet friends who think like you and join adda meetups. Not a dating app.")
+
+
+def strip_tags(html):
+    """Plain text of an HTML snippet (for structured data, which must not contain markup)."""
+    return re.sub(r"<[^>]+>", "", html)
+
+
+def home_schema(faq):
+    """Structured data (schema.org JSON-LD) for the home page, so Google understands what
+    Mon Mela is: the organisation, the website, the Android app (free) and the FAQ.
+    Only facts that are true on the page; no ratings (we don't have public ones yet)."""
+    data = {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Organization",
+                "@id": f"{SITE}/#org",
+                "name": "Mon Mela",
+                "alternateName": "মনমেলা",
+                "url": f"{SITE}/",
+                "logo": f"{SITE}/icon-512.png",
+                "email": EMAIL,
+                "areaServed": "West Bengal, India",
+                "sameAs": [INSTAGRAM_URL, FACEBOOK_URL],
+            },
+            {
+                "@type": "WebSite",
+                "@id": f"{SITE}/#website",
+                "name": "Mon Mela",
+                "alternateName": "মনমেলা",
+                "url": f"{SITE}/",
+                "inLanguage": ["en", "bn"],
+                "publisher": {"@id": f"{SITE}/#org"},
+            },
+            {
+                "@type": "MobileApplication",
+                "name": "Mon Mela",
+                "alternateName": "মনমেলা",
+                "operatingSystem": "Android",
+                "applicationCategory": "SocialNetworkingApplication",
+                "description": HOME_DESCRIPTION,
+                "url": f"{SITE}/",
+                "downloadUrl": PLAY_URL or f"{SITE}/download",
+                "inLanguage": ["bn", "en"],
+                "offers": {"@type": "Offer", "price": "0", "priceCurrency": "INR"},
+                "publisher": {"@id": f"{SITE}/#org"},
+            },
+            {
+                "@type": "FAQPage",
+                "mainEntity": [
+                    {"@type": "Question", "name": q_en,
+                     "acceptedAnswer": {"@type": "Answer", "text": strip_tags(a_en)}}
+                    for q_en, _q_bn, a_en, _a_bn in faq
+                ],
+            },
+        ],
+    }
+    # "</" can't appear inside a <script> block; JSON allows it escaped as "<\/".
+    return ('<script type="application/ld+json">'
+            + json.dumps(data, ensure_ascii=False).replace("</", "<\\/") + "</script>")
+
+
+def sitemap():
+    """sitemap.xml: every public page with today's date, so Google finds and re-reads them.
+    The URLs match each page's canonical link."""
+    today = datetime.date.today().isoformat()
+    paths = ["", "download", "privacy.html", "terms.html", "delete-account.html", "child-safety.html"]
+    urls = "".join(f"  <url><loc>{SITE}/{p}</loc><lastmod>{today}</lastmod></url>\n" for p in paths)
+    (ROOT / "sitemap.xml").write_text(
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + "</urlset>\n",
+        encoding="utf-8")
+    # robots.txt: everything may be crawled; points search engines to the sitemap.
+    (ROOT / "robots.txt").write_text(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n", encoding="utf-8")
+
 
 def get_app_button(cls="btn btn-primary", short=False):
     """The site's one 'get the app' button: download page now, Google Play after launch."""
@@ -622,4 +732,5 @@ page("delete-account.html", "Delete your account", "অ্যাকাউন্�
 page("child-safety.html", "Child Safety Standards", "শিশু সুরক্ষা নীতি",
      f"Last updated: {UPDATED_EN}", f"সর্বশেষ আপডেট: {UPDATED_BN}",
      load("child.en.html"), load("child.bn.html"))
+sitemap()
 print("built")

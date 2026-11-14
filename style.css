@@ -108,6 +108,14 @@ h1 :lang(bn), h2 :lang(bn) { font-family: var(--display); }
 .site-foot ul { list-style: none; margin: 0; padding: 0; }
 .site-foot li { margin: 0 0 6px; }
 .foot-brand p { margin-top: 12px; max-width: 22em; }
+/* Instagram / Facebook: round buttons under the tagline. */
+.site-foot .social { display: flex; gap: 10px; margin-top: 14px; }
+.social a {
+  display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+  background: #fff; color: var(--primary-deep); border: 1px solid #E2D9C6;
+}
+.social a:hover, .social a:focus-visible { background: var(--primary-deep); color: #fff; }
+.social svg { width: 20px; height: 20px; }
 .site-foot .foot-base {
   max-width: var(--page); margin: 0 auto; padding: 20px 20px 32px;
   border-top: 1px solid #E2D9C6; font-size: 14px;
