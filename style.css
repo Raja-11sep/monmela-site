@@ -161,7 +161,7 @@ body.home { font-size: 17px; }
 .home section h2 { font-size: clamp(32px, 4.4vw, 52px); line-height: 1.12; margin: 0 0 36px; color: var(--primary-deep); }
 @media (max-width: 860px) { .home section { padding-top: 60px; padding-bottom: 60px; } }
 
-/* ---------- hero: text, and an arched window onto the Hooghly (kantha-stitched frame) */
+/* ---------- hero: text, and an arched window onto a Ganga ghat at sunset (kantha-stitched frame) */
 .home .hero-k {
   display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); align-items: center; gap: 48px;
   padding: clamp(40px, 6vw, 80px) var(--gutter) clamp(56px, 7vw, 96px);
@@ -171,15 +171,16 @@ html[data-lang="bn"] .hero-k h1 { line-height: 1.18; }
 .hero-k .lede { color: var(--muted); font-size: clamp(17px, 1.5vw, 20px); max-width: 27em; margin: 0 0 30px; }
 .hero-note { margin: 20px 0 0; font-size: 15px; color: var(--muted); }
 .hero-k-art { justify-self: end; width: min(100%, 500px); }
-.hero-art { display: block; width: 100%; height: auto; filter: drop-shadow(0 30px 34px rgba(15, 76, 71, .2)); }
-/* The load moment: the logo's two rings slide together, then their overlap lights up. */
+/* The picture: a painted image, with live SVG (kites, stitched frame) laid exactly on top */
+.hero-art { position: relative; display: block; width: 100%; }
+.hero-art img { display: block; width: 100%; height: auto; filter: drop-shadow(0 30px 34px rgba(15, 76, 71, .2)); }
+.hero-art svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* Kites sway gently on their strings, each pivoting where its string leaves the frame */
 @media (prefers-reduced-motion: no-preference) {
-  .hero-art .sun { animation: sun-in 1.4s cubic-bezier(.2, .7, .2, 1) both; }
-  .hero-art .sun-left { --from: -60px; }
-  .hero-art .sun-right { --from: 60px; }
-  .hero-art .sun-lens { animation: fade-in .7s ease-out 1.25s both; }
-  @keyframes sun-in { from { transform: translateX(var(--from)); opacity: .3; } to { transform: none; opacity: 1; } }
-  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+  .hero-art .kite { transform-box: view-box; animation: kite-sway 7s ease-in-out infinite alternate; }
+  .hero-art .kite-a { transform-origin: 610px 470px; }
+  .hero-art .kite-b { transform-origin: -10px 480px; animation-duration: 9s; animation-direction: alternate-reverse; }
+  @keyframes kite-sway { from { transform: rotate(-1.3deg); } to { transform: rotate(1.5deg); } }
 }
 @media (max-width: 860px) {
   .home .hero-k { grid-template-columns: 1fr; gap: 36px; padding-top: 40px; }

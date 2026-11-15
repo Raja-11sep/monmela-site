@@ -400,7 +400,7 @@ def home():
     </div>
     <p class="hero-note">{both("For friendship, not dating. Adults 18+ only.", "বন্ধুত্বের জন্য, ডেটিংয়ের জন্য নয়। শুধু ১৮+।")}</p>
   </div>
-  <div class="hero-k-art">{hero_art()}</div>
+  <div class="hero-k-art">{hero_art(asset("img/hero-ghat.webp"))}</div>
 </section>
 
 <section class="interests" aria-labelledby="int-h">
