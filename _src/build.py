@@ -602,15 +602,54 @@ def download():
     ]
     steps_html = "".join(f"<li><p>{both(en, bn)}</p></li>" for en, bn in steps)
 
-    # Google Play test: two numbered steps (shown while TEST_JOIN_URL is set)
-    play_steps = ""
+    # Google Play test (while TEST_JOIN_URL is set): two steps, ONE big button at a time.
+    # Without JavaScript both steps show their own button; download.js turns this into a guided
+    # flow: the big button does step 1, then becomes step 2, and remembers where you were.
+    play_flow = ""
     if TEST_JOIN_URL:
-        play_steps = f"""<ol class="play-steps">
-        <li><span>{both("Join the Mon Mela testers group", "মনমেলা টেস্টার গ্রুপে যোগ দিন")}</span>
-          <a class="btn btn-primary" href="{TEST_GROUP_URL}">{both("Join group", "গ্রুপে যোগ দিন")}</a></li>
-        <li><span>{both("Become a tester, then install from Google Play", "টেস্টার হন, তারপর Google Play থেকে ইনস্টল করুন")}</span>
-          <a class="btn btn-primary" href="{TEST_JOIN_URL}">{both("Become a tester", "টেস্টার হন")}</a></li>
-      </ol>"""
+        play_flow = f"""<div class="flow" id="flow">
+        <ol class="play-steps">
+          <li id="step1"><span>{both("Join the Mon Mela testers group", "মনমেলা টেস্টার গ্রুপে যোগ দিন")}</span>
+            <a class="btn btn-primary step-btn" href="{TEST_GROUP_URL}" target="_blank" rel="noopener">{both("Join group", "গ্রুপে যোগ দিন")}</a></li>
+          <li id="step2"><span>{both("Become a tester, then install from Google Play", "টেস্টার হন, তারপর Google Play থেকে ইনস্টল করুন")}</span>
+            <a class="btn btn-primary step-btn" href="{TEST_JOIN_URL}" target="_blank" rel="noopener">{both("Become a tester", "টেস্টার হন")}</a></li>
+        </ol>
+        <!-- download.js shows this single button instead of the two above -->
+        <a class="btn btn-primary btn-big" id="flow-btn" href="{TEST_GROUP_URL}" target="_blank" rel="noopener" hidden
+           data-group="{TEST_GROUP_URL}" data-join="{TEST_JOIN_URL}">
+          <span class="l" lang="en" data-en1="Step 1: Join the testers group" data-en2="Step 2: Become a tester"
+                data-en3="Open the tester page again">Step 1: Join the testers group</span><span class="l" lang="bn"
+                data-bn1="ধাপ ১: টেস্টার গ্রুপে যোগ দিন" data-bn2="ধাপ ২: টেস্টার হন"
+                data-bn3="টেস্টার পেজ আবার খুলুন">ধাপ ১: টেস্টার গ্রুপে যোগ দিন</span></a>
+        <p class="dl-meta" id="flow-hint">{both(
+            "Use the same Gmail as your phone's Play Store. It takes about a minute.",
+            "ফোনের Play Store-এ যে Gmail আছে সেটাই ব্যবহার করুন। মিনিটখানেক লাগে।")}</p>
+        <p class="dl-meta" id="flow-done" hidden>{both(
+            'On the tester page, tap "Download it on Google Play" and install. Not working yet? Wait 15 minutes after joining the group, then try again.',
+            'টেস্টার পেজে "Download it on Google Play" চেপে ইনস্টল করুন। কাজ না করলে গ্রুপে যোগ দেওয়ার ১৫ মিনিট পরে আবার চেষ্টা করুন।')}
+          <button type="button" class="link-btn" id="flow-restart">{both("Start again", "আবার শুরু করুন")}</button></p>
+      </div>"""
+
+    # The APK: during the Play test it's folded away under "Can't use Google Play?" with its own
+    # install steps; without a Play test it's the main, big button and the steps get a section.
+    apk_button_cls = "btn-ghost" if TEST_JOIN_URL else "btn-primary btn-big"
+    apk_button = (f'<a class="btn {apk_button_cls}" id="apk" href="{APK_FILE}" download="mon-mela.apk">'
+                  f'{both("Download APK", "ডাউনলোড APK")}</a>'
+                  f'<p class="dl-meta">{both("Android app", "অ্যান্ড্রয়েড অ্যাপ")}<span id="apk-size"></span></p>')
+    if TEST_JOIN_URL:
+        apk_block = f"""<details class="apk-more" id="get">
+        <summary>{both("Can't use Google Play? Download the APK instead", "Google Play চালাতে পারছেন না? APK ডাউনলোড করুন")}</summary>
+        {apk_button}
+        <ol class="apk-steps">{steps_html}</ol>
+      </details>"""
+        steps_section = ""
+    else:
+        apk_block = f'<div id="get">{apk_button}</div>'
+        steps_section = f"""<section class="steps" aria-labelledby="install">
+    <h2 id="install">{both("Installing the APK", "APK কীভাবে ইনস্টল করবেন")}</h2>
+    <ol>{steps_html}</ol>
+  </section>
+"""
 
     help_items = [
         ("Google Play says the app isn't available", "Google Play বলছে অ্যাপটি পাওয়া যাচ্ছে না",
@@ -656,8 +695,8 @@ def download():
     <div>
       <h1>{both("Mon Mela for your Android phone", "আপনার অ্যান্ড্রয়েড ফোনে মনমেলা")}</h1>
       <p class="lede">{both(
-          "Free. Mon Mela is in testing on Google Play: join in two steps, using the same Gmail as your phone's Play Store.",
-          "বিনামূল্যে। মনমেলা এখন Google Play-তে টেস্টিংয়ে: দুই ধাপে যোগ দিন, ফোনের Play Store-এ যে Gmail আছে সেটাই দিয়ে।")}</p>
+          "Free. Mon Mela is in testing on Google Play: tap the button, then tap it once more.",
+          "বিনামূল্যে। মনমেলা এখন Google Play-তে টেস্টিংয়ে: বোতামটা চাপুন, তারপর আরেকবার।")}</p>
 
       <!-- Shown by download.js inside Instagram/Facebook-style in-app browsers -->
       <div class="dl-note" id="inapp" hidden>
@@ -676,12 +715,8 @@ def download():
                  "মনমেলা এখন শুধু অ্যান্ড্রয়েডে। iPhone ভার্সন পরে আসবে।")}</p>
       </div>
 
-      {play_steps}
-      <div id="get"{' class="apk-alt"' if TEST_JOIN_URL else ''}>
-        {('<p class="dl-meta">' + both("Can't use Google Play?", "Google Play চালাতে পারছেন না?") + '</p>') if TEST_JOIN_URL else ''}
-        <a class="btn {'btn-ghost' if TEST_JOIN_URL else 'btn-primary btn-big'}" id="apk" href="{APK_FILE}" download="mon-mela.apk">{both("Download APK", "ডাউনলোড APK")}</a>
-        <p class="dl-meta">{both("Android app", "অ্যান্ড্রয়েড অ্যাপ")}<span id="apk-size"></span></p>
-      </div>
+      {play_flow}
+      {apk_block}
       <!-- Shown by download.js if the APK isn't on the site yet, instead of a broken button -->
       <p class="dl-note" id="soon" hidden>{both("The download will be ready very soon. Please check back in a day.",
                                                "ডাউনলোড খুব শিগগিরই তৈরি হবে। একদিন পরে আবার দেখুন।")}</p>
@@ -701,11 +736,7 @@ def download():
 </section>
 
 <main class="home-main">
-  <section class="steps" aria-labelledby="install">
-    <h2 id="install">{both("Installing the APK", "APK কীভাবে ইনস্টল করবেন")}</h2>
-    <ol>{steps_html}</ol>
-  </section>
-
+  {steps_section}
   <section class="faq" aria-labelledby="help">
     <h2 id="help">{both("If something goes wrong", "সমস্যা হলে")}</h2>
     {help_html}
