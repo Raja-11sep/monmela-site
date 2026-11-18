@@ -225,31 +225,36 @@ def load(name):
 # ---------------------------------------------------------------- home page
 
 # "Matched by what you share": your answers, and the people match.js matches you with in turn
-# (the figure as built shows the first). Each person: who, their six answers, the three you share
-# (in the order they sit in the overlap), the match %, and the caption. Long answers like
-# Rabindrasangeet only fit in the wide middle, so keep them shared.
-VENN_YOU = [("Early riser", "ভোরে ওঠা"), ("Café adda", "ক্যাফেতে আড্ডা"), ("Biryani", "বিরিয়ানি"),
-            ("The hills", "পাহাড়"), ("Puri trips", "পুরী"), ("Rabindrasangeet", "রবীন্দ্রসংগীত")]
+# (the figure as built shows the first). Each person: who, their six answers, the ones you share
+# (3 or 4, in the order they sit in the overlap), the match %, and the caption. The hero card's
+# "Why you match" shows the first person's shared answers too.
+VENN_YOU = [("Prinsep Ghat", "প্রিন্সেপ ঘাট"), ("Early riser", "ভোরে ওঠা"), ("Maidan walks", "ময়দানে হাঁটা"),
+            ("Mishti doi", "মিষ্টি দই"), ("Feluda", "ফেলুদা"), ("Puri trips", "পুরী")]
 VENN_PEOPLE = [
     {"who": ("Someone in Howrah", "হাওড়ার কেউ"), "score": 86,
-     "items": [("Night owl", "রাত জাগা"), ("Café adda", "ক্যাফেতে আড্ডা"), ("Momos", "মোমো"),
-               ("The hills", "পাহাড়"), ("Football", "ফুটবল"), ("Rabindrasangeet", "রবীন্দ্রসংগীত")],
-     "shared": ["Café adda", "The hills", "Rabindrasangeet"],
-     "caption": ("You both love café adda, the hills and Rabindrasangeet: an 86% match.",
-                 "দুজনেই ক্যাফের আড্ডা, পাহাড় আর রবীন্দ্রসংগীত ভালোবাসেন: ৮৬% মিল।")},
+     "items": [("Night owl", "রাত জাগা"), ("Prinsep Ghat", "প্রিন্সেপ ঘাট"), ("Maidan walks", "ময়দানে হাঁটা"),
+               ("Football", "ফুটবল"), ("Mishti doi", "মিষ্টি দই"), ("Feluda", "ফেলুদা")],
+     "shared": ["Prinsep Ghat", "Maidan walks", "Mishti doi", "Feluda"],
+     "caption": ("You both love Prinsep Ghat, Maidan walks, mishti doi and Feluda: an 86% match.",
+                 "দুজনেই প্রিন্সেপ ঘাট, ময়দানে হাঁটা, মিষ্টি দই আর ফেলুদা ভালোবাসেন: ৮৬% মিল।")},
     {"who": ("Someone in Siliguri", "শিলিগুড়ির কেউ"), "score": 78,
      "items": [("Trekking", "ট্রেকিং"), ("Early riser", "ভোরে ওঠা"), ("Momos", "মোমো"),
-               ("The hills", "পাহাড়"), ("Cricket", "ক্রিকেট"), ("Rabindrasangeet", "রবীন্দ্রসংগীত")],
-     "shared": ["Early riser", "The hills", "Rabindrasangeet"],
-     "caption": ("You're both early risers who love the hills and Rabindrasangeet: a 78% match.",
-                 "দুজনেই ভোরে ওঠেন, পাহাড় আর রবীন্দ্রসংগীত ভালোবাসেন: ৭৮% মিল।")},
+               ("Feluda", "ফেলুদা"), ("Cricket", "ক্রিকেট"), ("Mishti doi", "মিষ্টি দই")],
+     "shared": ["Early riser", "Feluda", "Mishti doi"],
+     "caption": ("You're both early risers who love Feluda and mishti doi: a 78% match.",
+                 "দুজনেই ভোরে ওঠেন, ফেলুদা আর মিষ্টি দই ভালোবাসেন: ৭৮% মিল।")},
     {"who": ("Someone in Durgapur", "দুর্গাপুরের কেউ"), "score": 71,
-     "items": [("Films", "সিনেমা"), ("Rabindrasangeet", "রবীন্দ্রসংগীত"), ("Night owl", "রাত জাগা"),
-               ("Café adda", "ক্যাফেতে আড্ডা"), ("Football", "ফুটবল"), ("Biryani", "বিরিয়ানি")],
-     "shared": ["Café adda", "Biryani", "Rabindrasangeet"],
-     "caption": ("You both love café adda, biryani and Rabindrasangeet: a 71% match.",
-                 "দুজনেই ক্যাফের আড্ডা, বিরিয়ানি আর রবীন্দ্রসংগীত ভালোবাসেন: ৭১% মিল।")},
+     "items": [("Films", "সিনেমা"), ("Puri trips", "পুরী"), ("Night owl", "রাত জাগা"),
+               ("Prinsep Ghat", "প্রিন্সেপ ঘাট"), ("Football", "ফুটবল"), ("Mishti doi", "মিষ্টি দই")],
+     "shared": ["Prinsep Ghat", "Mishti doi", "Puri trips"],
+     "caption": ("You both love Prinsep Ghat, mishti doi and trips to Puri: a 71% match.",
+                 "দুজনেই প্রিন্সেপ ঘাট, মিষ্টি দই আর পুরী বেড়াতে ভালোবাসেন: ৭১% মিল।")},
 ]
+
+
+def venn_rows(n, middle, step):
+    """y of n lines spaced `step` apart, centred on `middle` (shared in the overlap, the rest at the sides)."""
+    return [middle - (n - 1) * step / 2 + k * step for k in range(n)]
 
 
 def venn():
@@ -262,11 +267,13 @@ def venn():
     them_only = [item for item in first["items"] if item[0] not in first["shared"]]
     shared = [next(item for item in VENN_YOU if item[0] == en) for en in first["shared"]]
     data = html_escape(json.dumps({"you": VENN_YOU, "people": VENN_PEOPLE}, ensure_ascii=False), quote=True)
-    def words(x, y, items, cls=""):
+    def words(x, ys, items, cls=""):
         # One <text> per language for each line; site.js/CSS hide the other language.
+        if not isinstance(ys, list):
+            ys = [ys]
         out = []
         for i, (en, bn) in enumerate(items):
-            dy = y + i * 26
+            dy = ys[i]
             out.append(f'<text x="{x}" y="{dy}" class="l {cls}" lang="en">{en}</text>'
                        f'<text x="{x}" y="{dy}" class="l {cls}" lang="bn">{bn}</text>')
         return "".join(out)
@@ -282,11 +289,11 @@ def venn():
   <circle class="ring ring-right" cx="270" cy="170" r="120"/>
   <g class="lens"><circle cx="270" cy="170" r="120" clip-path="url(#in-left)"/></g>
   <g class="side">
-    {words(102, 150, you_only)}
-    {words(338, 150, them_only)}
+    {words(102, venn_rows(len(you_only), 176, 26), you_only)}
+    {words(338, venn_rows(len(them_only), 176, 26), them_only)}
   </g>
   <g class="shared">
-    {words(220, 128, shared)}
+    {words(220, venn_rows(len(shared), 154 if len(shared) == 3 else 150, 26 if len(shared) == 3 else 24), shared)}
   </g>
   <g class="score">{words(220, 230, [(f"{first['score']}% match", f"{bn_num(first['score'])}% মিল")])}</g>
 </svg>
@@ -556,7 +563,7 @@ def home():
     <div class="float-card match-card" aria-hidden="true">
       <p class="mc-score">{both("86% match", "৮৬% মিল")}</p>
       <p class="mc-why">{both("Why you match", "কেন মিল")}</p>
-      <ul class="mc-chips"><li>{both("Café adda", "ক্যাফেতে আড্ডা")}</li><li>{both("The hills", "পাহাড়")}</li><li>{both("Rabindrasangeet", "রবীন্দ্রসংগীত")}</li></ul>
+      <ul class="mc-chips"><li>{both("Prinsep Ghat", "প্রিন্সেপ ঘাট")}</li><li>{both("Maidan walks", "ময়দানে হাঁটা")}</li><li>{both("Mishti doi", "মিষ্টি দই")}</li><li>{both("Feluda", "ফেলুদা")}</li></ul>
     </div>
     <div class="float-card ping-card" aria-hidden="true">
       <span class="ping-dot"></span>{both("Today's picks are ready", "আজকের মানুষেরা হাজির")}

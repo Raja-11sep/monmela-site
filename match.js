@@ -69,7 +69,11 @@
 
     var mine = data.you.map(function (w) { return { words: new Words(mineLayer, w[0], w[1], 't'), en: w[0] }; });
     var theirs = [], who = null, sparks = [];
-    for (var k = 0; k < 3; k++) sparks.push(el('circle', { 'class': 'spark', r: 0, opacity: 0 }, sparkLayer));
+    for (var k = 0; k < 4; k++) sparks.push(el('circle', { 'class': 'spark', r: 0, opacity: 0 }, sparkLayer));
+
+    // y of line k of n, spaced `step` apart around `middle` (same as venn_rows in build.py)
+    function row(k, n, middle, step) { return middle - (n - 1) * step / 2 + k * step; }
+    function sharedY(k, n) { return n === 3 ? row(k, 3, 154, 26) : row(k, n, 150, 24); }
 
     // Who is in which place for the current person: shared answers get an overlap slot (0-2),
     // the rest a side slot (0-2), in the order they sit in the circle.
@@ -115,16 +119,18 @@
       who.at(lerp(cxR, cxR + 68, meet), 30, named);
 
       var spread = ease(clamp((t - 1.5) / 0.9));
+      var nShared = p.shared.length, nSide = 6 - nShared;
+      var gap = nShared > 3 ? 0.26 : 0.32;        // between one pair flying in and the next
       function place(item, cx, outward, isMine) {
         var shown = clamp((t - 0.35 - item.row * 0.05) / 0.4);
         var homeY = 104 + item.row * 24;
         if (item.slot < 0) {                          // only theirs: settle to the side
-          item.words.at(cx + outward * spread, lerp(homeY, 150 + item.side * 26, spread), shown);
+          item.words.at(cx + outward * spread, lerp(homeY, row(item.side, nSide, 176, 26), spread), shown);
           item.words.mark('landed', false);
           return;
         }
-        var fly = ease(clamp((t - (1.7 + item.slot * 0.32)) / 0.85));
-        var x = lerp(cx, 220, fly), y = lerp(homeY, 128 + item.slot * 26, fly) - Math.sin(Math.PI * fly) * 16;
+        var fly = ease(clamp((t - (1.7 + item.slot * gap)) / 0.85));
+        var x = lerp(cx, 220, fly), y = lerp(homeY, sharedY(item.slot, nShared), fly) - Math.sin(Math.PI * fly) * 16;
         // the two copies meet in the overlap; theirs fades into yours
         item.words.at(x, y, isMine ? shown : shown * (1 - clamp((fly - 0.75) / 0.25)));
         item.words.mark('landed', fly >= 1);
@@ -133,9 +139,9 @@
       theirs.forEach(function (item) { place(item, cxR, 68, false); });
 
       sparks.forEach(function (spark, k) {         // a little ring of light where each pair lands
-        var s = clamp((t - (1.7 + k * 0.32 + 0.85)) / 0.5);
+        var s = k < nShared ? clamp((t - (1.7 + k * gap + 0.85)) / 0.5) : 0;
         spark.setAttribute('cx', 220);
-        spark.setAttribute('cy', 123 + k * 26);
+        spark.setAttribute('cy', sharedY(k, nShared) - 5);
         spark.setAttribute('r', (4 + 22 * s).toFixed(1));
         spark.setAttribute('opacity', s > 0 && s < 1 ? (0.9 * (1 - s)).toFixed(3) : 0);
       });
