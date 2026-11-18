@@ -555,7 +555,6 @@ def home():
       {get_app_button()}
       <a class="btn btn-quiet" href="#how">{both("How it works", "কীভাবে কাজ করে")}</a>
     </div>
-    <p class="hero-note">{both("Free. For friendship, not dating. Adults 18+ only.", "বিনামূল্যে। বন্ধুত্বের জন্য, ডেটিংয়ের জন্য নয়। শুধু ১৮+।")}</p>
   </div>
   <div class="hero-k-art">
     {hero_art(asset("img/hero-ghat.webp"))}
