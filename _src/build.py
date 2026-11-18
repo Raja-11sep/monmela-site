@@ -413,8 +413,11 @@ def music_button(cls="", play=("Play with music", "গান চালিয়�
 
 
 def music_player():
-    """The site's music, on every page: the floating button and the track (loaded only when it plays)."""
-    return (music_button("music-float", ("Play music", "গান চালান")) +
+    """The site's music, on every page: the floating button and the track (loaded only when it plays).
+    The floating button also carries the "Tap for music" nudge that music.js shows when a page opens
+    and the browser hasn't allowed sound yet."""
+    nudge = f'<span class="mb-nudge">{both("Tap for music", "গান শুনতে ট্যাপ করুন")}</span>'
+    return (music_button("music-float", ("Play music", "গান চালান")).replace("</button>", nudge + "</button>") +
             f'<audio class="site-audio" src="{asset("audio/story-theme.mp3")}" preload="none" loop></audio>')
 
 

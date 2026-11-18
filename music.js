@@ -6,6 +6,7 @@
 //     the site (Chrome), or, on desktop, when they often play sound on this site;
 //   - otherwise it starts with their first tap, click or key press anywhere on the page;
 //   - it carries on across pages from where it was.
+// When a page opens silent, the floating button says "Tap for music" for a few seconds.
 // "Pause music" (or pausing from the phone's lock screen) turns it off, and that's remembered
 // on every page until they turn it on again.
 // It stops at once when the page is hidden (another tab or app, screen locked) and comes back
@@ -15,6 +16,7 @@
   var VOLUME = 0.6;
   var OFF = 'mm-music-off';      // localStorage: the visitor turned the music off
   var AT = 'mm-music-at';        // sessionStorage: where the tune was when they left the last page
+  var NUDGED = 'mm-music-nudged';  // sessionStorage: the "Tap for music" nudge has been shown this visit
   var TOUCHES = ['click', 'keydown', 'touchend', 'pointerup'];
 
   // Storage can be blocked (private modes, strict settings); then nothing is remembered.
@@ -56,6 +58,19 @@
 
     function show() {
       buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(playing)); });
+      if (playing) endNudge();
+    }
+
+    // The nudge: if a page opens and sound isn't allowed yet, the floating button says "Tap for
+    // music" for a few seconds (once per visit, so it doesn't nag on every page).
+    var floatButton = document.querySelector('.music-float');
+    var nudgeTimer = null;
+    function endNudge() { clearTimeout(nudgeTimer); if (floatButton) floatButton.classList.remove('nudge'); }
+    function nudge() {
+      if (!floatButton || playing || !wanted || read('sessionStorage', NUDGED)) return;
+      write('sessionStorage', NUDGED, '1');
+      floatButton.classList.add('nudge');
+      nudgeTimer = setTimeout(endNudge, 7000);
     }
 
     // Try to play. If the browser says "not yet", nothing changes and we wait for a touch.
@@ -155,5 +170,6 @@
     }
 
     start();   // works if the browser already allows sound here
+    setTimeout(nudge, 1200);   // still silent a moment later: invite the first tap
   });
 })();
