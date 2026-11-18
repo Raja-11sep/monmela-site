@@ -228,15 +228,15 @@ def load(name):
 # (the figure as built shows the first). Each person: who, their six answers, the ones you share
 # (3 or 4, in the order they sit in the overlap), the match %, and the caption. The hero card's
 # "Why you match" shows the first person's shared answers too.
-VENN_YOU = [("Prinsep Ghat", "প্রিন্সেপ ঘাট"), ("Early riser", "ভোরে ওঠা"), ("Maidan walks", "ময়দানে হাঁটা"),
+VENN_YOU = [("Prinsep Ghat", "প্রিন্সেপ ঘাট"), ("Early riser", "ভোরে ওঠা"), ("Durga Puja", "দুর্গাপুজো"),
             ("Mishti doi", "মিষ্টি দই"), ("Feluda", "ফেলুদা"), ("Puri trips", "পুরী")]
 VENN_PEOPLE = [
     {"who": ("Someone in Howrah", "হাওড়ার কেউ"), "score": 86,
-     "items": [("Night owl", "রাত জাগা"), ("Prinsep Ghat", "প্রিন্সেপ ঘাট"), ("Maidan walks", "ময়দানে হাঁটা"),
+     "items": [("Night owl", "রাত জাগা"), ("Prinsep Ghat", "প্রিন্সেপ ঘাট"), ("Durga Puja", "দুর্গাপুজো"),
                ("Football", "ফুটবল"), ("Mishti doi", "মিষ্টি দই"), ("Feluda", "ফেলুদা")],
-     "shared": ["Prinsep Ghat", "Maidan walks", "Mishti doi", "Feluda"],
-     "caption": ("You both love Prinsep Ghat, Maidan walks, mishti doi and Feluda: an 86% match.",
-                 "দুজনেই প্রিন্সেপ ঘাট, ময়দানে হাঁটা, মিষ্টি দই আর ফেলুদা ভালোবাসেন: ৮৬% মিল।")},
+     "shared": ["Prinsep Ghat", "Durga Puja", "Mishti doi", "Feluda"],
+     "caption": ("You both love Prinsep Ghat, Durga Puja, mishti doi and Feluda: an 86% match.",
+                 "দুজনেই প্রিন্সেপ ঘাট, দুর্গাপুজো, মিষ্টি দই আর ফেলুদা ভালোবাসেন: ৮৬% মিল।")},
     {"who": ("Someone in Siliguri", "শিলিগুড়ির কেউ"), "score": 78,
      "items": [("Trekking", "ট্রেকিং"), ("Early riser", "ভোরে ওঠা"), ("Momos", "মোমো"),
                ("Feluda", "ফেলুদা"), ("Cricket", "ক্রিকেট"), ("Mishti doi", "মিষ্টি দই")],
@@ -563,7 +563,7 @@ def home():
     <div class="float-card match-card" aria-hidden="true">
       <p class="mc-score">{both("86% match", "৮৬% মিল")}</p>
       <p class="mc-why">{both("Why you match", "কেন মিল")}</p>
-      <ul class="mc-chips"><li>{both("Prinsep Ghat", "প্রিন্সেপ ঘাট")}</li><li>{both("Maidan walks", "ময়দানে হাঁটা")}</li><li>{both("Mishti doi", "মিষ্টি দই")}</li><li>{both("Feluda", "ফেলুদা")}</li></ul>
+      <ul class="mc-chips"><li>{both("Prinsep Ghat", "প্রিন্সেপ ঘাট")}</li><li>{both("Durga Puja", "দুর্গাপুজো")}</li><li>{both("Mishti doi", "মিষ্টি দই")}</li><li>{both("Feluda", "ফেলুদা")}</li></ul>
     </div>
     <div class="float-card ping-card" aria-hidden="true">
       <span class="ping-dot"></span>{both("Today's picks are ready", "আজকের মানুষেরা হাজির")}
