@@ -21,7 +21,7 @@ This rewrites `index.html`, `download.html` and the four legal pages in the site
 | `_src/tools/make_hero.py` | Paints the home page picture (friends on a Ganga ghat at sunset) into `img/hero-ghat.webp`. Run it, then `build.py`. Other looks: `dusk`, `morning` |
 | `_src/pages/*.html` | Legal page bodies (privacy, terms, delete account, child safety) |
 | `_src/tools/prep_screens.py` | Turns app screenshots into `img/app-*.webp` (cleans the status bar, blurs photos) |
-| `style.css`, `site.js`, `home.js`, `download.js` | Styles and the small scripts (edited directly) |
+| `style.css`, `site.js`, `story.js`, `download.js` | Styles and the small scripts (edited directly) |
 | `fonts/` | Anek Bangla (headings) and Hind Siliguri (text), served from the site itself. `_src/tools/make_fonts.py` remakes them |
 
 Settings at the top of `build.py`:

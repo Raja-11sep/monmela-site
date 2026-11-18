@@ -442,21 +442,9 @@ def home():
         f'<details><summary>{both(q_en, q_bn)}</summary><p>{both(a_en, a_bn)}</p></details>'
         for q_en, q_bn, a_en, a_bn in faq)
 
-    # Interests: tappable chips styled like the app's own; a few start picked. home.js updates the count.
-    interests = [("Adda", "আড্ডা", 1), ("Study partner", "পড়ার সঙ্গী", 1), ("Rabindrasangeet", "রবীন্দ্রসংগীত", 0),
-                 ("Pandal hopping", "ঠাকুর দেখা", 1), ("Biryani", "বিরিয়ানি", 0), ("Football", "ফুটবল", 0),
-                 ("Hill trips", "পাহাড়", 0), ("Books", "বই", 0), ("Phuchka", "ফুচকা", 0), ("Films", "সিনেমা", 0),
-                 ("Morning walks", "ভোরের হাঁটা", 0), ("Cricket", "ক্রিকেট", 0), ("Photography", "ছবি তোলা", 0),
-                 ("Chai", "চা", 1), ("Theatre", "থিয়েটার", 0), ("Board games", "বোর্ড গেম", 0), ("Coding", "কোডিং", 0),
-                 ("Trekking", "ট্রেকিং", 0)]
-    chips_html = "".join(
-        f'<button type="button" class="chip" aria-pressed="{"true" if on else "false"}">{both(en, bn)}</button>'
-        for en, bn, on in interests)
-    picked = sum(on for *_, on in interests)
-
     # Title and description: the words people actually search for (Bengali friendship app,
     # Kolkata, West Bengal, adda), in under ~60 and ~155 characters so Google shows them whole.
-    html = f"""{head(HOME_TITLE_EN, HOME_TITLE_BN, HOME_DESCRIPTION, "", script("home.js") + script("story.js") + home_schema(faq))}
+    html = f"""{head(HOME_TITLE_EN, HOME_TITLE_BN, HOME_DESCRIPTION, "", script("story.js") + home_schema(faq))}
 <body class="home">
 {header(on_home=True)}
 <section class="hero-k">
@@ -484,13 +472,6 @@ def home():
       <span class="ping-dot"></span>{both("Today's picks are ready", "আজকের মানুষেরা হাজির")}
     </div>
   </div>
-</section>
-
-<section class="interests" aria-labelledby="int-h">
-  <h2 id="int-h">{both("What do you love?", "আপনার কী ভালো লাগে?")}</h2>
-  <p class="int-lede">{both("Tap a few, just like in the app.", "অ্যাপের মতোই, কয়েকটা বেছে নিন।")}</p>
-  <div class="chip-board" role="group" aria-label="Interests">{chips_html}</div>
-  <p class="chip-count" aria-live="polite"><span class="l" lang="en"><b class="n">{picked}</b> picked. Mon Mela suggests people whose answers match yours.</span><span class="l" lang="bn"><b class="n">{bn_num(picked)}</b>টা বেছেছেন। মনমেলা দেখায় তাঁদের, যাঁদের উত্তর আপনার সঙ্গে মেলে।</span></p>
 </section>
 
 <main class="home-main">
