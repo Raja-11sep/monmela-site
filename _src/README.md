@@ -15,11 +15,12 @@ This rewrites `index.html`, `download.html` and the four legal pages in the site
 | File | What it holds |
 |---|---|
 | `_src/build.py` | Page layouts, all home/download text (English + Bengali), header/footer, settings |
-| `_src/art.py` | The SVG illustrations: the home picture's kites and stitched arch frame, alpana border, stitched rings |
+| `_src/art.py` | The SVG illustrations: the home picture's kites and stitched arch frame, the strings of mela lights (`festoon`), alpana border |
 | `_src/tools/make_hero.py` | Paints the home page picture (friends on a Ganga ghat at sunset) into `img/hero-ghat.webp`. Run it, then `build.py`. Other looks: `dusk`, `morning` |
 | `_src/pages/*.html` | Legal page bodies (privacy, terms, delete account, child safety) |
 | `_src/tools/prep_screens.py` | Turns app screenshots into `img/app-*.webp` (cleans the status bar, blurs photos) |
 | `style.css`, `site.js`, `home.js`, `download.js` | Styles and the small scripts (edited directly) |
+| `fonts/` | Anek Bangla (headings) and Hind Siliguri (text), served from the site itself. `_src/tools/make_fonts.py` remakes them |
 
 Settings at the top of `build.py`:
 
@@ -28,6 +29,12 @@ Settings at the top of `build.py`:
 - `UPDATED_EN` / `UPDATED_BN`: the "Last updated" date on the legal pages.
 
 Links to `style.css` and the scripts carry `?v=<hash>`, so browsers fetch the new file as soon as it changes.
+
+## Look
+
+"A mela at dusk": deep-teal evening sections (hero, download page, closing panel, footer) with strings of
+lights that switch on once when the page opens, and warm paper sections in between. Marigold is kept for
+the "get the app" buttons. Colours, fonts and every section are described at the top of `style.css`.
 
 ## New app screenshots
 

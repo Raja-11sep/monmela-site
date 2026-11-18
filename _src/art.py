@@ -4,6 +4,7 @@
 #   bridge()          - Howrah Bridge truss, used by tools/make_hero.py
 #   rings_stitched()  - the logo's two rings with running stitches, for the download panel
 #   alpana_tile()     - one repeat of the alpana border used above the footer
+#   festoon()         - a mela's string of lights, hung across the top of dusk sections
 
 TEAL_DEEP = "#0F4C47"
 TEAL = "#115E59"
@@ -94,8 +95,8 @@ def hero_art(img_src):
   <g class="kite kite-a"><path d="M398 166Q420 330 610 470" {string}/>{kite(404, 142, 14, "#0F766E", MARIGOLD, .52)}</g>
   <g class="kite kite-b"><path d="M246 246Q200 350 -10 480" {string}/>{kite(250, 225, -16, "#C0392B", "#FBF3E6", .44)}</g>
 </g>
-<path d="{ARCH}" fill="none" stroke="{TEAL_DEEP}" stroke-width="22"/>
-<path d="{ARCH}" fill="none" stroke="{MARIGOLD}" stroke-width="3" stroke-dasharray="10 9" stroke-linecap="round"/>
+<path class="frame" d="{ARCH}" fill="none" stroke="{TEAL_DEEP}" stroke-width="22"/>
+<path class="stitch" d="{ARCH}" fill="none" stroke="{MARIGOLD}" stroke-width="3" stroke-dasharray="10 9" stroke-linecap="round"/>
 </svg>
 </div>"""
 
@@ -125,3 +126,37 @@ def alpana_tile():
 <path d="M8 28q9 -9 18 0q-9 9 -18 0zM94 28q9 -9 18 0q-9 9 -18 0z"/></g>
 </svg>
 """
+
+
+def festoon(swags=4, per_swag=9, width=1600):
+    """A string of mela lights: `swags` dips of wire across `width`, bulbs hanging from each.
+    The SVG is wide and anchored to the top centre; narrow screens crop the sides (no stretching).
+    Each bulb carries --i (its order), so CSS can switch them on one after another."""
+    sag, top = 46, 6
+    seg = width / swags
+    colours = [MARIGOLD, "#FFE7B3", "#E2553A", MARIGOLD, "#FFE7B3", "#7FD8CC"]
+    # One soft halo per colour: the bulb's colour fading out to nothing.
+    gid = {c: f"fg{n}" for n, c in enumerate(dict.fromkeys(colours))}
+    defs = "".join(f'<radialGradient id="{g}"><stop offset="0" stop-color="{c}" stop-opacity=".75"/>'
+                   f'<stop offset="1" stop-color="{c}" stop-opacity="0"/></radialGradient>' for c, g in gid.items())
+    wire, bulbs, i = [], [], 0
+    for k in range(swags):
+        x0, x1 = k * seg, (k + 1) * seg
+        cx = (x0 + x1) / 2
+        # Quadratic curve through the middle at depth `sag`: control point at 2*sag.
+        wire.append(f"M{_f(x0)} {top}Q{_f(cx)} {top + 2 * sag} {_f(x1)} {top}")
+        for j in range(1, per_swag + 1):
+            t = j / (per_swag + 1)
+            x = (1 - t) ** 2 * x0 + 2 * (1 - t) * t * cx + t ** 2 * x1
+            y = (1 - t) ** 2 * top + 2 * (1 - t) * t * (top + 2 * sag) + t ** 2 * top
+            c = colours[i % len(colours)]
+            bulbs.append(
+                f'<g class="bulb" style="--i:{i}" transform="translate({_f(x)} {_f(y)})">'
+                f'<circle class="glow" cy="13" r="20" fill="url(#{gid[c]})"/>'
+                f'<rect x="-2.6" y="0" width="5.2" height="5" rx="1" fill="#2B2420"/>'
+                f'<ellipse cy="12" rx="5.4" ry="7" fill="{c}"/></g>')
+            i += 1
+    return (f'<svg class="festoon" viewBox="0 0 {width} 120" preserveAspectRatio="xMidYMin slice" aria-hidden="true">'
+            f'<defs>{defs}</defs>'
+            f'<path d="{"".join(wire)}" fill="none" stroke="#06221F" stroke-width="2"/>'
+            f'{"".join(bulbs)}</svg>')

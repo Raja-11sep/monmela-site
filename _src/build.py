@@ -9,7 +9,7 @@ import json
 import pathlib
 import re
 
-from art import alpana_tile, hero_art, rings_stitched
+from art import alpana_tile, festoon, hero_art
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent      # the site folder (built files go here)
 PAGES = pathlib.Path(__file__).resolve().parent / "pages"  # legal page bodies
@@ -79,7 +79,7 @@ def head(title_en, title_bn, description, path="", extra=""):
 <meta name="title-en" content="{title_en}">
 <meta name="title-bn" content="{title_bn}">
 <meta name="description" content="{description}">
-<meta name="theme-color" content="#115E59">
+<meta name="theme-color" content="#0B3B37">
 <link rel="canonical" href="{SITE}/{path}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Mon Mela">
@@ -94,9 +94,7 @@ def head(title_en, title_bn, description, path="", extra=""):
 <link rel="icon" href="{asset("favicon.svg")}" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{asset("apple-touch-icon.png")}">
 <link rel="manifest" href="site.webmanifest">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Tiro+Bangla&display=swap" rel="stylesheet">
+<link rel="preload" href="fonts/anek-bangla-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{asset("style.css")}">
 <script src="{asset("site.js")}"></script>
 {extra}
@@ -163,7 +161,7 @@ def footer():
       <ul>{links}</ul>
     </nav>
   </div>
-  <p class="foot-base">{both("© 2026 Mon Mela · Made in West Bengal", "© ২০২৬ মনমেলা · পশ্চিমবঙ্গে তৈরি")}</p>
+  <p class="foot-base">{both("© 2026 Mon Mela. Made in West Bengal.", "© ২০২৬ মনমেলা। পশ্চিমবঙ্গে তৈরি।")}</p>
 </footer>"""
 
 
@@ -282,6 +280,22 @@ def phone(key, cls="", lazy=True, alt=True):
             f'<img src="{asset(src)}" alt="{alt_text}" width="720" height="1520"{loading}></div></div>')  # ?v= → new screenshot shows at once
 
 
+def adda_card(cls, title_en, title_bn, when_en, when_bn, taken, seats, tag=None, full=True):
+    """An Adda Table card in the app's style (decorative, for the Adda Tables band).
+    full=False: a short card peeking out from behind (title, time and seats only)."""
+    dots = "".join(f'<i class="{"on" if n < taken else ""}"></i>' for n in range(seats))
+    tag_html = f'<p class="ac-tag">{both(*tag)}</p>' if tag else ""
+    rest = f"""
+  <p class="ac-host">{icon("badge")}{both("Host is photo verified", "আয়োজক ছবি-যাচাই করা")}</p>
+  <span class="ac-btn">{both("Ask for a seat", "জায়গা চান")}</span>
+  <p class="ac-note">{both("Exact spot shared once the host says yes", "আয়োজক রাজি হলে ঠিক জায়গা জানানো হবে")}</p>""" if full else ""
+    return f"""<div class="adda-card {cls}">
+  {tag_html}<p class="ac-title">{both(title_en, title_bn)}</p>
+  <p class="ac-when">{both(when_en, when_bn)}</p>
+  <div class="ac-seats"><span class="ac-dots">{dots}</span>{both(f"{taken} of {seats} seats taken", f"{bn_num(seats)}টার মধ্যে {bn_num(taken)}টা জায়গা ভরা")}</div>{rest}
+</div>"""
+
+
 def home():
     # How it works: four app screens in a row (a swipeable row on phones), then one line about chatting.
     steps = [
@@ -389,6 +403,7 @@ def home():
 <body class="home">
 {header(on_home=True)}
 <section class="hero-k">
+  {festoon()}
   <div class="hero-k-text">
     <h1>{both("Friends who think like you, near you.", "মনের মতো বন্ধু, আপনার কাছেই।")}</h1>
     <p class="lede">{both(
@@ -400,7 +415,18 @@ def home():
     </div>
     <p class="hero-note">{both("For friendship, not dating. Adults 18+ only.", "বন্ধুত্বের জন্য, ডেটিংয়ের জন্য নয়। শুধু ১৮+।")}</p>
   </div>
-  <div class="hero-k-art">{hero_art(asset("img/hero-ghat.webp"))}</div>
+  <div class="hero-k-art">
+    {hero_art(asset("img/hero-ghat.webp"))}
+    <!-- Two small cards in the app's own style, floating on the picture (decorative) -->
+    <div class="float-card match-card" aria-hidden="true">
+      <p class="mc-score">{both("86% match", "৮৬% মিল")}</p>
+      <p class="mc-why">{both("Why you match", "কেন মিল")}</p>
+      <ul class="mc-chips"><li>{both("Café adda", "ক্যাফেতে আড্ডা")}</li><li>{both("The hills", "পাহাড়")}</li><li>{both("Rabindrasangeet", "রবীন্দ্রসংগীত")}</li></ul>
+    </div>
+    <div class="float-card ping-card" aria-hidden="true">
+      <span class="ping-dot"></span>{both("Today's picks are ready", "আজকের মানুষেরা হাজির")}
+    </div>
+  </div>
 </section>
 
 <section class="interests" aria-labelledby="int-h">
@@ -429,6 +455,26 @@ def home():
                                                   "<b>তারপর কানেক্ট।</b> দুজনেই রাজি হলে তবেই চ্যাট খোলে।")}</span></p>
   </section>
 
+  <section class="adda" aria-labelledby="adda-h">
+    <div class="adda-text">
+      <h2 id="adda-h">{both("Adda Tables: meet in a small group", "আড্ডা টেবিল: ছোট দলে দেখা")}</h2>
+      <p class="adda-lede">{both(
+          "Rather meet a few people at once? Join a table of 3 to 6 at a café, a phuchka stall, a park or College Street.",
+          "একসঙ্গে কয়েকজনের সঙ্গে আলাপ করতে চান? ক্যাফে, ফুচকার দোকান, পার্ক বা কলেজ স্ট্রিটে ৩ থেকে ৬ জনের আড্ডায় যোগ দিন।")}</p>
+      <ul class="adda-points">
+        <li>{icon("badge")}<p>{both("A photo-verified member hosts every table.", "প্রতিটি আড্ডা বসান ছবি-যাচাই করা একজন সদস্য।")}</p></li>
+        <li>{icon("chat")}<p>{both("Ask for a seat. You join when the host says yes.", "জায়গা চান। আয়োজক রাজি হলে যোগ দিন।")}</p></li>
+        <li>{icon("pin")}<p>{both("The exact spot and the group chat open only for the people at the table.", "ঠিক জায়গা আর গ্রুপ চ্যাট খোলে শুধু আড্ডার মানুষদের জন্য।")}</p></li>
+        <li>{icon("people")}<p>{both("Women can host women-only addas.", "মহিলারা শুধু মহিলাদের আড্ডা বসাতে পারেন।")}</p></li>
+      </ul>
+    </div>
+    <div class="adda-art" aria-hidden="true">
+      {adda_card("back", "Book adda, College Street", "বইয়ের আড্ডা, কলেজ স্ট্রিট", "Sunday, 11 am", "রবিবার, সকাল ১১টা", 2, 4,
+                 ("Women only", "শুধু মহিলা"), full=False)}
+      {adda_card("front", "Phuchka and adda, Gariahat", "ফুচকা আর আড্ডা, গড়িয়াহাট", "Saturday, 5:30 pm", "শনিবার, বিকেল ৫:৩০", 4, 6)}
+    </div>
+  </section>
+
   <section class="tour" aria-labelledby="tour">
     <h2 id="tour">{both("Inside the app", "অ্যাপের ভেতরে")}</h2>
     <ul class="tour-row">{tour_html}</ul>
@@ -449,10 +495,10 @@ def home():
         <h2 id="cta-h">{both("Start your next adda.", "শুরু হোক নতুন আড্ডা।")}</h2>
         <p>{both("Free, in Bengali and English, for adults across West Bengal.",
                  "বিনামূল্যে, বাংলা আর ইংরেজিতে, সারা পশ্চিমবঙ্গের প্রাপ্তবয়স্কদের জন্য।")}</p>
-        <div class="actions">{get_app_button("btn btn-dark")}</div>
+        <div class="actions">{get_app_button()}</div>
       </div>
+      {festoon(swags=3, per_swag=8, width=1200)}
       <div class="cta-art" aria-hidden="true">
-        {rings_stitched()}
         {phone("looking", "phone-b", alt=False)}
         {phone("picks", "phone-a", alt=False)}
       </div>
@@ -691,6 +737,7 @@ def download():
 <body class="home dl">
 {header()}
 <section class="intro">
+  {festoon()}
   <div class="intro-inner">
     <div>
       <h1>{both("Mon Mela for your Android phone", "আপনার অ্যান্ড্রয়েড ফোনে মনমেলা")}</h1>
