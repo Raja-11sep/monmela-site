@@ -4,6 +4,7 @@
 #   - Legal pages: _src/pages/<name>.en.html + <name>.bn.html inside the standard card layout.
 #   - _src/ is not published: GitHub Pages (Jekyll) skips folders that start with "_".
 import datetime
+from html import escape as html_escape
 import hashlib
 import json
 import pathlib
@@ -97,6 +98,7 @@ def head(title_en, title_bn, description, path="", extra=""):
 <link rel="preload" href="fonts/anek-bangla-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{asset("style.css")}">
 <script src="{asset("site.js")}"></script>
+{script("music.js")}
 {extra}
 </head>"""
 
@@ -187,7 +189,8 @@ def footer(on_home=False):
     <p>{both("© 2026 Mon Mela. Made in West Bengal.", "© ২০২৬ মনমেলা। পশ্চিমবঙ্গে তৈরি।")}</p>
     <a class="foot-up" href="#">{UP_ICON}<span>{both("Back to top", "ওপরে যান")}</span></a>
   </div>
-</footer>"""
+</footer>
+{music_player()}"""
 
 
 def page(file, title_en, title_bn, sub_en, sub_bn, body_en, body_bn):
@@ -221,10 +224,44 @@ def load(name):
 
 # ---------------------------------------------------------------- home page
 
+# "Matched by what you share": your answers, and the people match.js matches you with in turn
+# (the figure as built shows the first). Each person: who, their six answers, the three you share
+# (in the order they sit in the overlap), the match %, and the caption. Long answers like
+# Rabindrasangeet only fit in the wide middle, so keep them shared.
+VENN_YOU = [("Early riser", "ভোরে ওঠা"), ("Café adda", "ক্যাফেতে আড্ডা"), ("Biryani", "বিরিয়ানি"),
+            ("The hills", "পাহাড়"), ("Puri trips", "পুরী"), ("Rabindrasangeet", "রবীন্দ্রসংগীত")]
+VENN_PEOPLE = [
+    {"who": ("Someone in Howrah", "হাওড়ার কেউ"), "score": 86,
+     "items": [("Night owl", "রাত জাগা"), ("Café adda", "ক্যাফেতে আড্ডা"), ("Momos", "মোমো"),
+               ("The hills", "পাহাড়"), ("Football", "ফুটবল"), ("Rabindrasangeet", "রবীন্দ্রসংগীত")],
+     "shared": ["Café adda", "The hills", "Rabindrasangeet"],
+     "caption": ("You both love café adda, the hills and Rabindrasangeet: an 86% match.",
+                 "দুজনেই ক্যাফের আড্ডা, পাহাড় আর রবীন্দ্রসংগীত ভালোবাসেন: ৮৬% মিল।")},
+    {"who": ("Someone in Siliguri", "শিলিগুড়ির কেউ"), "score": 78,
+     "items": [("Trekking", "ট্রেকিং"), ("Early riser", "ভোরে ওঠা"), ("Momos", "মোমো"),
+               ("The hills", "পাহাড়"), ("Cricket", "ক্রিকেট"), ("Rabindrasangeet", "রবীন্দ্রসংগীত")],
+     "shared": ["Early riser", "The hills", "Rabindrasangeet"],
+     "caption": ("You're both early risers who love the hills and Rabindrasangeet: a 78% match.",
+                 "দুজনেই ভোরে ওঠেন, পাহাড় আর রবীন্দ্রসংগীত ভালোবাসেন: ৭৮% মিল।")},
+    {"who": ("Someone in Durgapur", "দুর্গাপুরের কেউ"), "score": 71,
+     "items": [("Films", "সিনেমা"), ("Rabindrasangeet", "রবীন্দ্রসংগীত"), ("Night owl", "রাত জাগা"),
+               ("Café adda", "ক্যাফেতে আড্ডা"), ("Football", "ফুটবল"), ("Biryani", "বিরিয়ানি")],
+     "shared": ["Café adda", "Biryani", "Rabindrasangeet"],
+     "caption": ("You both love café adda, biryani and Rabindrasangeet: a 71% match.",
+                 "দুজনেই ক্যাফের আড্ডা, বিরিয়ানি আর রবীন্দ্রসংগীত ভালোবাসেন: ৭১% মিল।")},
+]
+
+
 def venn():
     """Two people's quiz answers as overlapping circles: the overlap is what they share.
     Same idea as the logo (two rings, marigold where they meet).
-    Geometry: circles r=120 at x=170 and x=270, so the overlap (lens) spans x 150-290."""
+    Geometry: circles r=120 at x=170 and x=270, so the overlap (lens) spans x 150-290.
+    data-venn carries the answers and people for match.js, which animates the matching."""
+    first = VENN_PEOPLE[0]
+    you_only = [item for item in VENN_YOU if item[0] not in first["shared"]]
+    them_only = [item for item in first["items"] if item[0] not in first["shared"]]
+    shared = [next(item for item in VENN_YOU if item[0] == en) for en in first["shared"]]
+    data = html_escape(json.dumps({"you": VENN_YOU, "people": VENN_PEOPLE}, ensure_ascii=False), quote=True)
     def words(x, y, items, cls=""):
         # One <text> per language for each line; site.js/CSS hide the other language.
         out = []
@@ -234,28 +271,27 @@ def venn():
                        f'<text x="{x}" y="{dy}" class="l {cls}" lang="bn">{bn}</text>')
         return "".join(out)
 
-    return f"""<figure class="venn">
+    return f"""<figure class="venn" data-venn="{data}">
 <svg viewBox="0 0 440 320" aria-hidden="true">
   <defs><clipPath id="in-left"><circle cx="170" cy="170" r="120"/></clipPath></defs>
   <g class="who">
     {words(102, 30, [("You", "আপনি")])}
-    {words(338, 30, [("Someone in Howrah", "হাওড়ার কেউ")])}
+    {words(338, 30, [first["who"]])}
   </g>
   <circle class="ring ring-left" cx="170" cy="170" r="120"/>
   <circle class="ring ring-right" cx="270" cy="170" r="120"/>
   <g class="lens"><circle cx="270" cy="170" r="120" clip-path="url(#in-left)"/></g>
   <g class="side">
-    {words(102, 150, [("Early riser", "ভোরে ওঠা"), ("Biryani", "বিরিয়ানি"), ("Puri trips", "পুরী")])}
-    {words(338, 150, [("Night owl", "রাত জাগা"), ("Momos", "মোমো"), ("Football", "ফুটবল")])}
+    {words(102, 150, you_only)}
+    {words(338, 150, them_only)}
   </g>
   <g class="shared">
-    {words(220, 128, [("Café adda", "ক্যাফেতে আড্ডা"), ("The hills", "পাহাড়"), ("Rabindrasangeet", "রবীন্দ্রসংগীত")])}
+    {words(220, 128, shared)}
   </g>
-  <g class="score">{words(220, 230, [("86% match", "৮৬% মিল")])}</g>
+  <g class="score">{words(220, 230, [(f"{first['score']}% match", f"{bn_num(first['score'])}% মিল")])}</g>
 </svg>
-<figcaption>{both(
-    "You both love café adda, the hills and Rabindrasangeet: an 86% match.",
-    "দুজনেই ক্যাফের আড্ডা, পাহাড় আর রবীন্দ্রসংগীত ভালোবাসেন: ৮৬% মিল।")}</figcaption>
+<figcaption>{both(*first["caption"])}</figcaption>
+<button class="venn-next" type="button" hidden>{both("Try someone else", "অন্য কাউকে দেখুন")}</button>
 </figure>"""
 
 
@@ -360,13 +396,19 @@ STORY = [
 ]
 
 
-def music_button(cls=""):
-    """The story's opt-in music button (music.js shows it; without JavaScript there's no music).
-    cls="music-float": the copy that floats at the bottom of the screen while the music plays."""
+def music_button(cls="", play=("Play with music", "গান চালিয়ে দেখুন")):
+    """A music on/off button (music.js shows it; without JavaScript there's no music).
+    The story has one under its title; every page has the floating one (music_player)."""
     return (f'<button class="music-btn {cls}" type="button" aria-pressed="false" hidden>'
             f'<span class="mb-icon" aria-hidden="true"><i></i><i></i><i></i></span>'
-            f'<span class="mb-play">{both("Play with music", "গান চালিয়ে দেখুন")}</span>'
+            f'<span class="mb-play">{both(*play)}</span>'
             f'<span class="mb-pause">{both("Pause music", "গান থামান")}</span></button>')
+
+
+def music_player():
+    """The site's music, on every page: the floating button and the track (loaded only when it plays)."""
+    return (music_button("music-float", ("Play music", "গান চালান")) +
+            f'<audio class="site-audio" src="{asset("audio/story-theme.mp3")}" preload="none" loop></audio>')
 
 
 def story_section():
@@ -393,8 +435,6 @@ def story_section():
     </div>
     <div class="story-body">
       <ol class="story-chapters">{"".join(chapters)}</ol>
-      {music_button("music-float")}
-      <audio class="story-audio" src="{asset("audio/story-theme.mp3")}" preload="none" loop></audio>
       <div class="story-frame" aria-hidden="true"><div class="sf-pics">{"".join(frame)}</div><div class="sf-dots">{"".join(dots)}</div></div>
     </div>
   </section>"""
@@ -494,7 +534,7 @@ def home():
 
     # Title and description: the words people actually search for (Bengali friendship app,
     # Kolkata, West Bengal, adda), in under ~60 and ~155 characters so Google shows them whole.
-    html = f"""{head(HOME_TITLE_EN, HOME_TITLE_BN, HOME_DESCRIPTION, "", script("story.js") + script("music.js") + script("motion.js") + home_schema(faq))}
+    html = f"""{head(HOME_TITLE_EN, HOME_TITLE_BN, HOME_DESCRIPTION, "", script("story.js") + script("motion.js") + script("match.js") + home_schema(faq))}
 <body class="home">
 {header(on_home=True)}
 <section class="hero-k">

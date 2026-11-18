@@ -19,11 +19,12 @@ This rewrites `index.html`, `download.html` and the four legal pages in the site
 | `_src/tools/make_story.py` | Paints the six pictures of the home page story ("A story of friendship") into `img/story-1.webp` … `story-6.webp`, with the same four friends and style as the hero. Run it, then `build.py`. `python3 _src/tools/make_story.py 4` repaints only picture 4 |
 | `story.js` | The story section on wide screens: one sticky picture frame that cross-fades as each chapter scrolls past. Without it (and on phones) each chapter shows its own picture card |
 | `motion.js` | Home page motion: How it works (a thread sews from step to step, each number lights up, its phone wakes), Adda Tables (the cards are dealt, then the front card acts out asking for a seat), Inside the app (a fanned hand of phones laid out as you scroll), and phones tilting toward the mouse. Off for visitors who ask for reduced motion |
-| `music.js`, `audio/story-theme.mp3` | The story's "Play with music" button. The track is our own recording of the Purano Sei Diner Kotha tune, made by `_src/tools/make_theme.py` (public-domain tune, so no licence needed). It only loads and plays after a tap, and fades out when the story scrolls away |
+| `music.js`, `audio/story-theme.mp3` | The site's music, on every page: our own recording of the Purano Sei Diner Kotha tune, made by `_src/tools/make_theme.py` (public-domain tune, so no licence needed). On by default, it starts with the visitor's first tap (browsers allow no sound before that), carries on across pages, and "Pause music" is remembered. The floating button is on every page; the story has its own under its title |
+| `match.js` | "Matched by what you share": the two circles drift together, shared answers fly into the overlap, the match % counts up; "Try someone else" matches you with the next person (`VENN_PEOPLE` in `build.py`) |
 | `_src/tools/make_hero.py` | Paints the home page picture (friends on a Ganga ghat at sunset) into `img/hero-ghat.webp`. Run it, then `build.py`. Other looks: `dusk`, `morning` |
 | `_src/pages/*.html` | Legal page bodies (privacy, terms, delete account, child safety) |
 | `_src/tools/prep_screens.py` | Turns app screenshots into `img/app-*.webp` (cleans the status bar, blurs photos) |
-| `style.css`, `site.js`, `story.js`, `motion.js`, `music.js`, `download.js` | Styles and the small scripts (edited directly) |
+| `style.css`, `site.js`, `story.js`, `motion.js`, `music.js`, `match.js`, `download.js` | Styles and the small scripts (edited directly) |
 | `fonts/` | Anek Bangla (headings) and Hind Siliguri (text), served from the site itself. `_src/tools/make_fonts.py` remakes them |
 
 Settings at the top of `build.py`:
