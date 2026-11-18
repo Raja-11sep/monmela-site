@@ -327,6 +327,37 @@ html[data-lang="bn"] .hero-k h1 { font-size: clamp(42px, 5.8vw, 82px); line-heig
 .home .story h2 { color: var(--on-dusk); margin-bottom: 12px; }
 .story-head { text-align: center; max-width: 34em; margin: 0 auto clamp(44px, 6vw, 80px); }
 .story-head p { margin: 0; color: var(--on-dusk-muted); font-size: 19px; }
+/* The story's music button (music.js). The floating copy shows while the music plays and the
+   button under the title has scrolled away. */
+.music-btn {
+  display: inline-flex; align-items: center; gap: 10px; margin-top: 22px; padding: 10px 18px 10px 15px;
+  border: 0; border-radius: 999px; cursor: pointer; font: 600 16px/1.2 var(--sans);
+  color: var(--on-dusk); background: rgba(255, 246, 229, .08); box-shadow: inset 0 0 0 1.5px rgba(255, 246, 229, .32);
+  transition: background-color .2s, color .2s, box-shadow .2s;
+}
+.music-btn[hidden], .music-tune[hidden] { display: none; }
+.music-btn:hover { box-shadow: inset 0 0 0 1.5px var(--marigold); }
+.music-btn[aria-pressed="true"] { background: var(--marigold); color: var(--ink); box-shadow: none; }
+.music-btn .mb-pause, .music-btn[aria-pressed="true"] .mb-play { display: none; }
+.music-btn[aria-pressed="true"] .mb-pause { display: inline; }
+.mb-icon { display: flex; align-items: flex-end; gap: 2.5px; height: 15px; }
+.mb-icon i { width: 3px; height: 40%; border-radius: 2px; background: currentColor; }
+.mb-icon i:nth-child(2) { height: 100%; }
+.mb-icon i:nth-child(3) { height: 65%; }
+@media (prefers-reduced-motion: no-preference) {
+  .music-btn[aria-pressed="true"] .mb-icon i { animation: mb-bar .8s ease-in-out infinite alternate; }
+  .music-btn[aria-pressed="true"] .mb-icon i:nth-child(2) { animation-delay: -.3s; }
+  .music-btn[aria-pressed="true"] .mb-icon i:nth-child(3) { animation-delay: -.55s; }
+}
+@keyframes mb-bar { from { height: 25%; } to { height: 100%; } }
+.story-head .music-tune { margin: 10px 0 0; font-size: 14px; color: rgba(255, 246, 229, .55); }
+.music-float {
+  position: fixed; left: 16px; bottom: 16px; z-index: 30; margin: 0;
+  box-shadow: 0 12px 28px -10px rgba(0, 0, 0, .6) !important;
+  opacity: 0; visibility: hidden; translate: 0 14px; transition: opacity .3s, translate .3s, visibility .3s;
+}
+.story.float-on .music-float { opacity: 1; visibility: visible; translate: none; }
+
 .story-chapters { list-style: none; margin: 0 auto; padding: 0; display: grid; gap: clamp(56px, 9vw, 80px); max-width: 520px; }
 .ch-pic, .sf-pics {
   position: relative; margin: 0; overflow: hidden; border-radius: 28px; aspect-ratio: 5 / 6; background: var(--dusk-deep);
@@ -368,26 +399,27 @@ html[data-lang="bn"] .hero-k h1 { font-size: clamp(42px, 5.8vw, 82px); line-heig
   list-style: none; margin: 0; padding: 0; counter-reset: how;
   display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--how-gap);
 }
+.home .how { --how-bg: #F3DECB; background: var(--how-bg); }   /* terracotta clay, as on Bishnupur's temples */
+.home .how h2 { color: #7A3417; }
 .how-item { counter-increment: how; position: relative; padding-top: 68px; text-align: center; }
 .how-item::before {
   content: counter(how); position: absolute; z-index: 1; top: 0; left: 50%; transform: translateX(-50%);
   display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%;
   background: var(--marigold); color: var(--ink); font: 700 22px/1 var(--display);
-  box-shadow: 0 0 0 6px var(--paper);
+  box-shadow: 0 0 0 6px var(--how-bg, var(--paper));
 }
 html[data-lang="bn"] .how-item::before { content: counter(how, bengali); }
-.how-item::after {                 /* stitch to the next step */
-  content: ""; position: absolute; top: 23px; left: 50%; width: calc(100% + var(--how-gap));
-  border-top: 2.5px dashed rgba(15, 118, 110, .45);
+.how-thread {                      /* the stitch to the next step (motion.js sews it in) */
+  position: absolute; top: 23px; left: 50%; width: calc(100% + var(--how-gap)); height: 3px; pointer-events: none;
 }
-.how-item:last-child::after { display: none; }
+.how-thread::before { content: ""; position: absolute; inset: 0; border-top: 2.5px dashed rgba(122, 52, 23, .45); }
 .how-item .phone { width: min(100%, 248px); margin: 0 auto 24px; }
-.how-cap h3 { margin: 0 0 6px; font: 600 20px/1.35 var(--sans); color: var(--ink); }
-.how-cap p { margin: 0 auto; max-width: 17em; color: var(--muted); font-size: 16px; }
+.how-cap h3 { margin: 0 0 6px; font: 600 20px/1.35 var(--sans); color: #3B2418; }
+.how-cap p { margin: 0 auto; max-width: 17em; color: #6E4B38; font-size: 16px; }
 .how-then {
   display: flex; align-items: center; justify-content: center; gap: 14px;
   width: fit-content; margin: 56px auto 0; padding: 12px 22px 12px 14px; border-radius: 999px;
-  background: var(--mint); font-size: 18px;
+  background: #FBEFE4; font-size: 18px;
 }
 .how-then .icon { width: 40px; height: 40px; padding: 9px; }
 
@@ -445,24 +477,34 @@ html[data-lang="bn"] .how-item::before { content: counter(how, bengali); }
 .ac-host { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--teal-deep); }
 .ac-host .icon { width: 28px; height: 28px; padding: 5px; box-shadow: none; background: var(--mint); }
 .ac-btn {
-  display: block; margin-top: 16px; padding: 12px; border-radius: 14px; text-align: center;
-  background: var(--teal-deep); color: #fff; font-weight: 600;
+  position: relative; display: grid; margin-top: 16px; padding: 12px; border-radius: 14px; text-align: center;
+  background: var(--teal-deep); color: #fff; font-weight: 600; transition: background-color .4s, color .4s, scale .15s;
 }
-.ac-note { margin-top: 10px !important; font-size: 13px; color: var(--muted); text-align: center; }
+.ac-note { display: grid; margin-top: 10px !important; font-size: 13px; color: var(--muted); text-align: center; }
+.ac-count { display: grid; }
+/* A full card holds every state of its button, count and note in one grid cell; only "ask" shows
+   until motion.js sets data-state on the section (wait, then in). */
+.ac-btn > .st, .ac-note > .st, .ac-count > .st { grid-area: 1 / 1; transition: opacity .35s, translate .35s; }
+.adda-card .st-wait, .adda-card .st-in { opacity: 0; translate: 0 8px; }
+.ac-btn .st-wait { display: flex; align-items: center; justify-content: center; gap: 9px; }
+.ac-pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--sindoor); }
 @media (max-width: 860px) {
   .home .adda { grid-template-columns: 1fr; gap: 40px; }
   .adda-art { min-height: 450px; max-width: 460px; width: 100%; margin: 0 auto; }
 }
 @media (max-width: 420px) { .adda-art { min-height: 430px; } .adda-card { padding: 18px; } }
 
-/* ---------- inside the app: five more screens; a swipeable row below 1100 px */
+/* ---------- inside the app: five more screens at mela night; a swipeable row below 1100 px */
+.home .tour { color: var(--on-dusk); background: radial-gradient(ellipse 70% 60% at 50% 62%, #0F4B45 0%, var(--dusk-deep) 70%); }
+.home .tour h2 { color: var(--on-dusk); }
+.tour .phone { box-shadow: inset 0 0 0 1.5px #4C6B67, 0 40px 70px -34px rgba(0, 0, 0, .8), 0 26px 60px -30px rgba(245, 176, 35, .28); }
 .tour-row {
   list-style: none; margin: 0; padding: 0;
   display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(18px, 2.4vw, 32px);
 }
 .tour-item .phone { width: min(100%, 224px); margin: 0 auto 22px; }
-.tour-item h3 { margin: 0 0 4px; font: 600 19px/1.35 var(--sans); color: var(--ink); }
-.tour-item p { margin: 0; color: var(--muted); font-size: 15px; }
+.tour-item h3 { margin: 0 0 4px; font: 600 19px/1.35 var(--sans); color: var(--on-dusk); }
+.tour-item p { margin: 0; color: var(--on-dusk-muted); font-size: 15px; }
 @media (max-width: 1100px) {
   .tour-row {
     grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: min(62%, 236px);
@@ -628,3 +670,98 @@ html[data-lang="bn"] .play-steps li::before { content: counter(ps, bengali); }
 .apk-steps li { margin: 0 0 8px; }
 .apk-steps p { margin: 0; }
 @media (max-width: 480px) { .play-steps li { flex-direction: column; align-items: flex-start; } }
+
+/* ---------- motion (motion.js). It arms a section (its start state) only while that section is
+   still below the fold, then plays it once it scrolls in. With reduced motion or no JavaScript
+   nothing here applies and everything shows in its final state. */
+
+/* How it works: the bulbs are off, the thread is unsewn, the phones are asleep. As each step
+   lights (.lit), its bulb glows on, its phone wakes and the thread sews on to the next step. */
+.how-row.armed .how-item { perspective: 1100px; }
+.how-row.armed .how-item::before {
+  background: var(--how-bg); color: rgba(122, 52, 23, .5);
+  box-shadow: 0 0 0 6px var(--how-bg), inset 0 0 0 2px rgba(122, 52, 23, .35);
+}
+.how-row.armed .how-item.lit::before {
+  background: var(--marigold); color: var(--ink); box-shadow: 0 0 0 6px var(--how-bg);
+  animation: how-bulb .8s cubic-bezier(.3, 1.6, .5, 1) both;
+}
+@keyframes how-bulb {
+  0% { scale: .7; box-shadow: 0 0 0 6px var(--how-bg), 0 0 0 0 rgba(245, 176, 35, .75); }
+  45% { scale: 1.2; }
+  100% { scale: 1; box-shadow: 0 0 0 6px var(--how-bg), 0 0 0 26px rgba(245, 176, 35, 0); }
+}
+.how-row.armed .how-thread::before { clip-path: inset(0 100% 0 0); transition: clip-path .6s cubic-bezier(.65, 0, .35, 1) .2s; }
+.how-row.armed .how-item.lit .how-thread::before { clip-path: inset(0); }
+.how-row.armed .how-thread::after {   /* the needle running ahead of the thread */
+  content: ""; position: absolute; top: -4.5px; left: 0; width: 11px; height: 11px; border-radius: 50%;
+  background: var(--sindoor); box-shadow: 0 0 10px 2px rgba(217, 72, 43, .45); opacity: 0;
+}
+.how-row.armed .how-item.lit .how-thread::after { animation: how-needle .6s cubic-bezier(.65, 0, .35, 1) .2s both; }
+@keyframes how-needle {
+  0% { left: 0; opacity: 0; } 12%, 80% { opacity: 1; } 100% { left: calc(100% - 11px); opacity: 0; }
+}
+.how-row.armed .how-item .phone {
+  opacity: 0; translate: 0 70px; rotate: x 28deg; scale: .92;
+  transition: opacity .45s, translate 1s cubic-bezier(.2, .9, .25, 1), rotate 1s cubic-bezier(.2, .9, .25, 1), scale 1s cubic-bezier(.2, .9, .25, 1);
+}
+.how-row.armed .how-item.lit .phone { opacity: 1; translate: none; rotate: none; scale: none; }
+.how-row.armed .how-item .phone img { filter: brightness(.12) saturate(.4); transition: filter .9s ease .45s; }
+.how-row.armed .how-item.lit .phone img { filter: none; }
+.how-row.armed .how-cap { opacity: 0; translate: 0 12px; transition: opacity .5s .4s, translate .5s .4s; }
+.how-row.armed .how-item.lit .how-cap { opacity: 1; translate: none; }
+
+/* Adda Tables: the two cards are dealt onto the table like playing cards; then the front card
+   acts out asking for a seat (data-state on the section: aim, press, wait, in). */
+.home .adda { overflow: clip; }
+.adda-art.armed .adda-card { opacity: 0; }
+.adda-art.armed .adda-card.back { transform: translate(140px, 260px) rotate(32deg); }
+.adda-art.armed .adda-card.front { transform: translate(300px, 200px) rotate(-34deg); }
+.adda-art.armed.dealt .adda-card { opacity: 1; transition: transform 1s cubic-bezier(.2, 1.2, .35, 1), opacity .25s; }
+.adda-art.armed.dealt .adda-card.back { transform: rotate(5deg); }
+.adda-art.armed.dealt .adda-card.front { transform: rotate(-2.5deg); transition-delay: .2s; }
+
+.ac-btn::before {                 /* a finger tap, like a screen recording's touch dot */
+  content: ""; position: absolute; left: 50%; top: 50%; width: 40px; height: 40px; margin: -20px;
+  border-radius: 50%; background: rgba(255, 255, 255, .3); box-shadow: 0 0 0 2px rgba(255, 255, 255, .75);
+  opacity: 0; scale: 1.6; transition: opacity .3s, scale .3s;
+}
+.adda[data-state="aim"] .ac-btn::before { opacity: 1; scale: 1; }
+.adda[data-state="press"] .ac-btn::before { opacity: 1; scale: .8; }
+.adda[data-state="press"] .ac-btn { scale: .95; }
+.ac-btn::after {                  /* the ripple when it's pressed */
+  content: ""; position: absolute; left: 50%; top: 50%; width: 24px; height: 24px; margin: -12px;
+  border-radius: 50%; background: rgba(245, 176, 35, .55); opacity: 0;
+}
+.adda[data-state="wait"] .ac-btn::after { animation: ac-ripple .8s ease-out both; }
+@keyframes ac-ripple { 0% { opacity: 1; scale: 1; } 100% { opacity: 0; scale: 16; } }
+.adda[data-state="wait"] .ac-btn { background: var(--haldi); color: var(--ink); }
+.adda[data-state="in"] .ac-btn { background: var(--mint); color: var(--teal-deep); box-shadow: inset 0 0 0 2px var(--teal); }
+.adda[data-state="wait"] .ac-btn .st-ask, .adda[data-state="in"] .st-ask { opacity: 0; translate: 0 -8px; }
+.adda[data-state="wait"] .ac-btn .st-wait, .adda[data-state="in"] .st-in { opacity: 1; translate: none; }
+.adda[data-state="wait"] .ac-pulse { animation: ac-pulse 1s ease-in-out infinite alternate; }
+@keyframes ac-pulse { from { scale: .6; opacity: .5; } to { scale: 1.15; opacity: 1; } }
+.ac-dots i { transition: background-color .3s, box-shadow .3s; }
+.adda[data-state="wait"] .ac-dots i.yours { box-shadow: inset 0 0 0 2px var(--marigold); animation: ac-pulse .9s ease-in-out infinite alternate; }
+.adda[data-state="in"] .ac-dots i.yours {
+  background: var(--marigold); box-shadow: inset 0 0 0 2px var(--marigold);
+  animation: seat-pop .55s cubic-bezier(.3, 1.9, .5, 1) both;
+}
+@keyframes seat-pop { 0% { scale: .3; } 100% { scale: 1; } }
+.adda-points .icon { transition: background-color .4s, stroke .4s, scale .4s; }
+.adda[data-state="wait"] .pt-wait .icon, .adda[data-state="in"] .pt-in .icon { background: var(--marigold); stroke: var(--ink); scale: 1.1; }
+
+/* Inside the app, wide screens: the five phones start as a fanned hand of cards and are laid out
+   in a row as you scroll (motion.js sets each item's transform and --cap, its caption's fade). */
+.tour-row.fan .tour-item { transform-origin: 50% 125%; will-change: transform; }
+.tour-row.fan .tour-item h3, .tour-row.fan .tour-item p { opacity: var(--cap, 1); translate: 0 calc((1 - var(--cap, 1)) * 14px); }
+/* Narrower screens (a swipeable row): the phones rise in one after another. */
+.tour-row.armed .tour-item { opacity: 0; translate: 0 44px;   /* up, not sideways: sideways would move the row's swipe stops */ transition: opacity .5s, translate .8s cubic-bezier(.2, .9, .25, 1); transition-delay: calc(var(--i) * 110ms); }
+.tour-row.armed.in .tour-item { opacity: 1; translate: none; }
+
+/* Phones tilt toward the pointer, with a glint across the glass (mouse and trackpad only). */
+.phone .screen::before {
+  content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0; transition: opacity .4s;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 0%), rgba(255, 255, 255, .32), transparent 50%);
+}
+.phone.tilting .screen::before { opacity: 1; }

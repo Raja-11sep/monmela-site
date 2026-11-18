@@ -282,17 +282,26 @@ def phone(key, cls="", lazy=True, alt=True):
 
 def adda_card(cls, title_en, title_bn, when_en, when_bn, taken, seats, tag=None, full=True):
     """An Adda Table card in the app's style (decorative, for the Adda Tables band).
-    full=False: a short card peeking out from behind (title, time and seats only)."""
-    dots = "".join(f'<i class="{"on" if n < taken else ""}"></i>' for n in range(seats))
+    full=False: a short card peeking out from behind (title, time and seats only).
+    A full card also carries the later states of its button, seat count and note; motion.js plays
+    them (ask -> request sent -> you're in). Without it only the first state shows."""
+    def seats_text(n):
+        return both(f"{n} of {seats} seats taken", f"{bn_num(seats)}টার মধ্যে {bn_num(n)}টা জায়গা ভরা")
+
+    # The dot right after the taken ones is "yours": it fills when the host says yes.
+    dots = "".join(f'<i class="{"on" if n < taken else "yours" if n == taken and full else ""}"></i>'
+                   for n in range(seats))
     tag_html = f'<p class="ac-tag">{both(*tag)}</p>' if tag else ""
+    count = (f'<span class="st st-ask">{seats_text(taken)}</span><span class="st st-in">{seats_text(taken + 1)}</span>'
+             if full else seats_text(taken))
     rest = f"""
   <p class="ac-host">{icon("badge")}{both("Host is photo verified", "আয়োজক ছবি-যাচাই করা")}</p>
-  <span class="ac-btn">{both("Ask for a seat", "জায়গা চান")}</span>
-  <p class="ac-note">{both("Exact spot shared once the host says yes", "আয়োজক রাজি হলে ঠিক জায়গা জানানো হবে")}</p>""" if full else ""
+  <span class="ac-btn"><span class="st st-ask">{both("Ask for a seat", "জায়গা চান")}</span><span class="st st-wait"><i class="ac-pulse"></i>{both("Request sent", "অনুরোধ পাঠানো হয়েছে")}</span><span class="st st-in">{both("You're in! Group chat open", "জায়গা পেলেন! গ্রুপ চ্যাট খোলা")}</span></span>
+  <p class="ac-note"><span class="st st-ask">{both("Exact spot shared once the host says yes", "আয়োজক রাজি হলে ঠিক জায়গা জানানো হবে")}</span><span class="st st-in">{both("Exact spot: the phuchka stall at Gariahat crossing", "ঠিক জায়গা: গড়িয়াহাট মোড়ের ফুচকার দোকান")}</span></p>""" if full else ""
     return f"""<div class="adda-card {cls}">
   {tag_html}<p class="ac-title">{both(title_en, title_bn)}</p>
   <p class="ac-when">{both(when_en, when_bn)}</p>
-  <div class="ac-seats"><span class="ac-dots">{dots}</span>{both(f"{taken} of {seats} seats taken", f"{bn_num(seats)}টার মধ্যে {bn_num(taken)}টা জায়গা ভরা")}</div>{rest}
+  <div class="ac-seats"><span class="ac-dots">{dots}</span><span class="ac-count">{count}</span></div>{rest}
 </div>"""
 
 
@@ -326,6 +335,15 @@ STORY = [
 ]
 
 
+def music_button(cls=""):
+    """The story's opt-in music button (music.js shows it; without JavaScript there's no music).
+    cls="music-float": the copy that floats at the bottom of the screen while the music plays."""
+    return (f'<button class="music-btn {cls}" type="button" aria-pressed="false" hidden>'
+            f'<span class="mb-icon" aria-hidden="true"><i></i><i></i><i></i></span>'
+            f'<span class="mb-play">{both("Play with music", "গান চালিয়ে দেখুন")}</span>'
+            f'<span class="mb-pause">{both("Pause music", "গান থামান")}</span></button>')
+
+
 def story_section():
     """Six chapters. Phones (and no JavaScript): each chapter is a picture card with its text.
     Wide screens with story.js: the pictures sit in one sticky frame on the right and cross-fade
@@ -345,9 +363,13 @@ def story_section():
     <div class="story-head">
       <h2 id="story-h">{both("A story of friendship", "একটা বন্ধুত্বের গল্প")}</h2>
       <p>{both("Six small moments, the way friendships start in Bengal.", "ছ'টা ছোট মুহূর্ত, বাংলায় যেভাবে বন্ধুত্ব শুরু হয়।")}</p>
+      {music_button()}
+      <p class="music-tune" hidden>{both("Tune: Purano Sei Diner Kotha", "সুর: পুরানো সেই দিনের কথা")}</p>
     </div>
     <div class="story-body">
       <ol class="story-chapters">{"".join(chapters)}</ol>
+      {music_button("music-float")}
+      <audio class="story-audio" src="{asset("audio/story-theme.mp3")}" preload="none" loop></audio>
       <div class="story-frame" aria-hidden="true"><div class="sf-pics">{"".join(frame)}</div><div class="sf-dots">{"".join(dots)}</div></div>
     </div>
   </section>"""
@@ -369,9 +391,12 @@ def home():
          "New people every morning, each with a match % and why you match.",
          "প্রতিদিন সকালে নতুন মানুষ, সঙ্গে মিলের % আর কেন মিল।"),
     ]
+    # .how-thread: the kantha stitch to the next step (motion.js sews it in; static dashes without JS)
+    thread = '<span class="how-thread" aria-hidden="true"></span>'
     steps_html = "".join(
-        f'<li class="how-item">{phone(k)}<div class="how-cap"><h3>{both(t_en, t_bn)}</h3><p>{both(d_en, d_bn)}</p></div></li>'
-        for k, t_en, t_bn, d_en, d_bn in steps)
+        f'<li class="how-item">{thread if i < len(steps) - 1 else ""}{phone(k)}'
+        f'<div class="how-cap"><h3>{both(t_en, t_bn)}</h3><p>{both(d_en, d_bn)}</p></div></li>'
+        for i, (k, t_en, t_bn, d_en, d_bn) in enumerate(steps))
 
     # Inside the app: five more screens, no numbers (they're not steps).
     tour = [
@@ -444,7 +469,7 @@ def home():
 
     # Title and description: the words people actually search for (Bengali friendship app,
     # Kolkata, West Bengal, adda), in under ~60 and ~155 characters so Google shows them whole.
-    html = f"""{head(HOME_TITLE_EN, HOME_TITLE_BN, HOME_DESCRIPTION, "", script("story.js") + home_schema(faq))}
+    html = f"""{head(HOME_TITLE_EN, HOME_TITLE_BN, HOME_DESCRIPTION, "", script("story.js") + script("music.js") + script("motion.js") + home_schema(faq))}
 <body class="home">
 {header(on_home=True)}
 <section class="hero-k">
@@ -503,8 +528,8 @@ def home():
           "একসঙ্গে কয়েকজনের সঙ্গে আলাপ করতে চান? ক্যাফে, ফুচকার দোকান, পার্ক বা কলেজ স্ট্রিটে ৩ থেকে ৬ জনের আড্ডায় যোগ দিন।")}</p>
       <ul class="adda-points">
         <li>{icon("badge")}<p>{both("A photo-verified member hosts every table.", "প্রতিটি আড্ডা বসান ছবি-যাচাই করা একজন সদস্য।")}</p></li>
-        <li>{icon("chat")}<p>{both("Ask for a seat. You join when the host says yes.", "জায়গা চান। আয়োজক রাজি হলে যোগ দিন।")}</p></li>
-        <li>{icon("pin")}<p>{both("The exact spot and the group chat open only for the people at the table.", "ঠিক জায়গা আর গ্রুপ চ্যাট খোলে শুধু আড্ডার মানুষদের জন্য।")}</p></li>
+        <li class="pt-wait">{icon("chat")}<p>{both("Ask for a seat. You join when the host says yes.", "জায়গা চান। আয়োজক রাজি হলে যোগ দিন।")}</p></li>
+        <li class="pt-in">{icon("pin")}<p>{both("The exact spot and the group chat open only for the people at the table.", "ঠিক জায়গা আর গ্রুপ চ্যাট খোলে শুধু আড্ডার মানুষদের জন্য।")}</p></li>
         <li>{icon("people")}<p>{both("Women can host women-only addas.", "মহিলারা শুধু মহিলাদের আড্ডা বসাতে পারেন।")}</p></li>
       </ul>
     </div>
