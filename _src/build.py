@@ -104,13 +104,13 @@ def head(title_en, title_bn, description, path="", extra=""):
 
 
 def header(on_home=False):
-    """Sticky top bar on every page: logo, section links (wide screens), language switch, Download.
+    """Floating top bar on every page: logo, section links (wide screens), language switch, Download.
     On the home page the links only scroll; elsewhere they open the home page at that section."""
     prefix = "" if on_home else "./"
     links = '<nav class="top-nav" aria-label="Sections">' + "".join(
         f'<a href="{prefix}#{anchor}">{both(en, bn)}</a>'
-        for anchor, en, bn in [("how", "How it works", "কীভাবে"), ("safe", "Safety", "নিরাপত্তা"),
-                               ("qa", "Questions", "প্রশ্ন")]) + "</nav>"
+        for anchor, en, bn in [("how", "How it works", "কীভাবে"), ("adda-h", "Adda Tables", "আড্ডা টেবিল"),
+                               ("safe", "Safety", "নিরাপত্তা"), ("qa", "Questions", "প্রশ্ন")]) + "</nav>"
     cta = get_app_button("btn btn-primary btn-small top-cta", short=True)
     return f"""<header class="top"><div class="top-inner">
   <a class="brand" href="./">{LOGO}{both("Mon Mela", "মনমেলা")}</a>
