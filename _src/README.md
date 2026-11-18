@@ -16,6 +16,8 @@ This rewrites `index.html`, `download.html` and the four legal pages in the site
 |---|---|
 | `_src/build.py` | Page layouts, all home/download text (English + Bengali), header/footer, settings |
 | `_src/art.py` | The SVG illustrations: the home picture's kites and stitched arch frame, the strings of mela lights (`festoon`), alpana border |
+| `_src/tools/make_story.py` | Paints the six pictures of the home page story ("A story of friendship") into `img/story-1.webp` … `story-6.webp`, with the same four friends and style as the hero. Run it, then `build.py`. `python3 _src/tools/make_story.py 4` repaints only picture 4 |
+| `story.js` | The story section on wide screens: one sticky picture frame that cross-fades as each chapter scrolls past. Without it (and on phones) each chapter shows its own picture card |
 | `_src/tools/make_hero.py` | Paints the home page picture (friends on a Ganga ghat at sunset) into `img/hero-ghat.webp`. Run it, then `build.py`. Other looks: `dusk`, `morning` |
 | `_src/pages/*.html` | Legal page bodies (privacy, terms, delete account, child safety) |
 | `_src/tools/prep_screens.py` | Turns app screenshots into `img/app-*.webp` (cleans the status bar, blurs photos) |

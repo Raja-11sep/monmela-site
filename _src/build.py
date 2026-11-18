@@ -296,6 +296,63 @@ def adda_card(cls, title_en, title_bn, when_en, when_bn, taken, seats, tag=None,
 </div>"""
 
 
+# The story section: six moments of one friendship (pictures by tools/make_story.py).
+# (big title in Bengali, its English line, text in English, text in Bengali, picture alt text)
+STORY = [
+    ("নতুন শহর", "A new city",
+     "New job, new city, and evenings at the window. Everyone is busy, and there's no one to share a bhaar of cha with.",
+     "নতুন চাকরি, নতুন শহর, সন্ধেগুলো কাটে জানলার ধারে। সবাই ব্যস্ত, এক ভাঁড় চা খাওয়ার সঙ্গী নেই।",
+     "A young man sits alone at a window at night, looking out at the city lights"),
+    ("একটা হ্যালো", "A hello",
+     "Mon Mela shows someone nearby who also loves café adda and the hills. A wave, a wave back, and the chat opens.",
+     "মনমেলা দেখাল কাছেই এমন একজনকে, যিনিও ক্যাফের আড্ডা আর পাহাড় ভালোবাসেন। হাত নাড়া, উত্তরে হাত নাড়া, আর চ্যাট খুলে গেল।",
+     "A phone on a window sill showing a suggestion and a waving hand"),
+    ("প্রথম আড্ডা", "The first adda",
+     "Saturday, 5 pm, the para tea stall. Two cups of cha became six, and nobody looked at the time.",
+     "শনিবার, বিকেল ৫টা, পাড়ার চায়ের দোকান। দু'ভাঁড় চা গড়াল ছ'ভাঁড়ে, ঘড়ি দেখল না কেউ।",
+     "Three friends on a bench in front of a lit tea stall in the evening"),
+    ("বইমেলা", "Boi Mela",
+     "An Adda Table at the Book Fair: four people, too many books, and one shared jhola.",
+     "বইমেলায় একটা আড্ডা টেবিল: চারজন মানুষ, অনেক বেশি বই, আর একটাই ঝোলা।",
+     "Four friends at a book stall at the Kolkata Book Fair in the afternoon sun"),
+    ("মেলার রাত", "A night at the mela",
+     "Lights, the nagordola and phuchka. Now there's always someone to say \u201ccholo\u201d.",
+     "আলো, নাগরদোলা আর ফুচকা। এখন \u201cচলো\u201d বলার লোক সবসময় আছে।",
+     "Four friends at a fair at night, looking up at a lit giant wheel"),
+    ("ঘাটে সন্ধে", "Evenings at the ghat",
+     "The city doesn't feel new any more. It feels like home. Find your people on Mon Mela.",
+     "শহরটা আর নতুন লাগে না, ঘর মনে হয়। মনমেলায় খুঁজে নিন আপনার মানুষদের।",
+     "Four friends on a ghat of the Ganga at sunset, Howrah Bridge behind them"),
+]
+
+
+def story_section():
+    """Six chapters. Phones (and no JavaScript): each chapter is a picture card with its text.
+    Wide screens with story.js: the pictures sit in one sticky frame on the right and cross-fade
+    as each chapter scrolls past on the left."""
+    chapters, frame, dots = [], [], []
+    for i, (title_bn, title_en, en, bn, alt) in enumerate(STORY):
+        src = asset(f"img/story-{i + 1}.webp")
+        cta = f'<div class="actions">{get_app_button()}</div>' if i == len(STORY) - 1 else ""
+        chapters.append(
+            f'<li class="chapter" data-i="{i}">'
+            f'<figure class="ch-pic"><img src="{src}" alt="{alt}" width="1000" height="1200" loading="lazy" decoding="async"></figure>'
+            f'<div class="ch-text"><h3><span class="ch-bn" lang="bn">{title_bn}</span>'
+            f'<span class="ch-en l" lang="en">{title_en}</span></h3><p>{both(en, bn)}</p>{cta}</div></li>')
+        frame.append(f'<img class="sf-pic{" on" if i == 0 else ""}" src="{src}" alt="" width="1000" height="1200" loading="lazy" decoding="async">')
+        dots.append(f'<span{" class=\"on\"" if i == 0 else ""}></span>')
+    return f"""<section class="story" aria-labelledby="story-h">
+    <div class="story-head">
+      <h2 id="story-h">{both("A story of friendship", "একটা বন্ধুত্বের গল্প")}</h2>
+      <p>{both("Six small moments, the way friendships start in Bengal.", "ছ'টা ছোট মুহূর্ত, বাংলায় যেভাবে বন্ধুত্ব শুরু হয়।")}</p>
+    </div>
+    <div class="story-body">
+      <ol class="story-chapters">{"".join(chapters)}</ol>
+      <div class="story-frame" aria-hidden="true"><div class="sf-pics">{"".join(frame)}</div><div class="sf-dots">{"".join(dots)}</div></div>
+    </div>
+  </section>"""
+
+
 def home():
     # How it works: four app screens in a row (a swipeable row on phones), then one line about chatting.
     steps = [
@@ -399,7 +456,7 @@ def home():
 
     # Title and description: the words people actually search for (Bengali friendship app,
     # Kolkata, West Bengal, adda), in under ~60 and ~155 characters so Google shows them whole.
-    html = f"""{head(HOME_TITLE_EN, HOME_TITLE_BN, HOME_DESCRIPTION, "", script("home.js") + home_schema(faq))}
+    html = f"""{head(HOME_TITLE_EN, HOME_TITLE_BN, HOME_DESCRIPTION, "", script("home.js") + script("story.js") + home_schema(faq))}
 <body class="home">
 {header(on_home=True)}
 <section class="hero-k">
@@ -437,6 +494,15 @@ def home():
 </section>
 
 <main class="home-main">
+  {story_section()}
+
+  <section class="how" aria-labelledby="how">
+    <h2 id="how">{both("How it works", "কীভাবে কাজ করে")}</h2>
+    <ol class="how-row">{steps_html}</ol>
+    <p class="how-then">{icon("chat")}<span>{both("<b>Then connect.</b> The chat opens only when both of you say yes.",
+                                                  "<b>তারপর কানেক্ট।</b> দুজনেই রাজি হলে তবেই চ্যাট খোলে।")}</span></p>
+  </section>
+
   <section class="match" aria-labelledby="match-h">
     <div class="match-inner">
       <div class="match-text">
@@ -446,13 +512,6 @@ def home():
       </div>
       {venn()}
     </div>
-  </section>
-
-  <section class="how" aria-labelledby="how">
-    <h2 id="how">{both("How it works", "কীভাবে কাজ করে")}</h2>
-    <ol class="how-row">{steps_html}</ol>
-    <p class="how-then">{icon("chat")}<span>{both("<b>Then connect.</b> The chat opens only when both of you say yes.",
-                                                  "<b>তারপর কানেক্ট।</b> দুজনেই রাজি হলে তবেই চ্যাট খোলে।")}</span></p>
   </section>
 
   <section class="adda" aria-labelledby="adda-h">
