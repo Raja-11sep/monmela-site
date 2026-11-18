@@ -538,9 +538,12 @@ def home():
          f'Mon Mela is run by Dhritisha Palmal in West Bengal, who is also our Grievance Officer. Write to <a href="mailto:{EMAIL}">{EMAIL}</a>.',
          f'মনমেলা পরিচালনা করেন পশ্চিমবঙ্গের Dhritisha Palmal, যিনি আমাদের অভিযোগ আধিকারিকও। লিখুন <a href="mailto:{EMAIL}">{EMAIL}</a>-এ।'),
     ]
+    # Questions as a chat with Mon Mela: each question is a message you tap, the answer is Mon Mela's
+    # reply (motion.js shows it "typing" first). The first one starts open to show how it works.
+    typing = '<span class="ask-typing" aria-hidden="true"><i></i><i></i><i></i></span>'
     faq_html = "".join(
-        f'<details><summary>{both(q_en, q_bn)}</summary><p>{both(a_en, a_bn)}</p></details>'
-        for q_en, q_bn, a_en, a_bn in faq)
+        f'<details{" open" if i == 0 else ""}><summary>{both(q_en, q_bn)}</summary>{typing}<p>{both(a_en, a_bn)}</p></details>'
+        for i, (q_en, q_bn, a_en, a_bn) in enumerate(faq))
 
     # Title and description: the words people actually search for (Bengali friendship app,
     # Kolkata, West Bengal, adda), in under ~60 and ~155 characters so Google shows them whole.
@@ -554,10 +557,6 @@ def home():
     <p class="lede">{both(
         "New city, new job, but no one to share a cup of cha with? Mon Mela finds friends near you who love what you love, and shows exactly what you share before you say hello.",
         "নতুন শহর, নতুন চাকরি, কিন্তু এক ভাঁড় চা খাওয়ার সঙ্গী নেই? মনমেলা খুঁজে দেয় কাছেপিঠে মনের মতো বন্ধু, আর হ্যালো বলার আগেই দেখিয়ে দেয় কোথায় কোথায় মিল।")}</p>
-    <div class="actions">
-      {get_app_button()}
-      <a class="btn btn-quiet" href="#how">{both("How it works", "কীভাবে কাজ করে")}</a>
-    </div>
   </div>
   <div class="hero-k-art">
     {hero_art(asset("img/hero-ghat.webp"))}
@@ -644,9 +643,13 @@ def home():
     </div>
   </section>
 
-  <section class="faq" aria-labelledby="qa">
-    <h2 id="qa">{both("Questions", "প্রশ্ন")}</h2>
-    {faq_html}
+  <section class="faq ask" aria-labelledby="qa">
+    <div class="ask-head">
+      <h2 id="qa">{both("Questions", "প্রশ্ন")}</h2>
+      <p class="ask-lede">{both("Ask us anything. Tap a question and Mon Mela replies.", "যা খুশি জিজ্ঞেস করুন। প্রশ্নে ট্যাপ করুন, মনমেলা উত্তর দেবে।")}</p>
+    </div>
+    <div class="ask-chat">{faq_html}</div>
+    <p class="ask-more">{both("Can't find your answer?", "উত্তর পেলেন না?")} <a href="mailto:{EMAIL}">{EMAIL}</a></p>
   </section>
 </main>
 {footer(on_home=True)}

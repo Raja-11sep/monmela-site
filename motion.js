@@ -5,7 +5,7 @@
 //     a seat (tap, "request sent", "you're in") over and over while it's on screen.
 //  3. Inside the app: on wide screens the five phones start as a fanned hand of cards and are laid
 //     out in a row as you scroll; on narrower screens they rise in one after another.
-// Plus: phones tilt toward the mouse pointer.
+// Plus: phones tilt toward the mouse pointer, and Questions shows Mon Mela "typing" before each reply.
 // With reduced motion, or without this file, everything simply shows in its final state.
 (function () {
   if (!window.matchMedia || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -177,7 +177,22 @@
     });
   }
 
+  // 4. Questions: opening one shows Mon Mela "typing" for a moment, then its reply.
+  function askReplies() {
+    document.querySelectorAll('.ask details').forEach(function (d) {
+      var timer = null;
+      d.addEventListener('toggle', function () {
+        clearTimeout(timer);
+        d.classList.remove('replied');
+        if (!d.open) { d.classList.remove('typing'); return; }
+        d.classList.add('typing');
+        timer = setTimeout(function () { d.classList.remove('typing'); d.classList.add('replied'); }, 750);
+      });
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
+    askReplies();
     howItWorks();
     addaTables();
     insideTheApp();

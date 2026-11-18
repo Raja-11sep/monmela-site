@@ -159,7 +159,11 @@ h3 { text-wrap: balance; }
 @media (max-width: 1060px) { .top-nav { display: none; } }
 @media (max-width: 560px) { .top { padding: 10px 10px 4px; } .top-inner { padding: 6px 6px 6px 12px; } .top-inner::after { left: 22px; right: 22px; } }
 @media (max-width: 480px) {
-  .top-cta { display: none; }
+  .lang-switch { padding: 0; background: none; }
+  .lang-switch button[aria-pressed="true"] { display: none; }   /* show only the language to switch to */
+  .lang-switch button { padding: 8px 12px; box-shadow: inset 0 0 0 1.5px rgba(255, 246, 229, .3); color: var(--on-dusk); }
+  .top-end { gap: 8px; }
+  .top-cta { padding: 9px 14px; }
   .brand { font-size: 19px; }
   .brand svg { width: 34px; height: 34px; }
 }
@@ -280,7 +284,7 @@ html[data-lang="bn"] .home section h2 { line-height: 1.22; }
 }
 .hero-k h1 { font-size: clamp(46px, 6vw, 88px); line-height: .98; margin: 0 0 26px; color: var(--on-dusk); text-wrap: pretty; }
 html[data-lang="bn"] .hero-k h1 { font-size: clamp(42px, 5.8vw, 82px); line-height: 1.18; }
-.hero-k .lede { color: var(--on-dusk-muted); font-size: clamp(18px, 1.5vw, 21px); max-width: 30em; margin: 0 0 34px; text-wrap: pretty; }
+.hero-k .lede { color: var(--on-dusk-muted); font-size: clamp(18px, 1.5vw, 21px); max-width: 30em; margin: 0; text-wrap: pretty; }
 .hero-k .btn-quiet { color: var(--on-dusk); box-shadow: inset 0 0 0 1.5px rgba(255, 246, 229, .5); }
 .hero-k .btn-quiet:hover { background: rgba(255, 246, 229, .1); color: var(--on-dusk); }
 .hero-k-art { position: relative; justify-self: end; width: min(100%, 470px); }
@@ -337,7 +341,6 @@ html[data-lang="bn"] .hero-k h1 { font-size: clamp(42px, 5.8vw, 82px); line-heig
   .ping-card { right: -10%; top: 4%; font-size: 14px; }
 }
 @media (max-width: 480px) {
-  .hero-k .actions .btn { flex: 1 1 100%; }
   .hero-k-art { width: 84%; }
   .match-card { left: -6%; top: 22%; width: 168px; border-radius: 16px; }
   .mc-score { font-size: 15px; padding: 3px 11px; }
@@ -669,6 +672,60 @@ html[data-lang="bn"] .how-item::before { content: counter(how, bengali); }
   .home .faq { grid-template-columns: 1fr; }
   .faq h2 { grid-row: auto; margin-bottom: 20px !important; }
   .faq summary { font-size: 17px; }
+}
+
+/* ---------- questions on the home page (.ask): a chat with Mon Mela. Each question is a message
+   to tap; open, it becomes a sent bubble and Mon Mela "types" for a moment (motion.js), then replies
+   next to the logo. Still native <details>: works without JavaScript, and search engines read every answer. */
+.home .ask {
+  background: var(--mint); grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  grid-template-areas: "head chat" "more chat"; grid-template-rows: auto 1fr; align-content: start; row-gap: 22px;
+}
+.ask-head { grid-area: head; }
+.ask-chat { grid-area: chat; }
+.ask .ask-head h2 { grid-row: auto; margin-bottom: 12px; }
+.ask-lede { margin: 0; max-width: 16em; color: var(--muted); font-size: 18px; }
+.ask-more {
+  grid-area: more; align-self: start; max-width: 18em; margin: 0; padding: 16px 18px; border-radius: 18px;
+  background: #fff; color: var(--muted); font-size: 15px; box-shadow: 0 10px 26px -18px rgba(11, 59, 55, .5);
+}
+.ask-more a { display: block; margin-top: 4px; font-weight: 600; color: var(--teal-deep); }
+.ask details, .ask details:last-child { display: grid; gap: 10px; margin: 0 0 12px; border: 0; }
+.ask summary {
+  justify-self: end; max-width: 80%; padding: 11px 20px; border-radius: 22px 22px 6px 22px;
+  font-size: 17px; font-weight: 600; color: var(--teal-deep); background: #fff;
+  box-shadow: inset 0 0 0 1.5px rgba(15, 118, 110, .45); transition: background-color .2s, color .2s, box-shadow .2s;
+}
+.ask summary::after { display: none; }
+.ask summary:hover { background: #F2FAF8; box-shadow: inset 0 0 0 1.5px var(--teal); }
+.ask details[open] summary { color: #fff; background: var(--teal-deep); box-shadow: 0 10px 20px -14px rgba(11, 59, 55, .7); }
+.ask details p, .ask-typing {
+  position: relative; justify-self: start; margin: 0 0 8px 52px; border-radius: 22px 22px 22px 6px;
+  background: #fff; box-shadow: 0 10px 24px -16px rgba(11, 59, 55, .45);
+}
+.ask details p { max-width: 80%; padding: 14px 18px; color: var(--ink); }
+.ask details p a { color: var(--teal-deep); font-weight: 600; }
+.ask details p::before, .ask-typing::before {      /* Mon Mela's picture next to its reply */
+  content: ""; position: absolute; left: -50px; bottom: 0; width: 38px; height: 38px; border-radius: 50%;
+  background: #fff url("favicon.svg") center / 30px no-repeat; box-shadow: 0 4px 10px -4px rgba(11, 59, 55, .4);
+}
+.ask-typing { display: none; gap: 5px; padding: 15px 16px; }
+.ask-typing i { width: 7px; height: 7px; border-radius: 50%; background: #9BB8B3; }
+.ask details.typing .ask-typing { display: flex; }
+.ask details.typing p { display: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .ask-typing i { animation: ask-dot .9s ease-in-out infinite; }
+  .ask-typing i:nth-child(2) { animation-delay: .15s; }
+  .ask-typing i:nth-child(3) { animation-delay: .3s; }
+  .ask details.replied p { animation: ask-in .35s ease-out both; }
+}
+@keyframes ask-dot { 0%, 60%, 100% { translate: 0 0; opacity: .5; } 30% { translate: 0 -4px; opacity: 1; } }
+@keyframes ask-in { from { opacity: 0; translate: 0 8px; scale: .97; } to { opacity: 1; translate: none; scale: none; } }
+@media (max-width: 860px) {
+  .home .ask { grid-template-columns: 1fr; grid-template-areas: "head" "chat" "more"; grid-template-rows: none; }
+  .ask summary, .ask details p { max-width: 90%; }
+  .ask details p, .ask-typing { margin-left: 44px; }
+  .ask details p::before, .ask-typing::before { left: -42px; width: 32px; height: 32px; background-size: 25px; }
 }
 
 /* ---------------------------------------------------------------- download page (body.home.dl) */
