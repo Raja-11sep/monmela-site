@@ -280,7 +280,7 @@ html[data-lang="bn"] .home section h2 { line-height: 1.22; }
 }
 .hero-k h1 { font-size: clamp(46px, 6vw, 88px); line-height: .98; margin: 0 0 26px; color: var(--on-dusk); text-wrap: pretty; }
 html[data-lang="bn"] .hero-k h1 { font-size: clamp(42px, 5.8vw, 82px); line-height: 1.18; }
-.hero-k .lede { color: var(--on-dusk-muted); font-size: clamp(18px, 1.5vw, 21px); max-width: 30em; margin: 0 0 34px; }
+.hero-k .lede { color: var(--on-dusk-muted); font-size: clamp(18px, 1.5vw, 21px); max-width: 30em; margin: 0 0 34px; text-wrap: pretty; }
 .hero-k .btn-quiet { color: var(--on-dusk); box-shadow: inset 0 0 0 1.5px rgba(255, 246, 229, .5); }
 .hero-k .btn-quiet:hover { background: rgba(255, 246, 229, .1); color: var(--on-dusk); }
 .hero-note { margin: 22px 0 0; font-size: 15px; color: var(--on-dusk-muted); }

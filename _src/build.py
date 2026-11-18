@@ -549,13 +549,13 @@ def home():
   <div class="hero-k-text">
     <h1>{both("Friends who think like you, near you.", "মনের মতো বন্ধু, আপনার কাছেই।")}</h1>
     <p class="lede">{both(
-        "A free friendship app for adults in West Bengal. Answer a short quiz, and every day Mon Mela introduces you to people whose answers match yours.",
-        "পশ্চিমবঙ্গের প্রাপ্তবয়স্কদের জন্য বিনামূল্যের বন্ধুত্বের অ্যাপ। একটা ছোট কুইজের উত্তর দিন, আর প্রতিদিন মনমেলা আলাপ করিয়ে দেবে এমন মানুষের সঙ্গে, যাঁদের উত্তর আপনার সঙ্গে মেলে।")}</p>
+        "New city, new job, but no one to share a cup of cha with? Mon Mela finds friends near you who love what you love, and shows exactly what you share before you say hello.",
+        "নতুন শহর, নতুন চাকরি, কিন্তু এক ভাঁড় চা খাওয়ার সঙ্গী নেই? মনমেলা খুঁজে দেয় কাছেপিঠে মনের মতো বন্ধু, আর হ্যালো বলার আগেই দেখিয়ে দেয় কোথায় কোথায় মিল।")}</p>
     <div class="actions">
       {get_app_button()}
       <a class="btn btn-quiet" href="#how">{both("How it works", "কীভাবে কাজ করে")}</a>
     </div>
-    <p class="hero-note">{both("For friendship, not dating. Adults 18+ only.", "বন্ধুত্বের জন্য, ডেটিংয়ের জন্য নয়। শুধু ১৮+।")}</p>
+    <p class="hero-note">{both("Free. For friendship, not dating. Adults 18+ only.", "বিনামূল্যে। বন্ধুত্বের জন্য, ডেটিংয়ের জন্য নয়। শুধু ১৮+।")}</p>
   </div>
   <div class="hero-k-art">
     {hero_art(asset("img/hero-ghat.webp"))}
