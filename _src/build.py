@@ -132,36 +132,61 @@ FACEBOOK_ICON = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 8h2.5
 
 
 def social_links():
-    """Round Instagram / Facebook buttons. rel="me" says the pages are ours."""
-    items = [(INSTAGRAM_URL, "ig", "Mon Mela on Instagram", INSTAGRAM_ICON),
-             (FACEBOOK_URL, "fb", "Mon Mela on Facebook", FACEBOOK_ICON)]
-    return '<p class="social">' + "".join(
-        f'<a class="{cls}" href="{url}" target="_blank" rel="noopener me" aria-label="{label}" title="{label}">{svg}</a>'
-        for url, cls, label, svg in items) + "</p>"
+    """Instagram / Facebook as labelled buttons, with the handle under the name. rel="me" says the
+    pages are ours."""
+    items = [(INSTAGRAM_URL, INSTAGRAM_ICON, "Instagram", "@monmela.in"),
+             (FACEBOOK_URL, FACEBOOK_ICON, "Facebook", "Mon Mela")]
+    return '<div class="foot-social">' + "".join(
+        f'<a href="{url}" target="_blank" rel="noopener me">{svg}<span>{name}</span><small>{handle}</small></a>'
+        for url, svg, name, handle in items) + "</div>"
 
 
-def footer():
-    links = "".join(f'<li><a href="{href}">{both(en, bn)}</a></li>' for href, en, bn in NAV)
+UP_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>'
+
+
+def footer(on_home=False):
+    """Footer on every page: alpana border, brand and Download, three link groups, then the closing
+    scene (mela lights over a huge, fading মনমেলা) and the copyright line with Back to top.
+    The section links only scroll on the home page; elsewhere they open the home page there."""
+    home = "" if on_home else "./"
+
+    def group(title_en, title_bn, items):
+        lis = "".join(f'<li><a href="{href}">{both(en, bn)}</a></li>' for href, en, bn in items)
+        return f'<div class="foot-col"><h2>{both(title_en, title_bn)}</h2><ul>{lis}</ul></div>'
+
+    explore = group("Explore", "ঘুরে দেখুন", [
+        (f"{home}#how", "How it works", "কীভাবে কাজ করে"), (f"{home}#adda-h", "Adda Tables", "আড্ডা টেবিল"),
+        (f"{home}#safe", "Safety", "নিরাপত্তা"), (f"{home}#qa", "Questions", "প্রশ্ন")])
+    help_ = group("Help", "সাহায্য", [
+        ("terms.html", "Terms", "শর্তাবলি"), ("privacy.html", "Privacy", "প্রাইভেসি"),
+        ("child-safety.html", "Child safety", "শিশু সুরক্ষা"), ("delete-account.html", "Delete account", "অ্যাকাউন্ট মুছুন")])
     return f"""<footer class="site-foot">
   <div class="alpana" aria-hidden="true"></div>
   <div class="foot-inner">
     <div class="foot-brand">
       <a class="brand" href="./">{LOGO}{both("Mon Mela", "মনমেলা")}</a>
       <p>{both("Friends who think like you, across West Bengal.", "মনের মতো বন্ধু, সারা পশ্চিমবঙ্গে।")}</p>
-      <p class="follow">{both("Follow us", "আমাদের ফলো করুন")}</p>
-      {social_links()}
+      {get_app_button("foot-get")}
     </div>
-    <div>
-      <h2>{both("Write to us", "আমাদের লিখুন")}</h2>
-      <p><a href="mailto:{EMAIL}">{EMAIL}</a></p>
-      <p>{both("Grievance Officer: Dhritisha Palmal", "অভিযোগ আধিকারিক: Dhritisha Palmal")}</p>
-    </div>
-    <nav aria-label="Pages">
-      <h2>{both("Pages", "পেজ")}</h2>
-      <ul>{links}</ul>
+    <nav class="foot-cols" aria-label="Footer">
+      {explore}
+      {help_}
+      <div class="foot-col foot-write">
+        <h2>{both("Write to us", "আমাদের লিখুন")}</h2>
+        <a class="foot-mail" href="mailto:{EMAIL}">{EMAIL}</a>
+        <p>{both("Grievance Officer: Dhritisha Palmal", "অভিযোগ আধিকারিক: Dhritisha Palmal")}</p>
+        {social_links()}
+      </div>
     </nav>
   </div>
-  <p class="foot-base">{both("© 2026 Mon Mela. Made in West Bengal.", "© ২০২৬ মনমেলা। পশ্চিমবঙ্গে তৈরি।")}</p>
+  <div class="foot-night" aria-hidden="true">
+    <div class="foot-lights">{festoon(swags=5, per_swag=9, width=1800)}</div>
+    <p class="foot-word">মনমেলা</p>
+  </div>
+  <div class="foot-base">
+    <p>{both("© 2026 Mon Mela. Made in West Bengal.", "© ২০২৬ মনমেলা। পশ্চিমবঙ্গে তৈরি।")}</p>
+    <a class="foot-up" href="#">{UP_ICON}<span>{both("Back to top", "ওপরে যান")}</span></a>
+  </div>
 </footer>"""
 
 
@@ -575,7 +600,7 @@ def home():
     {faq_html}
   </section>
 </main>
-{footer()}
+{footer(on_home=True)}
 </body>
 </html>
 """
