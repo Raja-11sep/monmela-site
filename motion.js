@@ -4,7 +4,7 @@
 //  2. Adda Tables: the two cards are dealt onto the table, then the front card acts out asking for
 //     a seat (tap, "request sent", "you're in") over and over while it's on screen.
 //  3. Questions: Mon Mela "types" for a moment before each reply.
-// Plus: phones tilt toward the mouse pointer.
+// Plus: the hero's match % counts up, and phones tilt toward the mouse pointer.
 // With reduced motion, or without this file, everything simply shows in its final state.
 (function () {
   if (!window.matchMedia || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -112,6 +112,21 @@
     });
   }
 
+  // Hero match card: the % counts up while its ring fills (the ring itself is CSS).
+  function heroMatch() {
+    var pct = document.querySelector('.mc-pct');
+    if (!pct) return;
+    var target = parseInt(pct.textContent, 10), began = 0;
+    function step(now) {
+      if (!began) began = now;
+      var k = Math.min(1, Math.max(0, (now - began - 500) / 1400));     // same delay and length as the ring
+      pct.textContent = Math.round((1 - Math.pow(1 - k, 3)) * target) + '%';
+      if (k < 1) requestAnimationFrame(step);
+    }
+    pct.textContent = '0%';
+    requestAnimationFrame(step);
+  }
+
   // 3. Questions: opening one shows Mon Mela "typing" for a moment, then its reply.
   function askReplies() {
     document.querySelectorAll('.ask details').forEach(function (d) {
@@ -128,6 +143,7 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     askReplies();
+    heroMatch();
     howItWorks();
     addaTables();
     tilt();

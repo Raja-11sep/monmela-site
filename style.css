@@ -282,7 +282,7 @@ html[data-lang="bn"] .home section h2 { line-height: 1.22; }
     radial-gradient(55% 60% at 80% 58%, rgba(245, 176, 35, .16), transparent 70%),
     linear-gradient(180deg, var(--dusk-deep) 0%, var(--dusk) 55%, #0D4440 100%);
 }
-.hero-k h1 { font-size: clamp(46px, 6vw, 88px); line-height: .98; margin: 0 0 26px; color: var(--on-dusk); text-wrap: pretty; }
+.hero-k h1 { font-size: clamp(48px, 6.6vw, 96px); line-height: .98; margin: 0 0 26px; color: var(--on-dusk); text-wrap: pretty; }
 html[data-lang="bn"] .hero-k h1 { font-size: clamp(42px, 5.8vw, 82px); line-height: 1.18; }
 .hero-k .lede { color: var(--on-dusk-muted); font-size: clamp(18px, 1.5vw, 21px); max-width: 30em; margin: 0; text-wrap: pretty; }
 .hero-k .btn-quiet { color: var(--on-dusk); box-shadow: inset 0 0 0 1.5px rgba(255, 246, 229, .5); }
@@ -300,54 +300,54 @@ html[data-lang="bn"] .hero-k h1 { font-size: clamp(42px, 5.8vw, 82px); line-heig
   .hero-art .kite-b { transform-origin: -10px 480px; animation-duration: 9s; animation-direction: alternate-reverse; }
   @keyframes kite-sway { from { transform: rotate(-1.3deg); } to { transform: rotate(1.5deg); } }
 }
-/* Floating cards, styled like the app */
+/* Floating cards on the picture: a match card (frosted glass, a ring that fills to the match %)
+   and an Adda Tables chip. motion.js counts the % up while the ring fills. */
 .float-card {
-  position: absolute; z-index: 2; margin: 0; background: #FFFDF8; color: var(--ink);
-  box-shadow: 0 28px 44px -20px rgba(0, 0, 0, .6), 0 2px 6px rgba(0, 0, 0, .12);
+  position: absolute; z-index: 2; margin: 0; color: var(--ink);
+  background: rgba(255, 251, 243, .9); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  box-shadow: 0 24px 44px -20px rgba(0, 0, 0, .6), inset 0 0 0 1px rgba(255, 255, 255, .7);
 }
-.match-card { left: -16%; top: 39%; width: 236px; padding: 16px 16px 14px; border-radius: 20px; transform: rotate(-3deg); }
+.match-card { left: -8%; top: 44%; width: 250px; padding: 14px; border-radius: 22px; transform: rotate(-3deg); }
 .match-card p { margin: 0; }
-.mc-score {
-  display: inline-block; padding: 4px 14px; border-radius: 999px; background: var(--marigold);
-  font: 700 21px/1.25 var(--display); letter-spacing: -.01em;
-}
-.mc-score [lang="bn"] { letter-spacing: 0; }
-.mc-why { margin-top: 10px !important; font-size: 13px; color: var(--muted); }
-.mc-chips { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
-.mc-chips li {
-  padding: 3px 10px; border-radius: 999px; font-size: 13px; line-height: 1.5;
-  color: var(--teal-deep); background: var(--mint); box-shadow: inset 0 0 0 1px #BFE0D9;
-}
-.mc-chips li::before { content: "✓ "; font-weight: 600; }
-.ping-card {
-  right: -7%; top: 12%; display: flex; align-items: center; gap: 10px;
-  padding: 10px 18px 10px 12px; border-radius: 999px; font-size: 15px; font-weight: 600; transform: rotate(2deg);
-}
-.ping-dot { position: relative; flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--sindoor); }
+.mc-top { display: flex; align-items: center; gap: 12px; }
+.mc-ring { flex: none; width: 64px; height: 64px; }
+.mc-ring circle { fill: none; stroke-width: 6; }
+.mc-ring .track { stroke: var(--mint); }
+.mc-ring .fill { stroke: var(--marigold); stroke-linecap: round; stroke-dasharray: 86 100; transform: rotate(-90deg); transform-origin: center; }
+.mc-pct { text-anchor: middle; font: 700 15px var(--display); fill: var(--ink); }
 @media (prefers-reduced-motion: no-preference) {
-  .ping-dot::after {
-    content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--sindoor);
-    animation: ping 1.6s ease-out 2.4s 3;
-  }
-  @keyframes ping { from { transform: scale(1); opacity: .6; } to { transform: scale(2.8); opacity: 0; } }
+  .mc-ring .fill { animation: mc-fill 1.4s cubic-bezier(.3, .7, .3, 1) .5s both; }
+  @keyframes mc-fill { from { stroke-dasharray: 0 100; } }
 }
-@media (max-width: 1100px) { .match-card { left: -8%; } .ping-card { right: -3%; } }
+.mc-who { font: 700 17px/1.2 var(--display); }
+.mc-who [lang="bn"] { line-height: 1.4; }
+.mc-why { margin-top: 2px !important; font-size: 13px; color: var(--muted); }
+.mc-chips { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.mc-chips li { padding: 3px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; line-height: 1.5; color: var(--teal-deep); background: var(--mint); }
+.seat-card {
+  right: -10%; top: 4%; display: flex; align-items: center; gap: 10px; padding: 9px 16px 9px 9px;
+  border-radius: 999px; font-size: 14px; box-shadow: 0 16px 30px -14px rgba(0, 0, 0, .55), inset 0 0 0 1px rgba(255, 255, 255, .7);
+}
+.seat-card b { display: grid; place-items: center; flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--haldi); font-size: 16px; font-weight: 400; }
+.seat-card em { font-style: normal; font-weight: 700; color: var(--teal-deep); }
+@media (max-width: 1100px) { .match-card { left: -4%; } .seat-card { right: -4%; } }
 @media (max-width: 860px) {
   .home .hero-k { grid-template-columns: 1fr; gap: 44px; padding-top: 96px; }
   .hero-k-art { justify-self: center; width: min(80%, 380px); }
   /* Up in the sky, so the four friends at the bottom stay in view */
-  .match-card { left: -12%; top: 24%; width: 196px; padding: 12px 12px 11px; }
-  .mc-score { font-size: 17px; }
-  .ping-card { right: -10%; top: 4%; font-size: 14px; }
+  .match-card { left: -8%; top: 30%; width: 220px; padding: 12px; }
+  .seat-card { right: -8%; top: 3%; font-size: 13px; }
 }
 @media (max-width: 480px) {
   .hero-k-art { width: 84%; }
-  .match-card { left: -6%; top: 22%; width: 168px; border-radius: 16px; }
-  .mc-score { font-size: 15px; padding: 3px 11px; }
-  .mc-why { font-size: 12px; margin-top: 7px !important; }
-  .mc-chips { gap: 4px; }
-  .mc-chips li { font-size: 11.5px; padding: 1px 8px; }
-  .ping-card { right: -6%; top: 2%; font-size: 13px; padding: 7px 13px 7px 10px; }
+  .match-card { left: -7%; top: 30%; width: 208px; padding: 11px; border-radius: 18px; }
+  .mc-ring { width: 54px; height: 54px; }
+  .mc-who { font-size: 15px; }
+  .mc-why { font-size: 12px; }
+  .mc-chips { gap: 4px; margin-top: 10px; }
+  .mc-chips li { font-size: 12px; padding: 2px 8px; }
+  .seat-card { right: -6%; top: 2%; font-size: 12.5px; padding: 7px 13px 7px 7px; }
+  .seat-card b { width: 26px; height: 26px; font-size: 14px; }
 }
 
 /* ---------- match: the Venn diagram on the app's teal */
