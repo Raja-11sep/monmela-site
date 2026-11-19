@@ -463,6 +463,29 @@ html[data-lang="bn"] .hero-k h1 { font-size: clamp(42px, 5.8vw, 82px); line-heig
 .ch-text p { margin: 0; max-width: 26em; font-size: 19px; color: var(--on-dusk-muted); }
 .chapter .actions { margin-top: 28px; }
 .story-frame { display: none; }
+/* Phones (no sticky frame): the chapters are a row of cards to swipe through, one per screen width,
+   with the next one peeking in; story.js adds dots that follow the swipe. */
+.story-dots { display: none; }
+@media (max-width: 899px) {
+  .story-chapters {
+    max-width: none; grid-auto-flow: column; grid-auto-columns: min(80%, 340px); gap: 16px; align-items: start;
+    overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 var(--gutter); scrollbar-width: none;
+    margin: 0 calc(-1 * var(--gutter)); padding: 4px var(--gutter) 6px;
+  }
+  .story-chapters::-webkit-scrollbar { display: none; }
+  .chapter { scroll-snap-align: start; }
+  .ch-pic { margin-bottom: 18px; }
+  .ch-bn { font-size: 34px; }
+  .ch-en { font-size: 16px; }
+  .ch-text p { font-size: 17px; }
+  .chapter .actions { margin-top: 20px; }
+  .story-dots { display: flex; justify-content: center; gap: 10px; margin-top: 22px; }
+  .story-dots button {
+    width: 8px; height: 8px; padding: 0; border: 0; border-radius: 4px; cursor: pointer;
+    background: rgba(255, 246, 229, .3); transition: width .3s, background-color .3s;
+  }
+  .story-dots button.on { width: 28px; background: var(--marigold); }
+}
 .story.is-live .story-body {
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(40px, 6vw, 80px); align-items: start;
 }
@@ -583,27 +606,6 @@ html[data-lang="bn"] .how-item::before { content: counter(how, bengali); }
 }
 @media (max-width: 420px) { .adda-art { min-height: 430px; } .adda-card { padding: 18px; } }
 
-/* ---------- inside the app: five more screens at mela night; a swipeable row below 1100 px */
-.home .tour { color: var(--on-dusk); background: radial-gradient(ellipse 70% 60% at 50% 62%, #0F4B45 0%, var(--dusk-deep) 70%); }
-.home .tour h2 { color: var(--on-dusk); }
-.tour .phone { box-shadow: inset 0 0 0 1.5px #4C6B67, 0 40px 70px -34px rgba(0, 0, 0, .8), 0 26px 60px -30px rgba(245, 176, 35, .28); }
-.tour-row {
-  list-style: none; margin: 0; padding: 0;
-  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(18px, 2.4vw, 32px);
-}
-.tour-item .phone { width: min(100%, 224px); margin: 0 auto 22px; }
-.tour-item h3 { margin: 0 0 4px; font: 600 19px/1.35 var(--sans); color: var(--on-dusk); }
-.tour-item p { margin: 0; color: var(--on-dusk-muted); font-size: 15px; }
-@media (max-width: 1100px) {
-  .tour-row {
-    grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: min(62%, 236px);
-    overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 var(--gutter);
-    margin: 0 calc(-1 * var(--gutter)); padding: 4px var(--gutter) 20px;
-  }
-  .tour-item { scroll-snap-align: start; }
-  .tour-item .phone { width: 100%; }
-}
-
 /* ---------- safety */
 .home .safety { background: var(--mint); display: grid; grid-template-columns: 1fr 2fr; gap: 56px; }
 .safety-head p { margin: -18px 0 0; color: var(--muted); font-size: 19px; max-width: 18em; }
@@ -618,37 +620,6 @@ html[data-lang="bn"] .how-item::before { content: counter(how, bengali); }
 .icon text { fill: var(--teal); stroke: none; font: 700 7.5px var(--sans); }
 @media (max-width: 860px) { .home .safety { grid-template-columns: 1fr; gap: 24px; } }
 @media (max-width: 560px) { .safety ul { grid-template-columns: 1fr; } }
-
-/* ---------- closing panel: dusk with lights again, two phones rising from the bottom */
-.home .cta { padding-top: 40px; padding-bottom: 40px; }
-.cta-panel {
-  --pad: clamp(32px, 6vw, 76px);
-  position: relative; overflow: hidden; border-radius: 32px; color: var(--on-dusk);
-  background:
-    radial-gradient(60% 80% at 85% 100%, rgba(245, 176, 35, .2), transparent 70%),
-    linear-gradient(160deg, var(--dusk-deep), var(--dusk) 60%, #0F4A45);
-  padding: calc(var(--pad) + 56px) var(--pad) var(--pad);
-  display: grid; grid-template-columns: 1.15fr 1fr; align-items: center; gap: 24px;
-}
-.cta-panel::before {               /* kantha running stitch just inside the edge */
-  content: ""; position: absolute; inset: 12px; border: 2px dashed rgba(245, 176, 35, .35); border-radius: 24px;
-  pointer-events: none;
-}
-.home .cta h2 { color: var(--on-dusk); font-size: clamp(42px, 5.6vw, 76px); margin-bottom: 18px; }
-.cta-text { position: relative; z-index: 1; }
-.cta-text p { color: var(--on-dusk-muted); font-size: 20px; margin: 0 0 30px; max-width: 24em; }
-.cta-art { position: relative; align-self: stretch; min-height: 400px; margin: calc(-1 * var(--pad)) 0; }
-.cta-art .phone { position: absolute; padding: 7px; border-radius: 34px; box-shadow: 0 40px 70px -30px rgba(0, 0, 0, .7), inset 0 0 0 1.5px #34494A; }
-.cta-art .phone .screen { border-radius: 28px; }
-.cta-art .phone-a { width: 42%; right: 8%; bottom: -16%; }
-.cta-art .phone-b { width: 38%; right: 48%; bottom: -32%; }
-@media (max-width: 860px) {
-  .cta-panel { grid-template-columns: 1fr; }
-  .cta-art { min-height: 300px; margin: 8px calc(-1 * var(--pad)) calc(-1 * var(--pad)); }
-  .cta-art .phone-a { width: 40%; right: 10%; bottom: -20%; }
-  .cta-art .phone-b { width: 36%; right: 50%; bottom: -34%; }
-}
-@media (max-width: 480px) { .cta-text .actions .btn { flex: 1 1 100%; } }
 
 /* ---------- questions (native <details>, works without JavaScript) */
 .home .faq { display: grid; grid-template-columns: 1fr 2fr; column-gap: 56px; align-items: start; }
@@ -893,14 +864,6 @@ html[data-lang="bn"] .play-steps li::before { content: counter(ps, bengali); }
 @keyframes seat-pop { 0% { scale: .3; } 100% { scale: 1; } }
 .adda-points .icon { transition: background-color .4s, stroke .4s, scale .4s; }
 .adda[data-state="wait"] .pt-wait .icon, .adda[data-state="in"] .pt-in .icon { background: var(--marigold); stroke: var(--ink); scale: 1.1; }
-
-/* Inside the app, wide screens: the five phones start as a fanned hand of cards and are laid out
-   in a row as you scroll (motion.js sets each item's transform and --cap, its caption's fade). */
-.tour-row.fan .tour-item { transform-origin: 50% 125%; will-change: transform; }
-.tour-row.fan .tour-item h3, .tour-row.fan .tour-item p { opacity: var(--cap, 1); translate: 0 calc((1 - var(--cap, 1)) * 14px); }
-/* Narrower screens (a swipeable row): the phones rise in one after another. */
-.tour-row.armed .tour-item { opacity: 0; translate: 0 44px;   /* up, not sideways: sideways would move the row's swipe stops */ transition: opacity .5s, translate .8s cubic-bezier(.2, .9, .25, 1); transition-delay: calc(var(--i) * 110ms); }
-.tour-row.armed.in .tour-item { opacity: 1; translate: none; }
 
 /* Phones tilt toward the pointer, with a glint across the glass (mouse and trackpad only). */
 .phone .screen::before {

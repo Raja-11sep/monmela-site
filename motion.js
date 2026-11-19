@@ -1,11 +1,10 @@
-// Home page motion, in three places (styles: the "motion" part of style.css):
+// Home page motion (styles: the "motion" part of style.css):
 //  1. How it works: a kantha thread sews from step to step; each number lights up like a mela bulb
 //     and its phone wakes up.
 //  2. Adda Tables: the two cards are dealt onto the table, then the front card acts out asking for
 //     a seat (tap, "request sent", "you're in") over and over while it's on screen.
-//  3. Inside the app: on wide screens the five phones start as a fanned hand of cards and are laid
-//     out in a row as you scroll; on narrower screens they rise in one after another.
-// Plus: phones tilt toward the mouse pointer, and Questions shows Mon Mela "typing" before each reply.
+//  3. Questions: Mon Mela "types" for a moment before each reply.
+// Plus: phones tilt toward the mouse pointer.
 // With reduced motion, or without this file, everything simply shows in its final state.
 (function () {
   if (!window.matchMedia || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -88,74 +87,10 @@
     }
   }
 
-  // 3. Inside the app.
-  function insideTheApp() {
-    var row = document.querySelector('.tour-row');
-    if (!row) return;
-    var items = [].slice.call(row.querySelectorAll('.tour-item'));
-    var wide = matchMedia('(min-width: 1101px)');
-    var offsets = [], near = false, queued = false;
-
-    items.forEach(function (item, i) { item.style.setProperty('--i', i); });
-
-    // How far each phone is from the middle of the row, laid out (offsetLeft ignores transforms).
-    function measure() {
-      var middle = row.offsetWidth / 2;
-      offsets = items.map(function (item) { return middle - (item.offsetLeft - row.offsetLeft + item.offsetWidth / 2); });
-    }
-
-    // Scroll position -> how fanned the hand is: fully fanned with the row's top near the bottom
-    // of the screen, laid out flat by the time it's a fifth of the way down.
-    function draw() {
-      queued = false;
-      var top = row.getBoundingClientRect().top;
-      var laid = easeInOut(clamp((innerHeight * 0.95 - top) / (innerHeight * 0.75)));
-      var fan = 1 - laid, middle = (items.length - 1) / 2;
-      items.forEach(function (item, i) {
-        var c = i - middle;                    // -2 .. 2, from the leftmost card to the rightmost
-        item.style.transform = fan < 0.001 ? '' :
-          'translate(' + (offsets[i] * 0.9 * fan).toFixed(1) + 'px,' + (40 * fan).toFixed(1) + 'px) ' +
-          'rotate(' + (c * 10 * fan).toFixed(2) + 'deg) scale(' + (1 - 0.08 * fan).toFixed(3) + ')';
-        item.style.setProperty('--cap', clamp((laid - 0.78) / 0.22).toFixed(3));
-      });
-    }
-    function queue() { if (near && !queued) { queued = true; requestAnimationFrame(draw); } }
-
-    // Only follow the scroll while the row is near the screen.
-    new IntersectionObserver(function (entries) {
-      near = entries[0].isIntersecting;
-      queue();
-    }, { rootMargin: '300px 0px' }).observe(row);
-    addEventListener('scroll', queue, { passive: true });
-
-    var risen = false;
-    function setup() {
-      if (wide.matches) {
-        row.classList.remove('armed', 'in');
-        row.classList.add('fan');
-        measure();
-        draw();
-      } else {
-        row.classList.remove('fan');
-        items.forEach(function (item) { item.style.transform = ''; item.style.removeProperty('--cap'); });
-        if (!risen && belowFold(row)) {
-          row.classList.add('armed');
-          whenSeen(row, 0.25, function () { row.classList.add('in'); });
-        }
-        risen = true;
-      }
-    }
-    setup();
-    addEventListener('resize', function () { if (wide.matches) { measure(); queue(); } });
-    if (wide.addEventListener) wide.addEventListener('change', setup); else wide.addListener(setup);
-    // Fonts and images can shift the layout a little after load.
-    addEventListener('load', function () { if (wide.matches) { measure(); draw(); } });
-  }
-
   // Phones lean toward the pointer, with a glint that follows it (mouse and trackpad only).
   function tilt() {
     if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-    document.querySelectorAll('.how-item .phone, .tour-item .phone').forEach(function (phone) {
+    document.querySelectorAll('.how-item .phone').forEach(function (phone) {
       phone.addEventListener('pointerenter', function () {
         phone.style.transition = 'transform .15s linear';
         phone.classList.add('tilting');
@@ -177,7 +112,7 @@
     });
   }
 
-  // 4. Questions: opening one shows Mon Mela "typing" for a moment, then its reply.
+  // 3. Questions: opening one shows Mon Mela "typing" for a moment, then its reply.
   function askReplies() {
     document.querySelectorAll('.ask details').forEach(function (d) {
       var timer = null;
@@ -195,7 +130,6 @@
     askReplies();
     howItWorks();
     addaTables();
-    insideTheApp();
     tilt();
   });
 })();

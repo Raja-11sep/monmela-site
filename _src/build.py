@@ -326,16 +326,6 @@ SCREENS = {
              "বন্ধুত্বের কুইজ: ১২টা প্রশ্নেরই উত্তর দেওয়া"),
     "picks": ("img/app-picks.webp", "Today's picks: a suggestion with 82% match and why you match",
               "আজকের মানুষ: ৮২% মিল আর কেন মিল"),
-    # "Inside the app" row (names, photos and messages blurred by tools/prep_store_screens.py)
-    "requests": ("img/app-requests.webp", "A friend request with a short hello, and Accept or Decline",
-                 "ছোট শুভেচ্ছা সহ বন্ধুত্বের অনুরোধ, মানুন বা না বলুন"),
-    "chats": ("img/app-chats.webp", "The Chats tab with three friends", "তিনজন বন্ধুর সঙ্গে চ্যাটের তালিকা"),
-    "verify": ("img/app-verify.webp", "Photo verification: copy a pose in a quick selfie",
-               "ছবি যাচাই: একটা ভঙ্গি নকল করে সেলফি"),
-    "filters": ("img/app-filters.webp", "Who to suggest: age range and same-gender-only switch",
-                "কাকে সাজেস্ট করা হবে: বয়স আর শুধু নিজের লিঙ্গ"),
-    "safety": ("img/app-safety.webp", "Safety and account settings: verification, safety tips, blocked people, pause",
-               "নিরাপত্তা আর অ্যাকাউন্ট: যাচাই, টিপস, ব্লক, পজ"),
 }
 
 
@@ -473,28 +463,6 @@ def home():
         f'<div class="how-cap"><h3>{both(t_en, t_bn)}</h3><p>{both(d_en, d_bn)}</p></div></li>'
         for i, (k, t_en, t_bn, d_en, d_bn) in enumerate(steps))
 
-    # Inside the app: five more screens, no numbers (they're not steps).
-    tour = [
-        ("requests", "Requests with a hello", "শুভেচ্ছা সহ অনুরোধ",
-         "Accept or decline. Nobody can message you until you say yes.",
-         "মানবেন কি না, আপনার ইচ্ছে। আপনি রাজি না হলে কেউ মেসেজ করতে পারে না।"),
-        ("chats", "Chat with your friends", "বন্ধুদের সঙ্গে চ্যাট",
-         "Talk only with people who said yes to you, and you to them.",
-         "শুধু তাঁদের সঙ্গে কথা, যাঁরা আপনাকে আর আপনি যাঁদের হ্যাঁ বলেছেন।"),
-        ("verify", "Get photo verified", "ছবি যাচাই করুন",
-         "One quick selfie earns the ✓ badge. Only our team sees it.",
-         "একটা সেলফিতেই ✓ ব্যাজ। সেলফি শুধু আমাদের টিম দেখে।"),
-        ("filters", "You choose who you see", "কাকে দেখবেন, আপনিই ঠিক করুন",
-         "Set an age range, or meet only people of your own gender.",
-         "বয়সের সীমা ঠিক করুন, বা শুধু নিজের লিঙ্গের মানুষের সঙ্গে আলাপ।"),
-        ("safety", "Safety in your hands", "নিরাপত্তা আপনার হাতে",
-         "Block anyone, pause your profile, read the safety tips.",
-         "যে কাউকে ব্লক, প্রোফাইল পজ, নিরাপত্তার টিপস।"),
-    ]
-    tour_html = "".join(
-        f'<li class="tour-item">{phone(k)}<h3>{both(t_en, t_bn)}</h3><p>{both(d_en, d_bn)}</p></li>'
-        for k, t_en, t_bn, d_en, d_bn in tour)
-
     safety = [
         ("chat", "Nobody can message you unless you accept their request.",
          "আপনি অনুরোধ না মানলে কেউ মেসেজ করতে পারে না।"),
@@ -508,10 +476,6 @@ def home():
          "যেকোনো চ্যাট থেকে সরাসরি ১১২ (জরুরি) বা ১৮১ (মহিলা হেল্পলাইন)-এ ফোন।"),
         ("pin", "Others see only your district, never your exact location.",
          "অন্যরা শুধু আপনার জেলা দেখেন, সঠিক লোকেশন কখনও নয়।"),
-        ("lock", "Screenshots are blocked inside the app, to protect everyone's photos and chats.",
-         "সবার ছবি আর চ্যাট সুরক্ষিত রাখতে অ্যাপে স্ক্রিনশট বন্ধ।"),
-        ("adult", "Adults only. A \"Looks under 18\" report hides a profile at once, until we check it.",
-         "শুধু প্রাপ্তবয়স্কদের জন্য। \"১৮-র কম মনে হচ্ছে\" রিপোর্ট এলেই প্রোফাইল সঙ্গে সঙ্গে লুকোনো হয়, যতক্ষণ না আমরা যাচাই করি।"),
     ]
     safety_html = "".join(f'<li>{icon(i)}<p>{both(en, bn)}</p></li>' for i, en, bn in safety)
 
@@ -613,11 +577,6 @@ def home():
     </div>
   </section>
 
-  <section class="tour" aria-labelledby="tour">
-    <h2 id="tour">{both("Inside the app", "অ্যাপের ভেতরে")}</h2>
-    <ul class="tour-row">{tour_html}</ul>
-  </section>
-
   <section class="safety" aria-labelledby="safe">
     <div class="safety-head">
       <h2 id="safe">{both("Safe by design", "শুরু থেকেই নিরাপদ")}</h2>
@@ -625,22 +584,6 @@ def home():
                "সোশ্যাল অ্যাপে যাঁরা সবচেয়ে কম নিরাপদ বোধ করেন, তাঁদের কথা ভেবেই তৈরি।")}</p>
     </div>
     <ul>{safety_html}</ul>
-  </section>
-
-  <section class="cta" aria-labelledby="cta-h">
-    <div class="cta-panel">
-      <div class="cta-text">
-        <h2 id="cta-h">{both("Start your next adda.", "শুরু হোক নতুন আড্ডা।")}</h2>
-        <p>{both("Free, in Bengali and English, for adults across West Bengal.",
-                 "বিনামূল্যে, বাংলা আর ইংরেজিতে, সারা পশ্চিমবঙ্গের প্রাপ্তবয়স্কদের জন্য।")}</p>
-        <div class="actions">{get_app_button()}</div>
-      </div>
-      {festoon(swags=3, per_swag=8, width=1200)}
-      <div class="cta-art" aria-hidden="true">
-        {phone("looking", "phone-b", alt=False)}
-        {phone("picks", "phone-a", alt=False)}
-      </div>
-    </div>
   </section>
 
   <section class="faq ask" aria-labelledby="qa">
