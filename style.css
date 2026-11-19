@@ -297,6 +297,14 @@ html[data-lang="bn"] .home section h2 { line-height: 1.22; }
   .hero-k h1 { white-space: nowrap; font-size: min(64px, calc((100vw - 40px) * .1)); line-height: 1.25; }
   .hero-k h1 br { display: none; }
 }
+/* Every screen (browsers with container units): one line, sized to the text column itself.
+   10cqi = 10% of the column's width, the same 9.7x rule as above; 82 px at most on big screens. */
+@supports (width: 1cqi) {
+  .hero-k-text { container-type: inline-size; }
+  .hero-k h1 { white-space: nowrap; font-size: min(82px, 10cqi); line-height: 1.25; }
+  .hero-k h1 br { display: none; }
+  @media (max-width: 860px) { .hero-k h1 { font-size: min(64px, 10cqi); } }   /* tablets: not bigger than before */
+}
 .hero-k .lede { color: var(--on-dusk-muted); font-size: clamp(18px, 1.5vw, 21px); max-width: 30em; margin: 0; text-wrap: pretty; }
 .hero-k .btn-quiet { color: var(--on-dusk); box-shadow: inset 0 0 0 1.5px rgba(255, 246, 229, .5); }
 .hero-k .btn-quiet:hover { background: rgba(255, 246, 229, .1); color: var(--on-dusk); }
@@ -343,7 +351,9 @@ html[data-lang="bn"] .home section h2 { line-height: 1.22; }
 }
 .seat-card b { display: grid; place-items: center; flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--haldi); font-size: 16px; font-weight: 400; }
 .seat-card em { font-style: normal; font-weight: 700; color: var(--teal-deep); }
-@media (max-width: 1100px) { .match-card { left: -4%; } .seat-card { right: -4%; } }
+/* the seat card hangs off the picture's right edge; keep it inside the page margin (gutter) */
+@media (max-width: 1240px) { .seat-card { right: -4%; } }
+@media (max-width: 1100px) { .match-card { left: -4%; } }
 @media (max-width: 860px) {
   .home .hero-k { grid-template-columns: 1fr; gap: 44px; padding-top: 96px; }
   .hero-k-art { justify-self: center; width: min(80%, 380px); }
