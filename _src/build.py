@@ -10,7 +10,7 @@ import json
 import pathlib
 import re
 
-from art import alpana_tile, festoon, hero_art
+from art import LOGO, alpana_tile, festoon, hero_art
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent      # the site folder (built files go here)
 PAGES = pathlib.Path(__file__).resolve().parent / "pages"  # legal page bodies
@@ -35,10 +35,6 @@ TEST_JOIN_URL = "https://play.google.com/apps/testing/com.monmela.app"
 INSTAGRAM_URL = "https://www.instagram.com/monmela.in/"
 FACEBOOK_URL = "https://www.facebook.com/profile.php?id=61596312788249"
 
-LOGO = """<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="#fff"/>
-<circle cx="19" cy="24" r="9" fill="none" stroke="#0F766E" stroke-width="3.2"/>
-<circle cx="29" cy="24" r="9" fill="none" stroke="#0F766E" stroke-width="3.2"/>
-<path d="M24 16.6a9 9 0 0 1 0 14.8a9 9 0 0 1 0-14.8z" fill="#F5B023"/></svg>"""
 
 NAV = [
     ("./", "Home", "হোম"),
@@ -90,7 +86,12 @@ def head(title_en, title_bn, description, path="", extra=""):
 <meta property="og:title" content="{title_en}">
 <meta property="og:description" content="{description}">
 <meta property="og:url" content="{SITE}/{path}">
-<meta property="og:image" content="{SITE}/og.png">
+<!-- ?v= changes whenever og.png changes, so WhatsApp, Facebook and X fetch the new picture (made by tools/make_og.py) -->
+<meta property="og:image" content="{SITE}/{asset("og.png")}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Mon Mela: মন মিললে, বন্ধু মেলে। Friends nearby who love what you love.">
+<meta name="twitter:image" content="{SITE}/{asset("og.png")}">
 <link rel="icon" href="{asset("favicon.ico")}" sizes="48x48">
 <link rel="icon" href="{asset("favicon.svg")}" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{asset("apple-touch-icon.png")}">
@@ -611,7 +612,7 @@ def home():
 HOME_TITLE_EN = "Mon Mela – Bengali Friendship App for Kolkata &amp; West Bengal"
 HOME_TITLE_BN = "মনমেলা – কলকাতা ও পশ্চিমবঙ্গের বন্ধুত্বের অ্যাপ"
 HOME_DESCRIPTION = ("Mon Mela (মনমেলা) is a free Bengali friendship app for Kolkata and West Bengal. "
-                    "Meet friends who think like you and join adda meetups. Not a dating app.")
+                    "Find friends nearby who love what you love, and join adda meetups. Not a dating app.")
 
 
 def strip_tags(html):

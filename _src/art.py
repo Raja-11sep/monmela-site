@@ -68,6 +68,12 @@ def bridge(x0, x1, deck, tower_h, step, color, chord_w, web_w, pier_bottom=None)
 STITCH = 'stroke-dasharray="8 6" stroke-linecap="round"'   # kantha running stitch
 
 
+# The Mon Mela mark: two rings, marigold where they meet (top bar, link preview)
+LOGO = """<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="#fff"/>
+<circle cx="19" cy="24" r="9" fill="none" stroke="#0F766E" stroke-width="3.2"/>
+<circle cx="29" cy="24" r="9" fill="none" stroke="#0F766E" stroke-width="3.2"/>
+<path d="M24 16.6a9 9 0 0 1 0 14.8a9 9 0 0 1 0-14.8z" fill="#F5B023"/></svg>"""
+
 ARCH = "M24 708V300A276 276 0 0 1 576 300V708Z"     # frame centre line
 INNER = "M35 697V300A265 265 0 0 1 565 300V697Z"    # what the window shows
 
