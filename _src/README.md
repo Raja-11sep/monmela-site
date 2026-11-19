@@ -23,7 +23,8 @@ This rewrites `index.html`, `download.html` and the four legal pages in the site
 | `match.js` | "Matched by what you share": the two circles drift together, shared answers fly into the overlap, the match % counts up; "Try someone else" matches you with the next person (`VENN_PEOPLE` in `build.py`) |
 | `_src/tools/make_hero.py` | Paints the home page picture (friends on a Ganga ghat at sunset) into `img/hero-ghat.webp`. Run it, then `build.py`. Other looks: `dusk`, `morning` |
 | `_src/pages/*.html` | Legal page bodies (privacy, terms, delete account, child safety) |
-| `_src/tools/prep_screens.py` | Turns app screenshots into `img/app-*.webp` (cleans the status bar, blurs photos) |
+| `_src/tools/make_app_screens.py` | Draws the four How it works screens (`img/app-welcome`, `app-looking-for`, `app-quiz`, `app-picks`.webp) in the app's new "Mela at dusk" look, which the app gets before the Play Store release. The picks photo is `_src/tools/picks-photo.webp`: already cropped, blurred and mirrored so no one can tell who it is. To use another photo: `python3 _src/tools/make_app_screens.py photo.jpg` (adjust `CROP` and `FACE` in the script); never commit the original. Run it, then `build.py` |
+| `_src/tools/prep_screens.py` | Turns app screenshots into `img/app-*.webp` (cleans the status bar, blurs photos) | Once the app has the dusk look, real screenshots replace the drawn ones |
 | `style.css`, `site.js`, `story.js`, `motion.js`, `music.js`, `match.js`, `download.js` | Styles and the small scripts (edited directly) |
 | `fonts/` | Anek Bangla (headings) and Hind Siliguri (text), served from the site itself. `_src/tools/make_fonts.py` remakes them |
 

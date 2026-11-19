@@ -316,16 +316,18 @@ def icon(name):
     return f'<svg viewBox="0 0 24 24" class="icon" aria-hidden="true">{paths[name]}</svg>'
 
 
-# App screens shown in the phone mockups (made by tools/prep_screens.py): file, alt text en/bn
+# App screens shown in the phone mockups: file, alt text en/bn.
+# Drawn by tools/make_app_screens.py in the app's new look (the app gets it before the Play Store release);
+# after that, real screenshots can replace them (tools/prep_screens.py).
 SCREENS = {
     "welcome": ("img/app-welcome.webp", "Mon Mela welcome screen with Continue with Google",
                 "মনমেলার শুরুর স্ক্রিন, Google দিয়ে লগইন"),
-    "looking": ("img/app-looking-for.webp", "Picking what you are looking for: adda, study partner, gym, foodie",
-                "কী খুঁজছেন বেছে নেওয়া: আড্ডা, পড়ার সঙ্গী, জিম, খাওয়াদাওয়া"),
-    "quiz": ("img/app-quiz.webp", "Friendship quiz: all 12 questions answered",
-             "বন্ধুত্বের কুইজ: ১২টা প্রশ্নেরই উত্তর দেওয়া"),
-    "picks": ("img/app-picks.webp", "Today's picks: a suggestion with 82% match and why you match",
-              "আজকের মানুষ: ৮২% মিল আর কেন মিল"),
+    "looking": ("img/app-looking-for.webp", "Picking what you are looking for: adda, foodie, books and movies, the Puja gang",
+                "কী খুঁজছেন বেছে নেওয়া: আড্ডা, খাওয়াদাওয়া, বই আর সিনেমা, পুজোর দল"),
+    "quiz": ("img/app-quiz.webp", "Friendship quiz question 9 of 12: Your Durga Puja style?",
+             "বন্ধুত্বের কুইজ, ১২টার মধ্যে ৯ নম্বর প্রশ্ন: দুর্গাপুজোয় আপনি কেমন?"),
+    "picks": ("img/app-picks.webp", "Today's picks: Riti from Howrah, 86% match, and where your minds meet",
+              "আজকের মানুষ: হাওড়ার রীতি, ৮৬% মিল, আর কোথায় মনের মিল"),
 }
 
 
@@ -519,8 +521,8 @@ def home():
   <div class="hero-k-text">
     <h1 lang="bn">মন মিললে, <br>বন্ধু মেলে।</h1>   <!-- in Bengali on both language versions; the line below explains it -->
     <p class="lede">{both(
-        "New city, new job, but no one to share a cup of cha with? Mon Mela finds friends near you who love what you love, and shows exactly what you share before you say hello.",
-        "নতুন শহর, নতুন চাকরি, কিন্তু এক ভাঁড় চা খাওয়ার সঙ্গী নেই? মনমেলা খুঁজে দেয় কাছেপিঠে মনের মতো বন্ধু, আর হ্যালো বলার আগেই দেখিয়ে দেয় কোথায় কোথায় মিল।")}</p>
+        "New city, but no one to share a cup of cha with? Mon Mela finds friends nearby who love what you love.",
+        "নতুন শহর, কিন্তু চায়ের সঙ্গী নেই? মনমেলা খুঁজে দেয় কাছেপিঠে মনের মতো বন্ধু।")}</p>
   </div>
   <div class="hero-k-art">
     {hero_art(asset("img/hero-ghat.webp"))}
