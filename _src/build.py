@@ -15,6 +15,9 @@ from art import LOGO, alpana_tile, festoon, hero_art
 ROOT = pathlib.Path(__file__).resolve().parent.parent      # the site folder (built files go here)
 PAGES = pathlib.Path(__file__).resolve().parent / "pages"  # legal page bodies
 SITE = "https://monmela.in"
+# Being retired: the pages stay online (Play Store privacy / delete-account links, testers'
+# download link) but ask Google to drop them from search (a "noindex" tag on every page).
+NOINDEX = True
 UPDATED_EN = "11 November 2026"
 UPDATED_BN = "১১ নভেম্বর ২০২৬"
 EMAIL = "monmela.team@gmail.com"
@@ -76,7 +79,7 @@ def head(title_en, title_bn, description, path="", extra=""):
 <meta name="title-en" content="{title_en}">
 <meta name="title-bn" content="{title_bn}">
 <meta name="description" content="{description}">
-<meta name="theme-color" content="#0B3B37">
+{'<meta name="robots" content="noindex, nofollow">' + chr(10) if NOINDEX else ""}<meta name="theme-color" content="#0B3B37">
 <link rel="canonical" href="{SITE}/{path}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Mon Mela">
@@ -685,8 +688,10 @@ def sitemap():
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + "</urlset>\n",
         encoding="utf-8")
-    # robots.txt: everything may be crawled; points search engines to the sitemap.
-    (ROOT / "robots.txt").write_text(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n", encoding="utf-8")
+    # robots.txt: crawling stays allowed even with NOINDEX, because Google must read the pages to see
+    # the noindex tag and drop them (a blocked page can stay in search). No sitemap while NOINDEX.
+    robots = "User-agent: *\nAllow: /\n" if NOINDEX else f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n"
+    (ROOT / "robots.txt").write_text(robots, encoding="utf-8")
 
 
 def get_app_button(cls="btn btn-primary", short=False):
