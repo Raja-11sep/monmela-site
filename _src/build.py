@@ -517,7 +517,7 @@ def home():
 <section class="hero-k">
   {festoon()}
   <div class="hero-k-text">
-    <h1 lang="bn">মন মিললে,<br>বন্ধু মেলে।</h1>   <!-- in Bengali on both language versions; the line below explains it -->
+    <h1 lang="bn">মন মিললে, <br>বন্ধু মেলে।</h1>   <!-- in Bengali on both language versions; the line below explains it -->
     <p class="lede">{both(
         "New city, new job, but no one to share a cup of cha with? Mon Mela finds friends near you who love what you love, and shows exactly what you share before you say hello.",
         "নতুন শহর, নতুন চাকরি, কিন্তু এক ভাঁড় চা খাওয়ার সঙ্গী নেই? মনমেলা খুঁজে দেয় কাছেপিঠে মনের মতো বন্ধু, আর হ্যালো বলার আগেই দেখিয়ে দেয় কোথায় কোথায় মিল।")}</p>
