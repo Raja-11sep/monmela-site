@@ -282,8 +282,7 @@ html[data-lang="bn"] .home section h2 { line-height: 1.22; }
     radial-gradient(55% 60% at 80% 58%, rgba(245, 176, 35, .16), transparent 70%),
     linear-gradient(180deg, var(--dusk-deep) 0%, var(--dusk) 55%, #0D4440 100%);
 }
-.hero-k h1 { font-size: clamp(48px, 6.6vw, 96px); line-height: .98; margin: 0 0 26px; color: var(--on-dusk); text-wrap: pretty; }
-html[data-lang="bn"] .hero-k h1 { font-size: clamp(42px, 5.8vw, 82px); line-height: 1.18; }
+.hero-k h1 { font-size: clamp(42px, 5.8vw, 82px); line-height: 1.18; margin: 0 0 26px; color: var(--on-dusk); }   /* Bengali on both language versions */
 .hero-k .lede { color: var(--on-dusk-muted); font-size: clamp(18px, 1.5vw, 21px); max-width: 30em; margin: 0; text-wrap: pretty; }
 .hero-k .btn-quiet { color: var(--on-dusk); box-shadow: inset 0 0 0 1.5px rgba(255, 246, 229, .5); }
 .hero-k .btn-quiet:hover { background: rgba(255, 246, 229, .1); color: var(--on-dusk); }
@@ -335,12 +334,13 @@ html[data-lang="bn"] .hero-k h1 { font-size: clamp(42px, 5.8vw, 82px); line-heig
   .home .hero-k { grid-template-columns: 1fr; gap: 44px; padding-top: 96px; }
   .hero-k-art { justify-self: center; width: min(80%, 380px); }
   /* Up in the sky, so the four friends at the bottom stay in view */
-  .match-card { left: -8%; top: 30%; width: 220px; padding: 12px; }
+  .match-card { left: -8%; top: 30%; width: 232px; padding: 12px; }
+  .mc-why { font-size: 12px; }
   .seat-card { right: -8%; top: 3%; font-size: 13px; }
 }
 @media (max-width: 480px) {
   .hero-k-art { width: 84%; }
-  .match-card { left: -7%; top: 30%; width: 208px; padding: 11px; border-radius: 18px; }
+  .match-card { left: -7%; top: 30%; width: 222px; padding: 11px; border-radius: 18px; }
   .mc-ring { width: 54px; height: 54px; }
   .mc-who { font-size: 15px; }
   .mc-why { font-size: 12px; }

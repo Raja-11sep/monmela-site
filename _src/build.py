@@ -517,7 +517,7 @@ def home():
 <section class="hero-k">
   {festoon()}
   <div class="hero-k-text">
-    <h1>{both("Find your adda people.", "আড্ডার মানুষ খুঁজে নিন।")}</h1>
+    <h1 lang="bn">মন মিললে,<br>বন্ধু মেলে।</h1>   <!-- in Bengali on both language versions; the line below explains it -->
     <p class="lede">{both(
         "New city, new job, but no one to share a cup of cha with? Mon Mela finds friends near you who love what you love, and shows exactly what you share before you say hello.",
         "নতুন শহর, নতুন চাকরি, কিন্তু এক ভাঁড় চা খাওয়ার সঙ্গী নেই? মনমেলা খুঁজে দেয় কাছেপিঠে মনের মতো বন্ধু, আর হ্যালো বলার আগেই দেখিয়ে দেয় কোথায় কোথায় মিল।")}</p>
@@ -528,7 +528,7 @@ def home():
     <div class="float-card match-card" aria-hidden="true">
       <div class="mc-top">
         <svg class="mc-ring" viewBox="0 0 64 64"><circle class="track" cx="32" cy="32" r="26"/><circle class="fill" cx="32" cy="32" r="26" pathLength="100"/><text x="32" y="37" class="mc-pct">86%</text></svg>
-        <div><p class="mc-who">{both("You and Riti", "আপনি আর রীতি")}</p><p class="mc-why">{both("Why you'll get along", "কেন জমবে")}</p></div>
+        <div><p class="mc-who">{both("You and Riti", "আপনি আর রীতি")}</p><p class="mc-why">{both("Where your minds meet", "মনের মিল")}</p></div>
       </div>
       <ul class="mc-chips"><li>{both("Prinsep Ghat", "প্রিন্সেপ ঘাট")}</li><li>{both("Durga Puja", "দুর্গাপুজো")}</li><li>{both("Mishti doi", "মিষ্টি দই")}</li><li>{both("Feluda", "ফেলুদা")}</li></ul>
     </div>
