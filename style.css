@@ -606,12 +606,19 @@ html[data-lang="bn"] .how-item::before { content: counter(how, bengali); }
 }
 @media (max-width: 420px) { .adda-art { min-height: 430px; } .adda-card { padding: 18px; } }
 
-/* ---------- safety */
-.home .safety { background: var(--mint); display: grid; grid-template-columns: 1fr 2fr; gap: 56px; }
-.safety-head p { margin: -18px 0 0; color: var(--muted); font-size: 19px; max-width: 18em; }
+/* ---------- safety: mela night, with marigold icons and a soft glow (between haldi Adda Tables and mint Questions) */
+.home .safety {
+  display: grid; grid-template-columns: 1fr 2fr; gap: 56px; color: var(--on-dusk);
+  background:
+    radial-gradient(60% 70% at 85% 30%, rgba(245, 176, 35, .10), transparent 70%),
+    linear-gradient(180deg, var(--dusk-deep), var(--dusk));
+}
+.home .safety h2 { color: var(--on-dusk); }
+.safety-head p { margin: -18px 0 0; color: var(--on-dusk-muted); font-size: 19px; max-width: 18em; }
 .safety ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0 36px; }
-.safety li { display: flex; gap: 16px; align-items: flex-start; padding: 20px 0; border-top: 1px solid #C2E1DB; }
+.safety li { display: flex; gap: 16px; align-items: flex-start; padding: 20px 0; border-top: 1px solid rgba(255, 246, 229, .12); }
 .safety li p { margin: 0; }
+.safety .icon { background: rgba(245, 176, 35, .12); stroke: var(--marigold); box-shadow: none; }
 .icon {
   flex: none; width: 46px; height: 46px; padding: 11px; border-radius: 50%; background: #fff;
   box-shadow: 0 6px 14px -8px rgba(11, 59, 55, .5);
