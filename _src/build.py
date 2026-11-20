@@ -28,7 +28,12 @@ EMAIL = "monmela.team@gmail.com"
 #   Then every download button goes to Google Play and /download redirects there (APK no longer offered).
 APK_FILE = "app/mon-mela.apk"
 PLAY_URL = ""
-# Closed test on Google Play (until launch): testers join the group, then become testers and install.
+# Closed test (until launch): the site is for testers only, so every download button opens the
+# app's Google Play page straight away (testers are already in; no group / "become a tester"
+# steps). The APK stays on /download under "Can't use Google Play?".
+# Empty it to go back to the two-step tester flow below (TEST_GROUP_URL + TEST_JOIN_URL).
+TEST_PLAY_URL = "https://play.google.com/store/apps/details?id=com.monmela.app"
+# Two-step tester flow, used only while TEST_PLAY_URL is empty: join the group, then become a tester.
 # Empty both to hide the Google Play steps and offer only the APK.
 TEST_GROUP_URL = "https://groups.google.com/g/mon-mela-testers"
 TEST_JOIN_URL = "https://play.google.com/apps/testing/com.monmela.app"
@@ -701,10 +706,11 @@ def sitemap():
 
 
 def get_app_button(cls="btn btn-primary", short=False):
-    """The site's one 'get the app' button: download page now, Google Play after launch."""
-    if PLAY_URL:
+    """The site's one 'get the app' button: Google Play (the test now, the public app after launch)."""
+    play = PLAY_URL or TEST_PLAY_URL
+    if play:
         label = ("Get the app", "অ্যাপ নিন") if short else ("Get it on Google Play", "Google Play থেকে নিন")
-        return f'<a class="{cls}" href="{PLAY_URL}">{both(*label)}</a>'
+        return f'<a class="{cls}" href="{play}">{both(*label)}</a>'
     label = ("Download", "ডাউনলোড") if short else ("Download for Android", "অ্যান্ড্রয়েডে ডাউনলোড করুন")
     return f'<a class="{cls}" href="download.html">{both(*label)}</a>'
 
@@ -753,7 +759,12 @@ def download():
     # Without JavaScript both steps show their own button; download.js turns this into a guided
     # flow: the big button does step 1, then becomes step 2, and remembers where you were.
     play_flow = ""
-    if TEST_JOIN_URL:
+    if TEST_PLAY_URL:  # testers: one button, straight to the app on Google Play
+        play_flow = f"""<a class="btn btn-primary btn-big" href="{TEST_PLAY_URL}">{both("Open in Google Play", "Google Play-তে খুলুন")}</a>
+        <p class="dl-meta">{both(
+            "Use the Gmail you joined the Mon Mela test with.",
+            "যে Gmail দিয়ে মনমেলা টেস্টে যোগ দিয়েছেন, সেটাই ব্যবহার করুন।")}</p>"""
+    elif TEST_JOIN_URL:
         play_flow = f"""<div class="flow" id="flow">
         <ol class="play-steps">
           <li id="step1"><span>{both("Join the Mon Mela testers group", "মনমেলা টেস্টার গ্রুপে যোগ দিন")}</span>
@@ -779,11 +790,12 @@ def download():
 
     # The APK: during the Play test it's folded away under "Can't use Google Play?" with its own
     # install steps; without a Play test it's the main, big button and the steps get a section.
-    apk_button_cls = "btn-ghost" if TEST_JOIN_URL else "btn-primary btn-big"
+    on_play = bool(TEST_PLAY_URL or TEST_JOIN_URL)
+    apk_button_cls = "btn-ghost" if on_play else "btn-primary btn-big"
     apk_button = (f'<a class="btn {apk_button_cls}" id="apk" href="{APK_FILE}" download="mon-mela.apk">'
                   f'{both("Download APK", "ডাউনলোড APK")}</a>'
                   f'<p class="dl-meta">{both("Android app", "অ্যান্ড্রয়েড অ্যাপ")}<span id="apk-size"></span></p>')
-    if TEST_JOIN_URL:
+    if on_play:
         apk_block = f"""<details class="apk-more" id="get">
         <summary>{both("Can't use Google Play? Download the APK instead", "Google Play চালাতে পারছেন না? APK ডাউনলোড করুন")}</summary>
         {apk_button}
@@ -800,10 +812,10 @@ def download():
 
     help_items = [
         ("Google Play says the app isn't available", "Google Play বলছে অ্যাপটি পাওয়া যাচ্ছে না",
-         "Join the group with the same Gmail that's signed in to your phone's Play Store, then open the second link again. "
-         "Right after joining it can take 15–30 minutes.",
-         "ফোনের Play Store-এ যে Gmail আছে, সেটা দিয়েই গ্রুপে যোগ দিন, তারপর দ্বিতীয় লিংকটা আবার খুলুন। "
-         "যোগ দেওয়ার পর ১৫–৩০ মিনিট লাগতে পারে।"),
+         "Mon Mela is in a closed test, so only testers can install it. Check that your phone's Play Store uses "
+         f"the Gmail you joined the test with. Not a tester yet? Write to us at {EMAIL}.",
+         "মনমেলা এখন ক্লোজড টেস্টে, তাই শুধু টেস্টাররাই ইনস্টল করতে পারেন। ফোনের Play Store-এ সেই Gmail আছে কি না দেখুন, "
+         f"যেটা দিয়ে টেস্টে যোগ দিয়েছেন। এখনও টেস্টার নন? আমাদের লিখুন: {EMAIL}।"),
         ("Chrome says the file might be harmful", "Chrome বলছে ফাইলটি ক্ষতিকর হতে পারে",
          'Chrome says this about every app downloaded outside the Play Store. Tap "Download anyway".',
          'Play Store-এর বাইরে থেকে নামানো সব অ্যাপের ক্ষেত্রেই Chrome এটা বলে। "Download anyway" চাপুন।'),
@@ -843,8 +855,8 @@ def download():
     <div>
       <h1>{both("Mon Mela for your Android phone", "আপনার অ্যান্ড্রয়েড ফোনে মনমেলা")}</h1>
       <p class="lede">{both(
-          "Free. Mon Mela is in testing on Google Play: tap the button, then tap it once more.",
-          "বিনামূল্যে। মনমেলা এখন Google Play-তে টেস্টিংয়ে: বোতামটা চাপুন, তারপর আরেকবার।")}</p>
+          "Free. For Mon Mela testers: tap the button to open the app on Google Play and install or update it.",
+          "বিনামূল্যে। মনমেলা টেস্টারদের জন্য: বোতাম চাপলেই Google Play-তে অ্যাপটি খুলবে, সেখান থেকে ইনস্টল বা আপডেট করুন।")}</p>
 
       <!-- Shown by download.js inside Instagram/Facebook-style in-app browsers -->
       <div class="dl-note" id="inapp" hidden>
@@ -902,7 +914,7 @@ def adda():
     (no app yet, iPhone, computer). With the app on Android, the link opens the table in the app
     directly (App Links: .well-known/assetlinks.json) and this page never shows.
     GitHub Pages serves adda.html at /adda. Not in the sitemap and noindex: it has no content of its own."""
-    get_url = PLAY_URL or f"{SITE}/download"  # people without the app
+    get_url = PLAY_URL or TEST_PLAY_URL or f"{SITE}/download"  # people without the app
     html = f"""{head("You're invited to an adda", "আপনাকে একটা আড্ডায় ডাকা হয়েছে",
                     "Someone shared an Adda Table on Mon Mela. Open it in the app to see who's going.",
                     "adda", script("adda.js"))}
