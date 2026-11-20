@@ -9,6 +9,7 @@ import hashlib
 import json
 import pathlib
 import re
+from urllib.parse import quote
 
 from art import LOGO, alpana_tile, festoon, hero_art
 
@@ -44,9 +45,37 @@ TEST_JOIN_URL = "https://play.google.com/apps/testing/com.monmela.app"
 APP_ID = "com.monmela.app"
 APP_SHA256 = []
 
+# HOME_BRAND: another name for the home page only (None = Mon Mela, as on every other page).
+HOME_BRAND = None
+# The hero's photo (wide, friends, no text on it). Until our own arrives: story photo 6, the ghat at sunset.
+HERO_PHOTO = "img/hero-friends.webp"
+HERO_PHOTO_FALLBACK = "img/story-6.webp"
+# HERO_STYLE "poster": the friends-on-the-ghat poster (img/hero-poster.webp; its old logo and words removed)
+# with our own chips, logo and words laid over it. "photo": the photo on the right, words on the left.
+HERO_STYLE = "light"   # "light": the bright riverside home page (Nov 2026); "poster" / "photo": earlier versions
+
+# The "Join us" pages (join, ambassador, partners, creators, host) all send people to ONE Google Form,
+# so every application lands in one sheet. The form's first question is "How would you like to be
+# part of Mon Mela?" with exactly the ROLES labels below as its options.
+# JOIN_FORM_URL: the form's link (…/viewform). JOIN_FORM_ROLE_ENTRY: that question's prefill id, e.g.
+# "entry.1234567890" (Form ⋮ → Get pre-filled link → pick an option → copy link → the entry.… part),
+# so each page's button arrives with its role already picked. Empty URL = the buttons open an e-mail
+# to us instead, with the questions in it.
+JOIN_FORM_URL = ""
+JOIN_FORM_ROLE_ENTRY = ""
+ROLES = {
+    "ambassador": "Campus ambassador",
+    "partner": "Venue or event partner",
+    "creator": "Creator",
+    "host": "Adda host",
+    "launch": "Launch updates",
+}
+
 # Our social pages: linked in the footer and listed in the structured data ("sameAs"),
 # which tells Google these pages belong to the same Mon Mela.
+# None hides one (footer and structured data).
 INSTAGRAM_URL = "https://www.instagram.com/monmela.in/"
+INSTAGRAM_HANDLE = "@monmela.in"
 FACEBOOK_URL = "https://www.facebook.com/profile.php?id=61596312788249"
 
 
@@ -125,7 +154,8 @@ def header(on_home=False):
     links = '<nav class="top-nav" aria-label="Sections">' + "".join(
         f'<a href="{prefix}#{anchor}">{both(en, bn)}</a>'
         for anchor, en, bn in [("how", "How it works", "কীভাবে"), ("adda-h", "Adda Tables", "আড্ডা টেবিল"),
-                               ("safe", "Safety", "নিরাপত্তা"), ("qa", "Questions", "প্রশ্ন")]) + "</nav>"
+                               ("safe", "Safety", "নিরাপত্তা"), ("qa", "Questions", "প্রশ্ন")]) + \
+        f'<a href="join.html">{both("Join us", "যুক্ত হোন")}</a></nav>'
     cta = get_app_button("btn btn-primary btn-small top-cta", short=True)
     return f"""<header class="top"><div class="top-inner">
   <a class="brand" href="./">{LOGO}{both("Mon Mela", "মনমেলা")}</a>
@@ -151,8 +181,11 @@ FACEBOOK_ICON = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 8h2.5
 def social_links():
     """Instagram / Facebook as labelled buttons, with the handle under the name. rel="me" says the
     pages are ours."""
-    items = [(INSTAGRAM_URL, INSTAGRAM_ICON, "Instagram", "@monmela.in"),
+    items = [(INSTAGRAM_URL, INSTAGRAM_ICON, "Instagram", INSTAGRAM_HANDLE),
              (FACEBOOK_URL, FACEBOOK_ICON, "Facebook", "Mon Mela")]
+    items = [item for item in items if item[0]]  # only pages that exist
+    if not items:
+        return ""
     return '<div class="foot-social">' + "".join(
         f'<a href="{url}" target="_blank" rel="noopener me">{svg}<span>{name}</span><small>{handle}</small></a>'
         for url, svg, name, handle in items) + "</div>"
@@ -173,7 +206,8 @@ def footer(on_home=False):
 
     explore = group("Explore", "ঘুরে দেখুন", [
         (f"{home}#how", "How it works", "কীভাবে কাজ করে"), (f"{home}#adda-h", "Adda Tables", "আড্ডা টেবিল"),
-        (f"{home}#safe", "Safety", "নিরাপত্তা"), (f"{home}#qa", "Questions", "প্রশ্ন")])
+        (f"{home}#safe", "Safety", "নিরাপত্তা"), (f"{home}#qa", "Questions", "প্রশ্ন"),
+        ("join.html", "Join us", "যুক্ত হোন")])
     help_ = group("Help", "সাহায্য", [
         ("terms.html", "Terms", "শর্তাবলি"), ("privacy.html", "Privacy", "প্রাইভেসি"),
         ("child-safety.html", "Child safety", "শিশু সুরক্ষা"), ("delete-account.html", "Delete account", "অ্যাকাউন্ট মুছুন")])
@@ -327,6 +361,14 @@ def icon(name):
         "pin": '<path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/>',
         "lock": '<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
         "adult": '<circle cx="12" cy="12" r="9.5"/><text x="12" y="15" text-anchor="middle">18+</text>',
+        "cap": '<path d="M2.5 9.5L12 5l9.5 4.5L12 14z"/><path d="M6.5 11.5v4c1.5 1.5 3.5 2.2 5.5 2.2s4-.7 5.5-2.2v-4M21.5 9.5v5"/>',
+        "award": '<circle cx="12" cy="9" r="5"/><path d="M9 13.5L7.5 21l4.5-2.5 4.5 2.5-1.5-7.5"/>',
+        "star": '<path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/>',
+        "spark": '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M18 6l-2.5 2.5M8.5 15.5L6 18"/>',
+        "cup": '<path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 11h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5c0 1.5 1.5 1.5 1.5 3M12 3.5c0 1.5 1.5 1.5 1.5 3"/>',
+        "ball": '<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17M3.5 12h17M6 6c3 2 3 10 0 12M18 6c-3 2-3 10 0 12"/>',
+        "fest": '<path d="M4 20l4-12 8 8z"/><path d="M14 4v2M18 6l-1.5 1.5M20 10h-2"/>',
+        "book": '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5"/>',
     }
     return f'<svg viewBox="0 0 24 24" class="icon" aria-hidden="true">{paths[name]}</svg>'
 
@@ -380,33 +422,34 @@ def adda_card(cls, title_en, title_bn, when_en, when_bn, taken, seats, tag=None,
 </div>"""
 
 
-# The story section: six moments of one friendship (pictures by tools/make_story.py).
+# The story section: six moments of one friendship. Pictures: img/story-1…6.webp, 1600 x 900 photos
+# (supplied Nov 2026; they replaced the drawings by tools/make_story.py). Also used on the Join us cards.
 # (big title in Bengali, its English line, text in English, text in Bengali, picture alt text)
 STORY = [
     ("নতুন শহর", "A new city",
      "New job, new city, and evenings at the window. Everyone is busy, and there's no one to share a bhaar of cha with.",
      "নতুন চাকরি, নতুন শহর, সন্ধেগুলো কাটে জানলার ধারে। সবাই ব্যস্ত, এক ভাঁড় চা খাওয়ার সঙ্গী নেই।",
-     "A young man sits alone at a window at night, looking out at the city lights"),
+     "A young man at his desk at night looks out of the window at Howrah Bridge under a full moon"),
     ("একটা হ্যালো", "A hello",
      "Mon Mela shows someone nearby who also loves café adda and the hills. A wave, a wave back, and the chat opens.",
      "মনমেলা দেখাল কাছেই এমন একজনকে, যিনিও ক্যাফের আড্ডা আর পাহাড় ভালোবাসেন। হাত নাড়া, উত্তরে হাত নাড়া, আর চ্যাট খুলে গেল।",
-     "A phone on a window sill showing a suggestion and a waving hand"),
+     "Friends laughing at a cafe table in the evening, a phone on the table in front"),
     ("প্রথম আড্ডা", "The first adda",
      "Saturday, 5 pm, the para tea stall. Two cups of cha became six, and nobody looked at the time.",
      "শনিবার, বিকেল ৫টা, পাড়ার চায়ের দোকান। দু'ভাঁড় চা গড়াল ছ'ভাঁড়ে, ঘড়ি দেখল না কেউ।",
-     "Three friends on a bench in front of a lit tea stall in the evening"),
+     "Six friends on a bench at a lit tea stall in the evening, a tram passing behind"),
     ("বইমেলা", "Boi Mela",
      "An Adda Table at the Book Fair: four people, too many books, and one shared jhola.",
      "বইমেলায় একটা আড্ডা টেবিল: চারজন মানুষ, অনেক বেশি বই, আর একটাই ঝোলা।",
-     "Four friends at a book stall at the Kolkata Book Fair in the afternoon sun"),
+     "Four friends walking in through the Kolkata Book Fair gate"),
     ("মেলার রাত", "A night at the mela",
      "Lights, the nagordola and phuchka. Now there's always someone to say \u201ccholo\u201d.",
      "আলো, নাগরদোলা আর ফুচকা। এখন \u201cচলো\u201d বলার লোক সবসময় আছে।",
-     "Four friends at a fair at night, looking up at a lit giant wheel"),
+     "Friends at a fair at night, pointing up at a lit giant wheel"),
     ("ঘাটে সন্ধে", "Evenings at the ghat",
      "The city doesn't feel new any more. It feels like home. Find your people on Mon Mela.",
      "শহরটা আর নতুন লাগে না, ঘর মনে হয়। মনমেলায় খুঁজে নিন আপনার মানুষদের।",
-     "Four friends on a ghat of the Ganga at sunset, Howrah Bridge behind them"),
+     "Five friends sitting on a ghat of the Ganga at sunset, Howrah Bridge and a boat in front of them"),
 ]
 
 
@@ -433,15 +476,18 @@ def story_section():
     Wide screens with story.js: the pictures sit in one sticky frame on the right and cross-fade
     as each chapter scrolls past on the left."""
     chapters, frame, dots = [], [], []
+    # Where each photo's people are, so the 3:2 frame keeps them in view (CSS object-position).
+    focus = ["80% 50%", "60% 50%", "50% 55%", "45% 55%", "55% 55%", "55% 60%"]
     for i, (title_bn, title_en, en, bn, alt) in enumerate(STORY):
         src = asset(f"img/story-{i + 1}.webp")
+        pos = f' style="object-position: {focus[i]}"'
         cta = f'<div class="actions">{get_app_button()}</div>' if i == len(STORY) - 1 else ""
         chapters.append(
             f'<li class="chapter" data-i="{i}">'
-            f'<figure class="ch-pic"><img src="{src}" alt="{alt}" width="1000" height="1200" loading="lazy" decoding="async"></figure>'
+            f'<figure class="ch-pic"><img src="{src}" alt="{alt}" width="1600" height="900"{pos} loading="lazy" decoding="async"></figure>'
             f'<div class="ch-text"><h3><span class="ch-bn" lang="bn">{title_bn}</span>'
             f'<span class="ch-en l" lang="en">{title_en}</span></h3><p>{both(en, bn)}</p>{cta}</div></li>')
-        frame.append(f'<img class="sf-pic{" on" if i == 0 else ""}" src="{src}" alt="" width="1000" height="1200" loading="lazy" decoding="async">')
+        frame.append(f'<img class="sf-pic{" on" if i == 0 else ""}" src="{src}" alt="" width="1600" height="900"{pos} loading="lazy" decoding="async">')
         dots.append(f'<span{" class=\"on\"" if i == 0 else ""}></span>')
     return f"""<section class="story" aria-labelledby="story-h">
     <div class="story-head">
@@ -455,6 +501,219 @@ def story_section():
       <div class="story-frame" aria-hidden="true"><div class="sf-pics">{"".join(frame)}</div><div class="sf-dots">{"".join(dots)}</div></div>
     </div>
   </section>"""
+
+
+# ---------------------------------------------------------------- home page pieces (Nov 2026 redesign)
+
+# Three short marigold strokes, like a hand-drawn "shine" mark beside a heading.
+SPARK = ('<svg class="spark" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 4v9M6 12l6 6M34 12l-6 6"/></svg>')
+# A brush-stroke underline under the hero's Bengali line.
+SWOOSH = ('<svg class="swoosh" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true">'
+          '<path d="M4 15C80 5 180 3 296 9"/></svg>')
+
+# The five feature cards' drawings: flat shapes in the site's colours (viewBox 96 x 72).
+GIVES_ART = {
+    # three friends, arms round each other
+    "people": '<path d="M14 66c0-16 6-26 14-26s14 10 14 26z" fill="#F5B023"/><path d="M54 66c0-16 6-26 14-26s14 10 14 26z" fill="#D9482B"/>'
+              '<path d="M34 66c0-18 6-29 14-29s14 11 14 29z" fill="#0F766E"/>'
+              '<circle cx="28" cy="25" r="8" fill="#8D5524"/><circle cx="48" cy="21" r="8.5" fill="#A0673A"/><circle cx="68" cy="25" r="8" fill="#6B3E1F"/>'
+              '<path d="M20 24a8 8 0 0 1 16-2c-5-3-11-2-16 2z" fill="#13201E"/><path d="M39.5 20a8.5 8.5 0 0 1 17-1c-5-3-12-3-17 1z" fill="#13201E"/>'
+              '<path d="M60 25a8 8 0 0 1 16-3c-2 4-2 10 1 14-6-1-12-5-17-11z" fill="#13201E"/>',
+    # a small round table with two bhaars of cha, and seats around it
+    "table": '<ellipse cx="48" cy="40" rx="30" ry="9" fill="#0F766E"/><rect x="45" y="44" width="6" height="20" rx="2" fill="#115E59"/>'
+             '<rect x="34" y="62" width="28" height="5" rx="2.5" fill="#115E59"/>'
+             '<path d="M36 24h10l-2 12h-6z" fill="#C2552D"/><path d="M52 22h10l-2 13h-6z" fill="#C2552D"/>'
+             '<path d="M40 19c0-4 3-4 3-8M56 17c0-4 3-4 3-8" stroke="#B9D6CF" stroke-width="2" stroke-linecap="round" fill="none"/>'
+             '<circle cx="12" cy="44" r="6" fill="#F5B023"/><circle cx="84" cy="44" r="6" fill="#F5B023"/>'
+             '<circle cx="22" cy="60" r="6" fill="#F5B023"/><circle cx="74" cy="60" r="6" fill="none" stroke="#F5B023" stroke-width="2.5"/>',
+    # a tea stall with a striped awning: hosting your own adda
+    "stall": '<rect x="18" y="30" width="60" height="36" rx="3" fill="#0F766E"/><rect x="26" y="40" width="18" height="16" rx="2" fill="#FCEBC1"/>'
+             '<rect x="52" y="40" width="18" height="26" rx="2" fill="#115E59"/>'
+             '<path d="M12 18h72l-4 14H16z" fill="#FFF6E5"/>'
+             '<path d="M12 18h12l-1 14h-7zM36 18h12v14H36zM60 18h12l1 14h-12z" fill="#D9482B"/>'
+             '<path d="M16 32q3 5 7 0q3 5 7 0q3 5 7 0q3 5 7 0q3 5 7 0q3 5 7 0q3 5 7 0q3 5 7 0q3 5 6 0" fill="#D9482B"/>'
+             '<rect x="10" y="12" width="76" height="7" rx="3" fill="#F5B023"/>',
+    # a shield with a tick: safe by design
+    "shield": '<path d="M48 6l26 9v18c0 16-11 28-26 34C33 61 22 49 22 33V15z" fill="#0F766E"/>'
+              '<path d="M48 13l19 7v13c0 12-8 21-19 26-11-5-19-14-19-26V20z" fill="none" stroke="#F5B023" stroke-width="3"/>'
+              '<path d="M38 36l7 7 14-15" stroke="#FFF6E5" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>',
+    # a phone saying অ and A: made for Bengal, in two languages
+    "phone": '<rect x="30" y="4" width="36" height="64" rx="8" fill="#13201E"/><rect x="34" y="11" width="28" height="50" rx="4" fill="#FFF6E5"/>'
+             '<text x="48" y="31" font-size="16" font-weight="700" fill="#0F766E" font-family="Anek Bangla, sans-serif" text-anchor="middle">অ</text>'
+             '<text x="48" y="49" font-size="14" font-weight="700" fill="#D9482B" font-family="Anek Bangla, sans-serif" text-anchor="middle">A</text>'
+             '<rect x="41" y="53" width="14" height="3" rx="1.5" fill="#F5B023"/>',
+}
+
+# The closing band's line drawing: Victoria Memorial and Howrah Bridge (marigold, 320 x 90).
+SKYLINE = ('<svg class="skyline" viewBox="0 0 320 90" aria-hidden="true">'
+           '<path d="M2 86h316"/>'
+           # Victoria Memorial: wings, a central dome with its lantern and angel, two corner cupolas
+           '<path d="M8 86V64h104v22M8 64h104M20 64V56h80v8M44 56c0-18 32-18 32 0M60 38v-8M57 30h6M60 30l3-5"/>'
+           '<path d="M16 64v-6c0-5 8-5 8 0v6M96 64v-6c0-5 8-5 8 0v6M28 86V72M40 86V72M52 86V72M68 86V72M80 86V72M92 86V72"/>'
+           # Howrah Bridge: two towers, the cantilever arms and the deck
+           '<path d="M168 86V30M178 86V30M262 86V30M272 86V30M168 30h10M262 30h10"/>'
+           '<path d="M130 70h182M130 70l38-40M178 30l42 24 42-24M312 70l-40-40M178 46l84 0M150 70l18-18M290 70l-18-18"/>'
+           '<path d="M188 36v34M200 43v27M212 50v20M228 50v20M240 43v27M252 36v34"/>'
+           '</svg>')
+
+
+def home_hero():
+    """The hero: our friends photo on the right, fading into dusk on the left where the words are,
+    and a soft wave into the cream page below. The Bengali line is in the same brush script on both
+    language versions; the lede says it in English for English readers."""
+    photo = HERO_PHOTO if (ROOT / HERO_PHOTO).exists() else HERO_PHOTO_FALLBACK
+    trust = [("badge", "Photo-verified members", "ছবি-যাচাই করা সদস্য"), ("adult", "18+ only", "শুধু ১৮+"),
+             ("star", "Free, no ads", "বিনামূল্যে, বিজ্ঞাপন নেই")]
+    trust_html = "".join(f"<li>{icon(i)}{both(en, bn)}</li>" for i, en, bn in trust)
+    return f"""<section class="hero-m">
+  <div class="hero-m-photo"><img src="{asset(photo)}" alt="" width="1600" height="900" fetchpriority="high"></div>
+  <div class="hero-m-text">
+    {SPARK}
+    <h1>{both("Mon Mela", "মনমেলা")}</h1>
+    <p class="hero-m-script" lang="bn">মন মিললে, বন্ধু মেলে।{SWOOSH}</p>
+    <p class="lede">{both(
+        "Find friends nearby who love what you love. Join small addas, host your own, and be part of Bengal's friendliest community.",
+        "কাছেপিঠে মনের মতো বন্ধু খুঁজুন। ছোট আড্ডায় যোগ দিন, নিজেই আড্ডা বসান, আর হয়ে উঠুন বাংলার সবচেয়ে বন্ধুত্বপূর্ণ দলের অংশ।")}</p>
+    <div class="actions">{get_app_button("btn btn-primary btn-big")}</div>
+    <ul class="hero-m-trust">{trust_html}</ul>
+  </div>
+  <svg class="hero-m-wave" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0 46C260 96 560 6 900 40c220 22 380 26 540-6v56H0z"/></svg>
+</section>"""
+
+
+def home_hero_poster():
+    """The poster hero: one wide photo of friends round a phone at the ghat. Four chips sit where the
+    photo's dashed lines lead (the same spots as in the original artwork, in % of the picture). Phones get a closer crop of the
+    friends and no chips."""
+    chips = [  # icon, English, Bengali, left %, top %, width %, height %
+        ("people", "Find your people", "নিজের মানুষ খুঁজুন", 19.9, 17.6, 14.6, 10.1),
+        ("cup", "Join an Adda Table", "আড্ডা টেবিলে যোগ দিন", 44.3, 11.4, 15.5, 9.5),
+        ("star", "Host your own adda", "নিজেই আড্ডা বসান", 74.8, 23.6, 16.1, 9.8),
+        ("badge", "Photo-verified members", "ছবি-যাচাই করা সদস্য", 4.8, 39.0, 16.7, 10.9),
+    ]
+    chips_html = "".join(
+        f'<li style="left:{l}%;top:{t}%;width:{w}%;height:{h}%">{icon(i)}<span>{both(en, bn)}</span></li>'
+        for i, en, bn, l, t, w, h in chips)
+    return f"""<section class="hero-p">
+  <div class="hero-p-frame">
+    <picture>
+      <source media="(max-width: 760px)" srcset="{asset("img/hero-poster-m.webp")}" width="890" height="691">
+      <img src="{asset("img/hero-poster.webp")}" alt="Five friends laughing round a phone on the ghat steps at dusk, Howrah Bridge behind them"
+           width="1672" height="941" fetchpriority="high">
+    </picture>
+    <ul class="hero-p-chips" aria-hidden="true">{chips_html}</ul>
+    <!-- The picture speaks for itself (the header has the app button). The heading is for screen
+         readers and search engines. -->
+    <h1 class="sr-only">{both("Mon Mela: friends and adda meetups in West Bengal", "মনমেলা: পশ্চিমবঙ্গে বন্ধু আর আড্ডা")}</h1>
+  </div>
+  <svg class="hero-m-wave" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0 46C260 96 560 6 900 40c220 22 380 26 540-6v56H0z"/></svg>
+</section>"""
+
+
+def home_hero_light():
+    """The bright home page hero: the raw riverside photo (img/home-hero.webp, made by
+    tools/make_home_photo.py), the big name and its line over a soft haze on the left, then the five
+    round icons as a real HTML row under the picture, so they wrap to fit any screen."""
+    # (icon file number, English, Bengali)
+    icons = [
+        (1, "Find your<br>people", "নিজের<br>মানুষ খুঁজুন"),
+        (2, "Join<br>addas", "আড্ডায়<br>যোগ দিন"),
+        (3, "Explore<br>your city", "নিজের শহর<br>ঘুরে দেখুন"),
+        (4, "Safe and<br>trusted", "নিরাপদ আর<br>ভরসার"),
+        (5, "Feel at<br>home", "আপন<br>মনে হবে"),
+    ]
+    row = "".join(f'<li><img src="{asset(f"img/home-icon-{n}.png")}" alt="" width="74" height="74"><span>{both(en, bn)}</span></li>'
+                  for n, en, bn in icons)
+    return f"""<section class="hero-l">
+  <div class="hero-l-frame">
+    <picture>
+      <source media="(max-width: 760px)" srcset="{asset("img/home-hero-m.webp")}" width="1080" height="647">
+      <img src="{asset("img/home-hero.webp")}" alt="Five friends laughing round a phone on the grass by the river at sunset, Howrah Bridge behind them"
+           width="1884" height="835" fetchpriority="high">
+    </picture>
+    <div class="hero-l-text">
+      <h1>{both("Mon Mela", "মনমেলা")}</h1>
+      <p>{both("Find your people, join addas, and be a part of Bengal's friendliest community.",
+               "নিজের মানুষ খুঁজুন, আড্ডায় যোগ দিন, আর হয়ে উঠুন বাংলার সবচেয়ে বন্ধুত্বপূর্ণ দলের অংশ।")}{SWOOSH}</p>
+    </div>
+    <svg class="hero-l-wave" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0 52C240 6 520 4 760 30c260 28 470 40 680 2v58H0z"/></svg>
+  </div>
+  <ul class="hero-l-row">{row}</ul>
+</section>"""
+
+
+def home_how():
+    """How it works in three steps, each with its drawing, over the green Kolkata skyline."""
+    steps = [
+        ("how-1", "Create your profile", "প্রোফাইল তৈরি করুন",
+         "Tell us about yourself: your interests, city and more.", "নিজের কথা বলুন: আপনার শখ, শহর আর আরও অনেক কিছু।"),
+        ("how-2", "Find and join addas", "আড্ডা খুঁজুন, যোগ দিন",
+         "Join an Adda Table nearby, or host your own.", "কাছের আড্ডা টেবিলে যোগ দিন, বা নিজেই বসান।"),
+        ("how-3", "Make new friends", "নতুন বন্ধু পান",
+         "Chat, meet and enjoy great conversations.", "চ্যাট করুন, দেখা করুন, জমিয়ে আড্ডা দিন।"),
+    ]
+    lis = "".join(
+        f"""<li><div><h3>{both(t_en, t_bn)}</h3><p>{both(d_en, d_bn)}</p></div>
+      <img src="{asset(f"img/{img}.webp")}" alt="" loading="lazy"></li>"""
+        for img, t_en, t_bn, d_en, d_bn in steps)
+    return f"""<section class="how-l" id="how" aria-labelledby="how-h">
+    <h2 id="how-h">{SPARK}<span>{both("How Mon Mela works", "মনমেলা কীভাবে কাজ করে")}</span>{SPARK}</h2>
+    <ol>{lis}</ol>
+    <img class="skyline-strip" src="{asset("img/skyline-strip.webp")}" alt="" loading="lazy" width="1672" height="103">
+  </section>"""
+
+
+def home_gives():
+    """Five cards right under the hero: what the app gives you, each with a small drawing."""
+    cards = [
+        ("people", "lilac", "Find your people", "নিজের মানুষ খুঁজুন",
+         "New picks every morning, with a match % and why you click.",
+         "প্রতিদিন সকালে নতুন মানুষ, সঙ্গে মিলের % আর কেন মিল।"),
+        ("table", "haldi", "Join an Adda Table", "আড্ডা টেবিলে যোগ দিন",
+         "Small meetups of 3 to 6 at a cafe, a park or a phuchka stall.",
+         "ক্যাফে, পার্ক বা ফুচকার দোকানে ৩ থেকে ৬ জনের ছোট আড্ডা।"),
+        ("stall", "peach", "Host your own adda", "নিজেই আড্ডা বসান",
+         "Pick the topic, place and seats, and you choose who joins.",
+         "বিষয়, জায়গা আর আসন ঠিক করুন, কে আসবেন তাও আপনি ঠিক করেন।"),
+        ("shield", "mint", "Safe by design", "শুরু থেকেই নিরাপদ",
+         "Photo-verified members, private meeting spots and two-tap reporting.",
+         "ছবি-যাচাই করা সদস্য, গোপন দেখার জায়গা আর দু-ট্যাপে রিপোর্ট।"),
+        ("phone", "rose", "Made for Bengal", "বাংলার জন্য তৈরি",
+         "In Bengali and English, from Kolkata to Cooch Behar.",
+         "বাংলা আর ইংরেজিতে, কলকাতা থেকে কোচবিহার।"),
+    ]
+    lis = "".join(
+        f'<li class="gv-{tint}"><svg class="gv-art" viewBox="0 0 96 72" aria-hidden="true">{GIVES_ART[art]}</svg>'
+        f"<h3>{both(t_en, t_bn)}</h3><p>{both(d_en, d_bn)}</p></li>"
+        for art, tint, t_en, t_bn, d_en, d_bn in cards)
+    return f"""<section class="gives" aria-labelledby="gives-h">
+    <div class="gives-head">
+      <h2 id="gives-h">{SPARK}<span>{both("What Mon Mela gives you", "মনমেলা আপনাকে যা দেয়")}</span>{SPARK}</h2>
+      <p>{both("A whole city of addas, in your pocket.", "গোটা শহরের আড্ডা, আপনার পকেটে।")}</p>
+    </div>
+    <ul class="gives-row">{lis}</ul>
+  </section>"""
+
+
+def home_ready():
+    """The closing band before the footer: skyline drawing, one line, the app button."""
+    return f"""<section class="ready" aria-labelledby="ready-h">
+    <div class="ready-inner">
+      {SKYLINE}
+      <div class="ready-text">
+        <h2 id="ready-h">{both("Ready to be part of Mon Mela?", "মনমেলার অংশ হতে তৈরি?")}</h2>
+        <p>{both("Download the app and find your adda.", "অ্যাপটা নিন, আর খুঁজে নিন আপনার আড্ডা।")}</p>
+      </div>
+      {get_app_button("btn btn-primary btn-big")}
+    </div>
+  </section>"""
+
+
+def with_home_brand(html):
+    """The home page under HOME_BRAND's name (both languages); other pages keep Mon Mela."""
+    if not HOME_BRAND:
+        return html
+    return html.replace("Mon Mela", HOME_BRAND[0]).replace("মনমেলা", HOME_BRAND[1])
 
 
 def home():
@@ -531,35 +790,15 @@ def home():
     html = f"""{head(HOME_TITLE_EN, HOME_TITLE_BN, HOME_DESCRIPTION, "", script("story.js") + script("motion.js") + script("match.js") + home_schema(faq))}
 <body class="home">
 {header(on_home=True)}
-<section class="hero-k">
-  {festoon()}
-  <div class="hero-k-text">
-    <h1 lang="bn">মন মিললে, <br>বন্ধু মেলে।</h1>   <!-- in Bengali on both language versions; the line below explains it -->
-    <p class="lede">{both(
-        "New city, but no one to share a cup of cha with? Mon Mela finds friends nearby who love what you love.",
-        "নতুন শহর, কিন্তু চায়ের সঙ্গী নেই? মনমেলা খুঁজে দেয় কাছেপিঠে মনের মতো বন্ধু।")}</p>
-  </div>
-  <div class="hero-k-art">
-    {hero_art(asset("img/hero-ghat.webp"))}
-    <!-- Two small cards in the app's own style, floating on the picture (decorative) -->
-    <div class="float-card match-card" aria-hidden="true">
-      <div class="mc-top">
-        <svg class="mc-ring" viewBox="0 0 64 64"><circle class="track" cx="32" cy="32" r="26"/><circle class="fill" cx="32" cy="32" r="26" pathLength="100"/><text x="32" y="37" class="mc-pct">86%</text></svg>
-        <div><p class="mc-who">{both("You and Riti", "আপনি আর রীতি")}</p><p class="mc-why">{both("Where your minds meet", "মনের মিল")}</p></div>
-      </div>
-      <ul class="mc-chips"><li>{both("Prinsep Ghat", "প্রিন্সেপ ঘাট")}</li><li>{both("Durga Puja", "দুর্গাপুজো")}</li><li>{both("Mishti doi", "মিষ্টি দই")}</li><li>{both("Feluda", "ফেলুদা")}</li></ul>
-    </div>
-    <div class="float-card seat-card" aria-hidden="true">
-      <b>☕</b><span>{both("Phuchka adda, Gariahat: <em>2 seats left</em>", "গড়িয়াহাটে ফুচকা আড্ডা: <em>২টো জায়গা খালি</em>")}</span>
-    </div>
-  </div>
-</section>
+{home_hero_light() if HERO_STYLE == "light" else home_hero_poster() if HERO_STYLE == "poster" else home_hero()}
 
 <main class="home-main">
+  {home_how() if HERO_STYLE == "light" else home_gives()}
+
   {story_section()}
 
-  <section class="how" aria-labelledby="how">
-    <h2 id="how">{both("How it works", "কীভাবে কাজ করে")}</h2>
+  <section class="how" aria-labelledby="inside">
+    <h2 id="inside">{both("Inside the app", "অ্যাপের ভেতরে")}</h2>
     <ol class="how-row">{steps_html}</ol>
     <p class="how-then">{icon("chat")}<span>{both("<b>Then connect.</b> The chat opens only when both of you say yes.",
                                                   "<b>তারপর কানেক্ট।</b> দুজনেই রাজি হলে তবেই চ্যাট খোলে।")}</span></p>
@@ -613,12 +852,14 @@ def home():
     <div class="ask-chat">{faq_html}</div>
     <p class="ask-more">{both("Can't find your answer?", "উত্তর পেলেন না?")} <a href="mailto:{EMAIL}">{EMAIL}</a></p>
   </section>
+
+  {home_ready()}
 </main>
 {footer(on_home=True)}
 </body>
 </html>
 """
-    (ROOT / "index.html").write_text(html, encoding="utf-8")
+    (ROOT / "index.html").write_text(with_home_brand(html), encoding="utf-8")
 
 
 # ------------------------------------------------------------ app download
@@ -650,7 +891,7 @@ def home_schema(faq):
                 "logo": f"{SITE}/icon-512.png",
                 "email": EMAIL,
                 "areaServed": "West Bengal, India",
-                "sameAs": [INSTAGRAM_URL, FACEBOOK_URL],
+                "sameAs": [url for url in (INSTAGRAM_URL, FACEBOOK_URL) if url],
             },
             {
                 "@type": "WebSite",
@@ -693,7 +934,7 @@ def sitemap():
     """sitemap.xml: every public page with today's date, so Google finds and re-reads them.
     The URLs match each page's canonical link."""
     today = datetime.date.today().isoformat()
-    paths = ["", "download", "privacy.html", "terms.html", "delete-account.html", "child-safety.html"]
+    paths = ["", "download", "join", "ambassador", "partners", "creators", "host", "privacy.html", "terms.html", "delete-account.html", "child-safety.html"]
     urls = "".join(f"  <url><loc>{SITE}/{p}</loc><lastmod>{today}</lastmod></url>\n" for p in paths)
     (ROOT / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -979,6 +1220,461 @@ def assetlinks():
     (folder / "assetlinks.json").write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
 
+def form_link(role, body):
+    """The join form with this role pre-picked; until the form exists, an e-mail to us with the questions."""
+    label = ROLES[role]
+    if JOIN_FORM_URL:
+        prefill = f"?usp=pp_url&{JOIN_FORM_ROLE_ENTRY}={quote(label)}" if JOIN_FORM_ROLE_ENTRY else ""
+        return JOIN_FORM_URL + prefill, ' target="_blank" rel="noopener"'
+    return f"mailto:{EMAIL}?subject={quote(label + ' - Mon Mela')}&body={quote(body)}", ""
+
+
+def bullet_list(items):
+    """A plain list of (English, Bengali) lines, marigold markers."""
+    return "<ul>" + "".join(f"<li>{both(en, bn)}</li>" for en, bn in items) + "</ul>"
+
+
+def icon_list(items):
+    """Icon + title + line items (the "What you get" style)."""
+    return "<ul>" + "".join(f"<li>{icon(i)}<div><h3>{both(t_en, t_bn)}</h3><p>{both(d_en, d_bn)}</p></div></li>"
+                            for i, t_en, t_bn, d_en, d_bn in items) + "</ul>"
+
+
+def join_page(file, path, title, description, intro, art, main):
+    """Shared frame of the ambassador and partner pages: dusk intro with an Adda Table card pair, then sections."""
+    h1_en, h1_bn, lede_en, lede_bn, button, meta = intro
+    html = f"""{head(*title, description, path)}
+<body class="home join">
+{header()}
+<section class="intro">
+  {festoon()}
+  <div class="intro-inner">
+    <div>
+      <h1>{both(h1_en, h1_bn)}</h1>
+      <p class="lede">{both(lede_en, lede_bn)}</p>
+      <div class="actions">{button}</div>
+      <p class="dl-meta">{both(*meta)}</p>
+    </div>
+    <div class="adda-art join-art" aria-hidden="true">{art}</div>
+  </div>
+</section>
+<main class="home-main">
+{main}
+</main>
+{footer()}
+</body>
+</html>
+"""
+    (ROOT / file).write_text(html, encoding="utf-8")
+
+
+def steps_list(items):
+    """A numbered run of steps (the download page's dashed-line style), each with a title and a line."""
+    lis = "".join(f"<li><h3>{both(t_en, t_bn)}</h3><p>{both(d_en, d_bn)}</p></li>" for t_en, t_bn, d_en, d_bn in items)
+    return f"<ol>{lis}</ol>"
+
+
+def ambassador():
+    """monmela.in/ambassador: the Founding Ambassador programme for college students (tried here first,
+    then moved to monmela.in)."""
+    href, target = form_link("ambassador",
+                             "Name:\nCollege:\nCourse and year:\nAge:\nPhone / WhatsApp:\n"
+                             "Clubs or groups you run or are part of:\nThe first adda you'd host on campus:\n"
+                             "Android phone (yes/no):\nInstagram (optional):\n")
+    apply_btn = lambda cls: f'<a class="btn {cls}" href="{href}"{target}>{both("Apply now", "আবেদন করুন")}</a>'
+
+    steps = steps_list([
+        ("Try the app before launch", "লঞ্চের আগেই অ্যাপ চালান",
+         "We add you to the test. Use it for a week and tell us what to fix.",
+         "আমরা আপনাকে টেস্টে যোগ করব। এক সপ্তাহ ব্যবহার করে বলুন কী ঠিক করা দরকার।"),
+        ("Plan two campus addas", "ক্যাম্পাসে দুটো আড্ডার পরিকল্পনা",
+         "A cha adda after class, a fest-prep meetup, a match screening: pick the date and place with us.",
+         "ক্লাসের পর চায়ের আড্ডা, ফেস্টের প্রস্তুতি, খেলা দেখা: তারিখ আর জায়গা আমাদের সঙ্গে ঠিক করুন।"),
+        ("Host them in launch week", "লঞ্চের সপ্তাহে আড্ডা বসান",
+         "Open them as Adda Tables in the app and welcome the people who join.",
+         "অ্যাপে আড্ডা টেবিল হিসেবে খুলুন, আর যাঁরা আসেন তাঁদের স্বাগত জানান।"),
+        ("Bring your people", "নিজের লোকেদের আনুন",
+         "From launch day, invite 10 classmates, and send us a short voice note each week.",
+         "লঞ্চের দিন থেকে ১০ জন সহপাঠীকে ডাকুন, আর প্রতি সপ্তাহে একটা ছোট ভয়েস নোট পাঠান।"),
+    ])
+    perks = [
+        ("award", "Founding Ambassador certificate", "ফাউন্ডিং অ্যাম্বাসাডর সার্টিফিকেট",
+         "Signed by the founder, plus a LinkedIn recommendation when you finish all four steps.",
+         "প্রতিষ্ঠাতার সই করা, আর চারটে ধাপ শেষ করলে LinkedIn-এ সুপারিশ।"),
+        ("star", "Your name on this page", "এই পেজে আপনার নাম",
+         "With your college, and a shout-out on our Instagram, if you agree.",
+         "কলেজের নাম সহ, আর আপনি রাজি থাকলে আমাদের Instagram-এ উল্লেখ।"),
+        ("spark", "Free premium for life", "সারাজীবন বিনামূল্যে প্রিমিয়াম",
+         "Whatever premium features come later, you never pay for them.",
+         "পরে যে প্রিমিয়াম ফিচারই আসুক, আপনাকে কখনও টাকা দিতে হবে না।"),
+        ("chat", "A real say in the app", "অ্যাপে আপনার কথার দাম",
+         "Talk to the founder directly, try new features first, and shape what we build.",
+         "সরাসরি প্রতিষ্ঠাতার সঙ্গে কথা বলুন, নতুন ফিচার সবার আগে চালান, আর ঠিক করুন আমরা কী বানাব।"),
+        ("people", "A path to City Lead", "সিটি লিড হওয়ার সুযোগ",
+         "After 30 days, the most active ambassador leads the next campuses in the city.",
+         "৩০ দিন পরে সবচেয়ে সক্রিয় অ্যাম্বাসাডর শহরের পরের ক্যাম্পাসগুলোর দায়িত্ব নেবেন।"),
+    ]
+    perks_html = "".join(f"<li>{icon(i)}<div><h3>{both(t_en, t_bn)}</h3><p>{both(d_en, d_bn)}</p></div></li>"
+                         for i, t_en, t_bn, d_en, d_bn in perks)
+
+    def bullets(items):
+        return "<ul>" + "".join(f"<li>{both(en, bn)}</li>" for en, bn in items) + "</ul>"
+
+    who = bullets([
+        ("College students in West Bengal, 18 or older", "পশ্চিমবঙ্গের কলেজ পড়ুয়া, বয়স ১৮ বা তার বেশি"),
+        ("You already run or join things: a club, fest team, hostel group, sports team or quiz society",
+         "আপনি আগে থেকেই কিছু চালান বা তাতে আছেন: ক্লাব, ফেস্ট টিম, হস্টেলের দল, খেলার দল বা কুইজ সোসাইটি"),
+        ("An Android phone", "একটা অ্যান্ড্রয়েড ফোন"),
+    ])
+    know = bullets([
+        ("This is an unpaid volunteer role. There's no stipend, salary or job offer.",
+         "এটা অবৈতনিক স্বেচ্ছাসেবী ভূমিকা। কোনো স্টাইপেন্ড, বেতন বা চাকরির প্রস্তাব নেই।"),
+        ("Addas happen in public places only, like cafes, canteens and sports grounds.",
+         "আড্ডা হয় শুধু সবার জন্য খোলা জায়গায়, যেমন ক্যাফে, ক্যান্টিন আর খেলার মাঠ।"),
+        ("We never ask you to add people to groups or to share anyone's number.",
+         "আমরা কখনও কাউকে গ্রুপে যোগ করতে বা কারও নম্বর দিতে বলি না।"),
+        ("After you apply, we call you within a few days for a 10-minute chat.",
+         "আবেদনের পর কয়েক দিনের মধ্যে ১০ মিনিট কথা বলতে আমরা ফোন করব।"),
+    ])
+
+    main = f"""  <section class="steps" aria-labelledby="do">
+    <h2 id="do">{both("What you'll do", "আপনার কাজ")}</h2>
+    {steps}
+  </section>
+  <section class="perks" aria-labelledby="get">
+    <h2 id="get">{both("What you get", "আপনি যা পাবেন")}</h2>
+    <ul>{perks_html}</ul>
+  </section>
+  <section class="fit">
+    <div><h2>{both("Who can apply", "কারা আবেদন করতে পারেন")}</h2>{who}</div>
+    <div><h2>{both("Good to know", "জেনে রাখুন")}</h2>{know}</div>
+  </section>
+  <section class="cta-band">
+    {festoon()}
+    <h2>{both("Your campus, your adda", "আপনার ক্যাম্পাস, আপনার আড্ডা")}</h2>
+    <p>{both("We're starting with a few colleges. Apply now to be one of the first.",
+             "আমরা কয়েকটা কলেজ দিয়ে শুরু করছি। প্রথম দিকের একজন হতে এখনই আবেদন করুন।")}</p>
+    <div class="actions">{apply_btn("btn-primary btn-big")}</div>
+  </section>"""
+
+    join_page("ambassador.html", "ambassador",
+              ("Campus Ambassador programme | Mon Mela", "ক্যাম্পাস অ্যাম্বাসাডর প্রোগ্রাম | মনমেলা"),
+              "Become a Founding Ambassador of Mon Mela: plan small addas on your campus and lead the launch at your college.",
+              ("Bring adda back to your campus", "ক্যাম্পাসে আবার আড্ডা জমান",
+               "Become a Founding Ambassador of Mon Mela. Plan small addas with people from your college, "
+               "help shape the app before it opens to everyone, and lead its launch on your campus.",
+               "মনমেলার ফাউন্ডিং অ্যাম্বাসাডর হোন। কলেজের মানুষদের সঙ্গে ছোট ছোট আড্ডার পরিকল্পনা করুন, "
+               "সবার জন্য খোলার আগেই অ্যাপটা গড়তে সাহায্য করুন, আর নিজের ক্যাম্পাসে লঞ্চের নেতৃত্ব দিন।",
+               apply_btn("btn-primary btn-big"),
+               ("A 30-day volunteer pilot for college students aged 18 and over.",
+                "১৮ বা তার বেশি বয়সী কলেজ পড়ুয়াদের জন্য ৩০ দিনের স্বেচ্ছাসেবী পাইলট।")),
+              adda_card("back", "Fest-prep adda, campus lawn", "ফেস্টের প্রস্তুতি আড্ডা, ক্যাম্পাসের লন",
+                        "Friday, 4 pm", "শুক্রবার, বিকেল ৪টে", 3, 6, full=False)
+              + adda_card("front", "Cha after class, college canteen", "ক্লাসের পর চা, কলেজ ক্যান্টিন",
+                          "Wednesday, 5 pm", "বুধবার, বিকেল ৫টা", 3, 5,
+                          tag=("Campus adda", "ক্যাম্পাস আড্ডা")),
+              main)
+
+
+def partners():
+    """monmela.in/partners: cafes, sports venues, college fests and communities that host our addas
+    (tried here first, then moved to monmela.in)."""
+    href, target = form_link("partner",
+                             "Name of your place or group:\nType (cafe, restaurant, sports venue, fest, club, community):\n"
+                             "Area:\nContact person:\nPhone:\nQuiet days and hours:\nA perk you could offer groups:\n")
+    interest = both("I'm interested", "আমি আগ্রহী")
+    interest_btn = lambda cls: f'<a class="btn {cls}" href="{href}"{target}>{interest}</a>'
+    mail_btn = f'<a class="btn btn-ghost" href="mailto:{EMAIL}">{both("Write to us", "আমাদের লিখুন")}</a>'
+
+    kinds = [
+        ("cup", "Cafes and restaurants", "ক্যাফে আর রেস্তোরাঁ",
+         "Groups on slow weekday evenings, and a mention on our Instagram",
+         "সপ্তাহের ফাঁকা সন্ধেয় দল, আর আমাদের Instagram-এ উল্লেখ",
+         "A table you can keep for a group, and a small perk, like a free cha refill",
+         "একটা দলের জন্য একটা টেবিল, আর ছোট একটা সুবিধা, যেমন আরেক কাপ চা ফ্রি"),
+        ("ball", "Sports venues", "খেলার জায়গা",
+         "Players for empty off-peak slots at your turf, court or club",
+         "আপনার টার্ফ, কোর্ট বা ক্লাবের ফাঁকা স্লটে খেলোয়াড়",
+         "A group rate in those slots", "সেই স্লটে দলের জন্য কম দাম"),
+        ("fest", "College fests and clubs", "কলেজ ফেস্ট আর ক্লাব",
+         "An ice-breaker corner where students meet new people, and help with promotion",
+         "নতুন মানুষের সঙ্গে আলাপের একটা কর্নার, আর প্রচারে সাহায্য",
+         "A small space at your event, and our name on your posters",
+         "অনুষ্ঠানে একটু জায়গা, আর পোস্টারে আমাদের নাম"),
+        ("book", "Communities", "কমিউনিটি",
+         "Book clubs, running groups, quiz clubs: an easy way to bring new members to your meetups",
+         "বইয়ের ক্লাব, দৌড়ের দল, কুইজ ক্লাব: আপনার মিটআপে নতুন সদস্য আনার সহজ উপায়",
+         "One open Mon Mela meetup a month", "মাসে একটা সবার জন্য খোলা মনমেলা মিটআপ"),
+    ]
+    cards = "".join(f"""<li>{icon(i)}<h3>{both(t_en, t_bn)}</h3>
+      <dl><dt>{both("You get", "আপনি পাবেন")}</dt><dd>{both(g_en, g_bn)}</dd>
+      <dt>{both("We ask", "আমরা চাই")}</dt><dd>{both(a_en, a_bn)}</dd></dl></li>"""
+                    for i, t_en, t_bn, g_en, g_bn, a_en, a_bn in kinds)
+
+    steps = steps_list([
+        ("Tell us about your place", "আপনার জায়গার কথা বলুন",
+         "Your quiet days and hours, and what you can offer a group.",
+         "কোন দিন আর কখন ফাঁকা থাকে, আর একটা দলকে কী দিতে পারেন।"),
+        ("We point hosts to you", "আয়োজকদের আপনার কাছে পাঠাই",
+         "When members plan an adda nearby, we suggest your place.",
+         "কাছাকাছি কেউ আড্ডার পরিকল্পনা করলে আমরা আপনার জায়গার কথা বলি।"),
+        ("Groups arrive", "দল আসে",
+         "Small groups of photo-verified members come in, and with your permission we share the best moments on Instagram.",
+         "ছবি-যাচাই করা সদস্যদের ছোট দল আসে, আর আপনার অনুমতি নিয়ে সেরা মুহূর্তগুলো আমরা Instagram-এ দিই।"),
+    ])
+
+    main = f"""  <section class="partner-kinds" aria-labelledby="who">
+    <h2 id="who">{both("Who we work with", "কাদের সঙ্গে কাজ করি")}</h2>
+    <ul>{cards}</ul>
+  </section>
+  <section class="steps" aria-labelledby="how">
+    <h2 id="how">{both("How it works", "কীভাবে হয়")}</h2>
+    {steps}
+  </section>
+  <section class="cta-band">
+    {festoon()}
+    <h2>{both("Let's talk", "চলুন কথা বলি")}</h2>
+    <p>{both("Fill in a short form or write to us, and we'll get back to you within two days.",
+             "একটা ছোট ফর্ম ভরুন বা আমাদের লিখুন, দু'দিনের মধ্যে উত্তর দেব।")}</p>
+    <div class="actions">{interest_btn("btn-primary btn-big")}{mail_btn}</div>
+  </section>"""
+
+    join_page("partners.html", "partners",
+              ("Partner with Mon Mela", "মনমেলার পার্টনার হোন"),
+              "Cafes, sports venues, college fests and communities: host small Mon Mela meetups and welcome new groups.",
+              ("Host addas with us", "আমাদের সঙ্গে আড্ডা জমান",
+               "Mon Mela brings small, friendly groups of 4 to 6 people together at real places. "
+               "Welcome them in your quiet hours, and we'll help them find you.",
+               "মনমেলা ৪ থেকে ৬ জনের ছোট, বন্ধুত্বপূর্ণ দলকে আসল জায়গায় একসঙ্গে আনে। "
+               "আপনার ফাঁকা সময়ে তাঁদের স্বাগত জানান, আর আমরা তাঁদের আপনার কাছে পৌঁছে দেব।",
+               interest_btn("btn-primary btn-big"),
+               ("No fees and no contracts. It starts with a conversation.",
+                "কোনো ফি নেই, কোনো চুক্তি নেই। শুরুটা শুধু একটু কথা দিয়ে।")),
+              adda_card("back", "Badminton and adda, Salt Lake", "ব্যাডমিন্টন আর আড্ডা, সল্টলেক",
+                        "Sunday, 7 am", "রবিবার, সকাল ৭টা", 3, 4, full=False)
+              + adda_card("front", "Board games and cha, a cafe near you", "বোর্ড গেম আর চা, কাছের ক্যাফেতে",
+                          "Thursday, 6:30 pm", "বৃহস্পতিবার, সন্ধে ৬:৩০", 4, 6,
+                          tag=("Partner cafe", "পার্টনার ক্যাফে")),
+              main)
+
+
+def card_picture(story_file):
+    """A join card's picture: our own photo img/join-<n>.webp when it's there (n = the story picture's
+    number), otherwise the home page story picture."""
+    own = story_file.replace("story-", "join-")
+    return own if (ROOT / own).exists() else story_file
+
+
+def join_hub():
+    """monmela.in/join: every way to be part of Mon Mela, one card each. Linked from the header
+    and footer ("Join us"). Tried here first, then moved to monmela.in."""
+    href, target = form_link("launch", "Name:\nCity or area:\nPhone or e-mail:\n")
+    roles = [
+        ("cap", "img/story-4.webp", "Campus ambassador", "ক্যাম্পাস অ্যাম্বাসাডর",
+         "College students who want to start addas on their campus.",
+         "যে কলেজ পড়ুয়ারা নিজের ক্যাম্পাসে আড্ডা শুরু করতে চান।", "ambassador.html", None),
+        ("cup", "img/story-3.webp", "Venue or event partner", "জায়গা বা অনুষ্ঠানের পার্টনার",
+         "Cafes, restaurants, sports venues and college fests that welcome our groups.",
+         "ক্যাফে, রেস্তোরাঁ, খেলার জায়গা আর কলেজ ফেস্ট, যাঁরা আমাদের দলকে স্বাগত জানান।", "partners.html", None),
+        ("star", "img/story-2.webp", "Creator", "ক্রিয়েটর",
+         "Bengali creators on Instagram, YouTube and meme pages.",
+         "Instagram, YouTube আর মিম পেজের বাঙালি ক্রিয়েটর।", "creators.html", None),
+        ("people", "img/story-5.webp", "Adda host", "আড্ডার হোস্ট",
+         "Club leads, group admins and hobby groups who bring people together.",
+         "ক্লাবের দায়িত্বে থাকা মানুষ, গ্রুপ অ্যাডমিন আর শখের দল, যাঁরা মানুষকে একসঙ্গে আনেন।", "host.html", None),
+        ("spark", "img/story-6.webp", "Just tell me at launch", "লঞ্চ হলে জানান",
+         "Not ready to do more? Leave your details and we'll message you when the app opens to everyone.",
+         "এখনই আর কিছু নয়? নিজের তথ্য দিয়ে রাখুন, অ্যাপ সবার জন্য খুললে আমরা জানাব।", href, target),
+    ]
+    # Picture cards: the picture fills the card, a dusk shade rises from the bottom under the words,
+    # the icon sits in a white disc top left. The pictures are decorative (alt=""): the words say it all.
+    cards = "".join(
+        f"""<li><a class="role" href="{link}"{tgt or ""}>
+      <img src="{asset(card_picture(img))}" alt="" loading="lazy">
+      {icon(i)}<span class="role-text"><h3>{both(t_en, t_bn)}</h3><p>{both(d_en, d_bn)}</p></span></a></li>"""
+        for i, img, t_en, t_bn, d_en, d_bn, link, tgt in roles)
+    main = f"""  <section class="roles" aria-labelledby="ways">
+    <h2 id="ways">{both("Choose your way in", "কীভাবে যুক্ত হবেন, বেছে নিন")}</h2>
+    <ul>{cards}</ul>
+    <p class="roles-note">{both(
+        f'Want to help some other way? Write to us at <a href="mailto:{EMAIL}">{EMAIL}</a>.',
+        f'অন্যভাবে সাহায্য করতে চান? লিখুন <a href="mailto:{EMAIL}">{EMAIL}</a>-এ।')}</p>
+  </section>"""
+    join_page("join.html", "join",
+              ("Join Mon Mela", "মনমেলায় যুক্ত হোন"),
+              "Campus ambassadors, partner venues, creators and adda hosts: the ways to be part of Mon Mela.",
+              ("Be part of Mon Mela", "মনমেলার অংশ হোন",
+               "Mon Mela is being built by the people who use it. Start addas on your campus, welcome groups "
+               "at your cafe, make content with us, or host your club's meetups.",
+               "মনমেলা গড়ে উঠছে এর মানুষদের হাতেই। নিজের ক্যাম্পাসে আড্ডা শুরু করুন, আপনার ক্যাফেতে দলকে "
+               "স্বাগত জানান, আমাদের সঙ্গে কনটেন্ট বানান, বা নিজের ক্লাবের মিটআপ বসান।",
+               f'<a class="btn btn-primary btn-big" href="#ways">{both("See the ways to join", "যুক্ত হওয়ার উপায় দেখুন")}</a>',
+               ("Free to join. Volunteer roles are unpaid.", "যুক্ত হতে টাকা লাগে না। স্বেচ্ছাসেবী ভূমিকাগুলো অবৈতনিক।")),
+              adda_card("back", "Quiz night, Jadavpur", "কুইজ নাইট, যাদবপুর",
+                        "Friday, 7 pm", "শুক্রবার, সন্ধে ৭টা", 5, 6, full=False)
+              + adda_card("front", "Trek planning adda, Gariahat", "ট্রেকের পরিকল্পনা আড্ডা, গড়িয়াহাট",
+                          "Sunday, 11 am", "রবিবার, সকাল ১১টা", 3, 6,
+                          tag=("Founding host", "ফাউন্ডিং হোস্ট")),
+              main)
+
+
+def creators():
+    """monmela.in/creators: Bengali creators join a list now; paid collaborations open after launch."""
+    href, target = form_link("creator",
+                             "Name:\nInstagram / YouTube / page link:\nFollowers:\nAverage views on your last 10 posts:\n"
+                             "Share of your audience in West Bengal (from your insights):\nWhat you make content about:\n"
+                             "Phone or e-mail:\n")
+    apply_btn = f'<a class="btn btn-primary btn-big" href="{href}"{target}>{both("Join the creator list", "ক্রিয়েটর তালিকায় নাম দিন")}</a>'
+    main = f"""  <section class="fit">
+    <div><h2>{both("What we look for", "আমরা যা খুঁজি")}</h2>{bullet_list([
+        ("Most of your audience lives in West Bengal", "আপনার দর্শকদের বেশিরভাগ পশ্চিমবঙ্গের"),
+        ("You make content in Bengali or Benglish", "আপনি বাংলা বা বাংলা-ইংরেজি মিশিয়ে কনটেন্ট বানান"),
+        ("Real views and comments matter more to us than follower count",
+         "ফলোয়ার সংখ্যার চেয়ে আসল ভিউ আর কমেন্ট আমাদের কাছে বেশি দামি"),
+        ("Friendly content that's fine for a general audience", "সবার দেখার মতো, বন্ধুত্বপূর্ণ কনটেন্ট"),
+    ])}</div>
+    <div><h2>{both("Good to know", "জেনে রাখুন")}</h2>{bullet_list([
+        ("Paid work starts after the app's public launch. Before that, nothing is paid.",
+         "টাকার কাজ শুরু হবে অ্যাপ সবার জন্য খোলার পর। তার আগে কোনো পেমেন্ট নেই।"),
+        ("Every fee and date is agreed in writing before you post.", "পোস্টের আগে ফি আর তারিখ লিখিতভাবে ঠিক হয়।"),
+        ("Every paid post is marked as a paid partnership, as Indian advertising rules require.",
+         "ভারতের বিজ্ঞাপনের নিয়ম মেনে প্রতিটা টাকার পোস্টে পেইড পার্টনারশিপ লেখা থাকে।"),
+        ("We never pay for followers, likes or fake engagement.", "ফলোয়ার, লাইক বা ভুয়ো এনগেজমেন্টের জন্য আমরা কখনও টাকা দিই না।"),
+    ])}</div>
+  </section>
+  <section class="perks" aria-labelledby="get">
+    <h2 id="get">{both("What you get", "আপনি যা পাবেন")}</h2>
+    {icon_list([
+        ("award", "Paid collaborations", "টাকার বিনিময়ে কাজ",
+         "After launch, selected creators get a paid brief, usually a reel and stories.",
+         "লঞ্চের পর বাছাই করা ক্রিয়েটররা টাকার বিনিময়ে কাজ পাবেন, সাধারণত একটা রিল আর কয়েকটা স্টোরি।"),
+        ("spark", "Early access", "সবার আগে অ্যাপ",
+         "Try the app before everyone else, and tell us what your audience would love.",
+         "সবার আগে অ্যাপ চালান, আর বলুন আপনার দর্শকদের কী ভালো লাগবে।"),
+        ("cup", "First invites to our addas", "আমাদের আড্ডায় প্রথম আমন্ত্রণ",
+         "Come to our first meetups and events in Kolkata, and film them if you like.",
+         "কলকাতায় আমাদের প্রথম মিটআপ আর অনুষ্ঠানে আসুন, চাইলে ভিডিও করুন।"),
+        ("people", "Work that lasts", "লম্বা সম্পর্ক",
+         "If your audience loves Mon Mela, we come back to you first.",
+         "আপনার দর্শকদের মনমেলা ভালো লাগলে, পরের বারও আমরা আগে আপনার কাছেই আসব।"),
+    ])}
+  </section>
+  <section class="steps" aria-labelledby="how">
+    <h2 id="how">{both("How it works", "কীভাবে হয়")}</h2>
+    {steps_list([
+        ("Join the list", "তালিকায় নাম দিন",
+         "Send us your page, followers, average views and how much of your audience is in West Bengal.",
+         "আপনার পেজ, ফলোয়ার, গড় ভিউ আর দর্শকদের কতটা পশ্চিমবঙ্গে, তা আমাদের পাঠান।"),
+        ("We look at your posts", "আমরা আপনার পোস্ট দেখি", "We reply within a week.", "এক সপ্তাহের মধ্যে উত্তর দিই।"),
+        ("After launch, a brief", "লঞ্চের পর কাজের বিবরণ",
+         "What to make, the fee and the date, agreed in writing.", "কী বানাবেন, ফি আর তারিখ, লিখিতভাবে ঠিক হয়।"),
+        ("You post", "আপনি পোস্ট করেন", "Marked as a paid partnership, with a link to the app.",
+         "পেইড পার্টনারশিপ লেখা, সঙ্গে অ্যাপের লিংক।"),
+    ])}
+  </section>
+  <section class="cta-band">
+    {festoon()}
+    <h2>{both("Make your audience's next adda", "আপনার দর্শকদের পরের আড্ডা জমান")}</h2>
+    <p>{both("It takes two minutes to join the list.", "তালিকায় নাম দিতে দু'মিনিট লাগে।")}</p>
+    <div class="actions">{apply_btn}</div>
+  </section>"""
+    join_page("creators.html", "creators",
+              ("Creators | Mon Mela", "ক্রিয়েটর | মনমেলা"),
+              "Bengali creators: join the Mon Mela creator list now. Paid collaborations open after the public launch.",
+              ("Create with Mon Mela", "মনমেলার সঙ্গে কনটেন্ট বানান",
+               "We're looking for Bengali creators whose followers love adda, food, books, football and their city. "
+               "Join our creator list now. Paid collaborations open after the public launch.",
+               "আমরা এমন বাঙালি ক্রিয়েটর খুঁজছি যাঁদের দর্শকেরা আড্ডা, খাওয়াদাওয়া, বই, ফুটবল আর নিজের শহর ভালোবাসেন। "
+               "এখনই ক্রিয়েটর তালিকায় নাম দিন। টাকার কাজ শুরু হবে অ্যাপ সবার জন্য খোলার পর।",
+               apply_btn,
+               ("Instagram, YouTube, meme pages and blogs. Every size is welcome.",
+                "Instagram, YouTube, মিম পেজ আর ব্লগ। ছোট-বড় সবাইকে স্বাগত।")),
+              adda_card("back", "Phuchka crawl, Vivekananda Park", "ফুচকা অভিযান, বিবেকানন্দ পার্ক",
+                        "Saturday, 6 pm", "শনিবার, সন্ধে ৬টা", 4, 6, full=False)
+              + adda_card("front", "Creators' adda, College Street", "ক্রিয়েটরদের আড্ডা, কলেজ স্ট্রিট",
+                          "Sunday, 4 pm", "রবিবার, বিকেল ৪টে", 4, 6,
+                          tag=("Creator meetup", "ক্রিয়েটর মিটআপ")),
+              main)
+
+
+def host():
+    """monmela.in/host: club leads, group admins and hobby groups become Founding Hosts of Adda Tables."""
+    href, target = form_link("host",
+                             "Name:\nYour club, group or community (with a link if it has one):\nWhat kind of meetups you run:\n"
+                             "Area:\nHow many people usually come:\nPhone or e-mail:\n")
+    apply_btn = f'<a class="btn btn-primary btn-big" href="{href}"{target}>{both("Become a Founding Host", "ফাউন্ডিং হোস্ট হোন")}</a>'
+    main = f"""  <section class="perks" aria-labelledby="tools">
+    <h2 id="tools">{both("What the app does for you", "অ্যাপ আপনার জন্য যা করে")}</h2>
+    {icon_list([
+        ("people", "You choose who joins", "কে আসবেন, আপনি ঠিক করেন",
+         "People ask for a seat, and you say yes or no. You set the number of seats.",
+         "মানুষ জায়গা চান, আপনি হ্যাঁ বা না বলেন। কতগুলো জায়গা, তাও আপনি ঠিক করেন।"),
+        ("pin", "The exact spot stays private", "ঠিক জায়গা গোপন থাকে",
+         "Only the people you accept see where you're meeting.", "শুধু যাঁদের আপনি নেন, তাঁরাই জানেন কোথায় দেখা হবে।"),
+        ("badge", "Women-only and verified-only tables", "শুধু মহিলাদের আর শুধু যাচাই করা সদস্যদের টেবিল",
+         "Hosts are photo verified, and you can open a table to women only or verified members only.",
+         "হোস্টরা ছবি-যাচাই করা, আর আপনি টেবিল শুধু মহিলাদের বা শুধু যাচাই করা সদস্যদের জন্য খুলতে পারেন।"),
+        ("chat", "A group chat for every adda", "প্রতিটা আড্ডার গ্রুপ চ্যাট",
+         "It opens for the people at your table, without sharing phone numbers.",
+         "টেবিলের মানুষদের জন্য খোলে, কারও ফোন নম্বর না দিয়েই।"),
+    ])}
+  </section>
+  <section class="fit">
+    <div><h2>{both("Who it's for", "কাদের জন্য")}</h2>{bullet_list([
+        ("Club and society leads in colleges", "কলেজের ক্লাব আর সোসাইটির দায়িত্বে থাকা মানুষ"),
+        ("Admins of local Facebook and WhatsApp groups", "পাড়ার বা শহরের Facebook আর WhatsApp গ্রুপের অ্যাডমিন"),
+        ("Hobby groups: trekking, photography, books, music, board games, running",
+         "শখের দল: ট্রেকিং, ফটোগ্রাফি, বই, গান, বোর্ড গেম, দৌড়"),
+        ("Anyone who loves bringing people together, 18 or older",
+         "মানুষকে একসঙ্গে আনতে ভালোবাসেন এমন যে কেউ, বয়স ১৮ বা তার বেশি"),
+    ])}</div>
+    <div><h2>{both("What we ask", "আমরা যা চাই")}</h2>{bullet_list([
+        ("Host at least 2 addas in the first month after launch", "লঞ্চের পর প্রথম মাসে অন্তত ২টো আড্ডা বসান"),
+        ("Meet in public places only: cafes, parks, sports grounds", "দেখা শুধু সবার জন্য খোলা জায়গায়: ক্যাফে, পার্ক, খেলার মাঠ"),
+        ("No selling, recruiting or paid entry at addas", "আড্ডায় কিছু বিক্রি, লোক টানা বা টাকা নিয়ে ঢোকানো চলবে না"),
+        ("Tell us what works and what doesn't", "কী ভালো চলছে আর কী নয়, আমাদের জানান"),
+    ])}</div>
+  </section>
+  <section class="perks paper" aria-labelledby="get">
+    <h2 id="get">{both("As a Founding Host", "ফাউন্ডিং হোস্ট হিসেবে")}</h2>
+    {icon_list([
+        ("spark", "Try it before launch", "লঞ্চের আগেই চালান",
+         "We add you to the test, so your first tables are ready on day one.",
+         "আমরা আপনাকে টেস্টে যোগ করব, যাতে প্রথম দিনেই আপনার টেবিল তৈরি থাকে।"),
+        ("star", "Get featured", "আমাদের পেজে আপনি", "We introduce you and your group on our Instagram.",
+         "আমাদের Instagram-এ আপনাকে আর আপনার দলকে পরিচয় করিয়ে দিই।"),
+        ("chat", "A direct line to us", "সরাসরি আমাদের সঙ্গে কথা", "Ask for the features your group needs, and we listen.",
+         "আপনার দলের যা দরকার, সেই ফিচার চান, আমরা শুনি।"),
+        ("award", "Free premium for life", "সারাজীবন বিনামূল্যে প্রিমিয়াম", "Whatever premium features come later, you never pay.",
+         "পরে যে প্রিমিয়াম ফিচারই আসুক, আপনাকে টাকা দিতে হবে না।"),
+    ])}
+  </section>
+  <section class="cta-band">
+    {festoon()}
+    <h2>{both("Bring your people along", "আপনার মানুষদের সঙ্গে নিয়ে আসুন")}</h2>
+    <p>{both("We're picking our first hosts in Kolkata and around West Bengal.",
+             "কলকাতা আর পশ্চিমবঙ্গ জুড়ে আমরা প্রথম হোস্টদের বেছে নিচ্ছি।")}</p>
+    <div class="actions">{apply_btn}</div>
+  </section>"""
+    join_page("host.html", "host",
+              ("Host an adda | Mon Mela", "আড্ডা বসান | মনমেলা"),
+              "Club leads, group admins and hobby groups: become a Founding Host and run your meetups as Adda Tables.",
+              ("Host addas your way", "নিজের মতো আড্ডা বসান",
+               "Run a book club, a trekking group, a board-game night or a local community? Bring it to Mon Mela "
+               "as a Founding Host, and fill your meetups with people who share your interests.",
+               "বইয়ের ক্লাব, ট্রেকিংয়ের দল, বোর্ড গেমের সন্ধে বা পাড়ার কোনো কমিউনিটি চালান? ফাউন্ডিং হোস্ট হয়ে "
+               "মনমেলায় নিয়ে আসুন, আর একই শখের মানুষে ভরিয়ে তুলুন আপনার মিটআপ।",
+               apply_btn,
+               ("For club leads, group admins and anyone who brings people together. 18+ only.",
+                "ক্লাবের দায়িত্বে থাকা মানুষ, গ্রুপ অ্যাডমিন আর যাঁরা মানুষকে একসঙ্গে আনেন, তাঁদের জন্য। শুধু ১৮+।")),
+              adda_card("back", "Book club, College Street", "বইয়ের ক্লাব, কলেজ স্ট্রিট",
+                        "Sunday, 11 am", "রবিবার, সকাল ১১টা", 4, 8, full=False)
+              + adda_card("front", "Board-game night, Salt Lake", "বোর্ড গেমের সন্ধে, সল্টলেক",
+                          "Saturday, 7 pm", "শনিবার, সন্ধে ৭টা", 5, 8,
+                          tag=("Founding host", "ফাউন্ডিং হোস্ট")),
+              main)
+
+
 (ROOT / "img" / "alpana.svg").write_text(alpana_tile(), encoding="utf-8")
 home()
 download()
@@ -995,6 +1691,11 @@ page("child-safety.html", "Child Safety Standards", "শিশু সুরক�
      f"Last updated: {UPDATED_EN}", f"সর্বশেষ আপডেট: {UPDATED_BN}",
      load("child.en.html"), load("child.bn.html"))
 adda()
+join_hub()
+ambassador()
+partners()
+creators()
+host()
 assetlinks()
 sitemap()
 print("built")

@@ -39,6 +39,18 @@
   unicode-range: U+0951-0952, U+0964-0965, U+0980-09FE, U+200C-200D, U+20B9, U+25CC;
 }
 
+/* Galada: a Bengali brush script, only for the hero's মন মিললে, বন্ধু মেলে। line. */
+@font-face {
+  font-family: "Galada"; font-style: normal; font-display: swap; font-weight: 400;
+  src: url("fonts/galada-bengali.woff2") format("woff2");
+  unicode-range: U+0951-0952, U+0964-0965, U+0980-09FE, U+200C-200D, U+20B9, U+25CC;
+}
+@font-face {
+  font-family: "Galada"; font-style: normal; font-display: swap; font-weight: 400;
+  src: url("fonts/galada-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212;
+}
+
 /* ---------------------------------------------------------------- base */
 :root {
   --dusk: #0B3B37;          /* evening sky: hero, header, footer, closing panel */
@@ -411,7 +423,7 @@ html[data-lang="bn"] .home section h2 { line-height: 1.22; }
   .venn svg { max-width: 400px; }
 }
 
-/* ---------- a story of friendship: six chapters (pictures: _src/tools/make_story.py).
+/* ---------- a story of friendship: six chapters (pictures: img/story-1…6.webp, landscape photos shown at 3:2).
    Phones / no JavaScript: a picture card per chapter. Wide screens with story.js (.is-live):
    one sticky frame on the right cross-fades as each chapter reaches the middle of the screen. */
 .home .story {
@@ -471,9 +483,9 @@ html[data-lang="bn"] .home section h2 { line-height: 1.22; }
 .music-float:not([hidden]) { opacity: 1; visibility: visible; translate: none; }
 .head-music-on-screen .music-float { opacity: 0; visibility: hidden; translate: 0 14px; }   /* the story's own button is showing */
 
-.story-chapters { list-style: none; margin: 0 auto; padding: 0; display: grid; gap: clamp(56px, 9vw, 80px); max-width: 520px; }
+.story-chapters { list-style: none; margin: 0 auto; padding: 0; display: grid; gap: clamp(56px, 9vw, 80px); max-width: 640px; }
 .ch-pic, .sf-pics {
-  position: relative; margin: 0; overflow: hidden; border-radius: 28px; aspect-ratio: 5 / 6; background: var(--dusk-deep);
+  position: relative; margin: 0; overflow: hidden; border-radius: 28px; aspect-ratio: 3 / 2; background: var(--dusk-deep);
   box-shadow: 0 44px 70px -36px rgba(0, 0, 0, .85);
 }
 .ch-pic::after, .sf-pics::after {   /* kantha running stitch just inside the edge */
@@ -492,7 +504,7 @@ html[data-lang="bn"] .home section h2 { line-height: 1.22; }
 .story-dots { display: none; }
 @media (max-width: 899px) {
   .story-chapters {
-    max-width: none; grid-auto-flow: column; grid-auto-columns: min(80%, 340px); gap: 16px; align-items: start;
+    max-width: none; grid-auto-flow: column; grid-auto-columns: min(86%, 420px); gap: 16px; align-items: start;
     overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 var(--gutter); scrollbar-width: none;
     margin: 0 calc(-1 * var(--gutter)); padding: 4px var(--gutter) 6px;
   }
@@ -511,21 +523,21 @@ html[data-lang="bn"] .home section h2 { line-height: 1.22; }
   .story-dots button.on { width: 28px; background: var(--marigold); }
 }
 .story.is-live .story-body {
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(40px, 6vw, 80px); align-items: start;
+  display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 5fr); gap: clamp(40px, 5vw, 72px); align-items: start;
 }
 .story.is-live .story-chapters { max-width: none; margin: 0; gap: 0; }
 .story.is-live .chapter { display: flex; align-items: center; min-height: 80vh; opacity: .26; transition: opacity .6s ease; }
 .story.is-live .chapter.is-current { opacity: 1; }
 .story.is-live .ch-pic { display: none; }
 .story.is-live .story-frame { display: block; position: sticky; top: 96px; }
-.sf-pics { width: min(100%, calc(min(76vh, 680px) * 5 / 6)); margin-left: auto; }
+.sf-pics { width: min(100%, calc(min(76vh, 680px) * 3 / 2)); margin-left: auto; }
 .sf-pic { position: absolute; inset: 0; opacity: 0; transition: opacity 1s ease; }
 .sf-pic.on { opacity: 1; }
 @media (prefers-reduced-motion: no-preference) {   /* a slow push-in on the picture that just arrived */
   .sf-pic { transform: scale(1.07); transition: opacity 1s ease, transform 7s cubic-bezier(.2, .7, .2, 1); }
   .sf-pic.on { transform: scale(1); }
 }
-.sf-dots { display: flex; justify-content: center; gap: 10px; width: min(100%, calc(min(76vh, 680px) * 5 / 6)); margin: 20px 0 0 auto; }
+.sf-dots { display: flex; justify-content: center; gap: 10px; width: min(100%, calc(min(76vh, 680px) * 3 / 2)); margin: 20px 0 0 auto; }
 .sf-dots span { width: 8px; height: 8px; border-radius: 4px; background: rgba(255, 246, 229, .3); transition: width .3s, background-color .3s; }
 .sf-dots span.on { width: 28px; background: var(--marigold); }
 
@@ -902,3 +914,256 @@ html[data-lang="bn"] .play-steps li::before { content: counter(ps, bengali); }
   background: radial-gradient(circle at var(--gx, 50%) var(--gy, 0%), rgba(255, 255, 255, .32), transparent 50%);
 }
 .phone.tilting .screen::before { opacity: 1; }
+
+/* ---------------------------------------------------------------- campus ambassador and partner pages
+   Dusk intro with two Adda Table cards (like the home page's Adda band), then paper sections:
+   numbered steps, what you get / who we work with, two short lists, and a dusk closing band. */
+.join-art { min-height: 430px; width: 100%; max-width: 440px; justify-self: center; }
+.join-art .adda-card { color: var(--ink); }   /* the intro sets cream text for the dusk; cards are paper */
+.join .steps h3 { margin: 0 0 6px; font: 700 21px/1.25 var(--display); color: var(--teal-deep); }
+/* What you get: icon + title + line, two or three to a row */
+.perks { background: var(--mint); }
+.perks ul, .partner-kinds ul {
+  list-style: none; margin: 0; padding: 0; display: grid; gap: 28px 40px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+.perks li { display: flex; gap: 16px; align-items: flex-start; }
+.perks h3, .partner-kinds h3 { margin: 4px 0 4px; font: 700 20px/1.3 var(--display); color: var(--ink); }
+.perks p { margin: 0; color: var(--muted); }
+/* Who we work with: four kinds of partner, each with "You get" and "We ask" */
+.partner-kinds ul { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 900px; }   /* four kinds: 2 x 2 */
+@media (max-width: 700px) { .partner-kinds ul { grid-template-columns: 1fr; } }
+.partner-kinds li { border-top: 2.5px solid var(--marigold); padding-top: 18px; }
+.partner-kinds h3 { margin-top: 14px; }
+.partner-kinds dl { margin: 10px 0 0; }
+.partner-kinds dt { margin-top: 12px; font-size: 14px; font-weight: 600; color: var(--teal-deep); }
+.partner-kinds dd { margin: 2px 0 0; color: var(--muted); }
+/* Who can apply / Good to know */
+.home .fit { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 64px; }
+.home .fit h2 { font-size: clamp(28px, 3.4vw, 40px); margin-bottom: 18px; }
+.fit ul { margin: 0; padding-left: 20px; }
+.fit li { margin-bottom: 10px; }
+.fit li::marker { color: var(--marigold); }
+/* Closing band */
+.home .cta-band {
+  position: relative; overflow: hidden; text-align: center; color: var(--on-dusk);
+  background: linear-gradient(180deg, var(--dusk-deep), var(--dusk));
+}
+.home .cta-band h2 { color: var(--on-dusk); margin: 24px 0 12px; }
+.cta-band p { color: var(--on-dusk-muted); font-size: 19px; margin: 0 auto 28px; max-width: 30em; }
+.cta-band .actions { justify-content: center; }
+@media (max-width: 860px) {
+  .home .fit { grid-template-columns: 1fr; }
+  .join-art { min-height: 400px; }
+}
+/* Join us hub: picture cards, three on top and two wider below (2 + 2 + 1 on tablets, one column on phones).
+   The picture fills the card; a dusk shade rises from the bottom so the cream words always read. */
+.roles ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.roles li { grid-column: span 2; }
+.roles li:nth-child(n + 4) { grid-column: span 3; }
+.role {
+  position: relative; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; min-height: 330px;
+  overflow: hidden; border-radius: 24px; color: var(--on-dusk); text-decoration: none; background: var(--dusk);
+  box-shadow: 0 24px 40px -28px rgba(7, 43, 40, .7);
+}
+.role img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 72%;
+  transition: transform .5s ease;
+}
+.role::after {   /* the shade under the words */
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(0deg, rgba(7, 43, 40, .96) 0%, rgba(7, 43, 40, .75) 34%, rgba(7, 43, 40, 0) 68%);
+}
+.role .icon { position: absolute; z-index: 1; left: 22px; top: 22px; background: #fff; }
+.role-text { position: relative; z-index: 1; padding: 0 24px 24px; }
+.role h3 { margin: 0 0 6px; font: 700 clamp(22px, 2.1vw, 28px)/1.2 var(--display); color: var(--on-dusk); text-shadow: 0 2px 12px rgba(0, 0, 0, .35); }
+.role p { margin: 0; color: rgba(255, 246, 229, .88); max-width: 30em; }
+.role:hover, .role:focus-visible { color: var(--on-dusk); }
+.role:hover img, .role:focus-visible img { transform: scale(1.05); }
+.roles-note { margin: 28px 0 0; color: var(--muted); }
+@media (max-width: 1000px) {
+  .roles ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .roles li, .roles li:nth-child(n + 4) { grid-column: span 1; }
+  .roles li:last-child { grid-column: span 2; }
+}
+@media (max-width: 600px) {
+  .roles ul { grid-template-columns: 1fr; }
+  .roles li, .roles li:nth-child(n + 4), .roles li:last-child { grid-column: auto; }
+  .role { min-height: 290px; }
+}
+@media (prefers-reduced-motion: reduce) { .role img { transition: none; } .role:hover img { transform: none; } }
+.perks.paper { background: var(--paper); }
+/* Four items read best as 2 x 2 rather than 3 + 1 */
+.perks ul:has(> li:nth-child(4):last-child) { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 900px; }
+@media (max-width: 700px) { .perks ul:has(> li:nth-child(4):last-child) { grid-template-columns: 1fr; } }
+
+/* ---------------------------------------------------------------- home page (Nov 2026 redesign)
+   Hero: our friends photo on the right fading into dusk on the left, a brush-script Bengali line,
+   a wave into the cream page. Then five feature cards with small drawings, and a closing band. */
+.spark { width: 34px; height: 34px; fill: none; stroke: var(--marigold); stroke-width: 3.2; stroke-linecap: round; flex: none; }
+.home .hero-m {
+  position: relative; overflow: hidden; display: flex; align-items: center;
+  min-height: min(94vh, 760px); padding: clamp(120px, 12vw, 160px) var(--gutter) clamp(120px, 11vw, 160px);
+  background: var(--dusk); color: var(--on-dusk);
+}
+.hero-m-photo { position: absolute; inset: 0 0 0 30%; }
+.hero-m-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center 60%; }
+.hero-m::before {   /* dusk over the photo's left edge, so the words always read */
+  content: ""; position: absolute; inset: 0; z-index: 1;
+  background:
+    linear-gradient(90deg, var(--dusk-deep) 0%, var(--dusk) 30%, rgba(11, 59, 55, .82) 44%, rgba(11, 59, 55, 0) 72%),
+    linear-gradient(180deg, rgba(7, 43, 40, .55) 0%, rgba(7, 43, 40, 0) 26%);
+}
+.hero-m-text { position: relative; z-index: 2; max-width: 600px; }
+.hero-m-text > .spark { position: absolute; left: -38px; top: -26px; transform: rotate(-30deg); }
+.hero-m h1 { margin: 0; font-size: clamp(56px, 7.4vw, 104px); line-height: 1; color: var(--on-dusk); }
+.hero-m-script {
+  position: relative; display: inline-block; margin: 6px 0 22px; padding-bottom: 12px;
+  font: 400 clamp(36px, 4.6vw, 62px)/1.35 "Galada", var(--display); color: var(--marigold);
+}
+.swoosh { position: absolute; left: 4%; right: 0; bottom: 0; width: 96%; height: 16px; fill: none; stroke: var(--marigold); stroke-width: 4; stroke-linecap: round; }
+.hero-m .lede { margin: 0 0 30px; max-width: 30em; font-size: clamp(18px, 1.5vw, 21px); color: var(--on-dusk); opacity: .9; text-wrap: pretty; }
+.hero-m-trust { list-style: none; display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 26px 0 0; padding: 0; font-size: 15px; color: var(--on-dusk-muted); }
+.hero-m-trust li { display: flex; align-items: center; gap: 8px; }
+.hero-m-trust .icon { width: 28px; height: 28px; padding: 6px; background: rgba(245, 176, 35, .14); stroke: var(--marigold); box-shadow: none; }
+.hero-m-trust .icon text { fill: var(--marigold); }
+.hero-m-wave { position: absolute; z-index: 2; left: 0; right: 0; bottom: -1px; width: 100%; height: clamp(40px, 6vw, 90px); fill: var(--paper); }
+@media (max-width: 860px) {   /* phones: the photo on top, the words under it on dusk */
+  .home .hero-m { display: block; min-height: 0; padding: 0 0 70px; }
+  .hero-m-photo { position: relative; inset: auto; height: min(78vw, 420px); }
+  .hero-m::before { background: linear-gradient(180deg, rgba(7, 43, 40, .6) 0%, rgba(7, 43, 40, 0) 22%, rgba(11, 59, 55, 0) 50%, var(--dusk) min(78vw, 420px)); }
+  .hero-m-text { margin-top: -64px; padding: 0 var(--gutter); }
+  .hero-m-text > .spark { left: auto; right: 24px; top: -8px; transform: rotate(20deg); }
+}
+/* What it gives you: five cards in soft colours, each with a drawing */
+.home .gives { padding-top: clamp(40px, 6vw, 72px); }
+.gives-head { text-align: center; margin-bottom: clamp(28px, 4vw, 44px); }
+.home .gives h2 { display: inline-flex; align-items: center; gap: 14px; margin: 0 0 8px; }
+.gives h2 .spark:last-child { transform: scaleX(-1); }
+.gives-head p { margin: 0; font-size: 19px; color: var(--teal-deep); }
+.gives-row { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.gives-row li { padding: 24px 18px 26px; border-radius: 24px; text-align: center; }
+.gives-row h3 { margin: 12px 0 6px; font: 700 20px/1.25 var(--display); color: var(--ink); }
+.gives-row p { margin: 0; color: var(--muted); font-size: 16px; }
+.gv-art { width: 100%; max-width: 120px; height: auto; }
+.gv-lilac { background: #F1EBF7; } .gv-haldi { background: var(--haldi); } .gv-peach { background: #FDE7D8; }
+.gv-mint { background: var(--mint); } .gv-rose { background: #FBE6EA; }
+@media (max-width: 560px) {
+  .gives-row { grid-template-columns: 1fr 1fr; }
+  .gives-row li:last-child { grid-column: span 2; }
+  .home .gives h2 { gap: 8px; } .gives h2 .spark { width: 24px; height: 24px; }
+}
+/* Closing band: skyline, one line, the app button */
+.home .ready { padding-top: 0; }
+.ready-inner {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 32px;
+  padding: 26px 40px 26px 28px; border-radius: 28px; color: var(--on-dusk);
+  background: linear-gradient(180deg, var(--dusk), var(--dusk-deep));
+}
+.skyline { width: clamp(220px, 26vw, 330px); height: auto; fill: none; stroke: var(--marigold); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.home .ready h2 { margin: 0 0 4px; font-size: clamp(26px, 2.6vw, 34px); color: var(--on-dusk); }
+.ready-text p { margin: 0; color: var(--on-dusk-muted); }
+@media (max-width: 860px) {
+  .ready-inner { grid-template-columns: 1fr; text-align: center; justify-items: center; gap: 18px; padding: 30px 22px; }
+}
+/* Poster hero: the picture keeps its own shape (1672 x 941); chips and words are placed in % of it and
+   sized in cqw (1% of the picture's width), so everything stays where the artwork's dashed lines lead. */
+.home .hero-p { position: relative; padding: 0; background: var(--dusk); }
+.hero-p-frame { position: relative; container-type: inline-size; }
+.hero-p-frame img { display: block; width: 100%; height: auto; }
+.hero-p-frame::before {   /* a little shade at the top for the floating header */
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(7, 43, 40, .5) 0%, rgba(7, 43, 40, 0) 14%);
+}
+.hero-p-chips { list-style: none; margin: 0; padding: 0; }
+.hero-p-chips li {
+  position: absolute; z-index: 2; display: flex; align-items: center; gap: 1cqw; padding: 0 1.1cqw;
+  border-radius: 1.5cqw; background: #FFFCF6; color: var(--ink); box-shadow: 0 .8cqw 2cqw -1cqw rgba(0, 0, 0, .45);
+  font: 600 clamp(12px, 1.25cqw, 19px)/1.25 var(--display);
+}
+.hero-p-chips .icon { width: 3cqw; height: 3cqw; padding: .65cqw; background: var(--mint); box-shadow: none; }
+.hero-p-brand { position: absolute; z-index: 2; right: 6cqw; bottom: 16%; color: var(--on-dusk); }
+.hero-p-name { display: flex; align-items: center; gap: 1cqw; margin: 0; font: 700 4cqw/1 var(--display); letter-spacing: -.02em; }
+.hero-p-name svg { width: 5.2cqw; height: 5.2cqw; flex: none; }
+.hero-p-script {
+  position: relative; display: inline-block; margin: 1cqw 0 0; padding-bottom: .8cqw;
+  font: 400 2.9cqw/1.35 "Galada", var(--display); color: var(--marigold); letter-spacing: 0;
+}
+.hero-p-script .swoosh { height: 1cqw; }
+.hero-p-line { margin: .8cqw 0 1.6cqw; font-size: clamp(15px, 1.45cqw, 22px); line-height: 1.45; color: var(--on-dusk); }
+.hero-p .hero-m-wave { z-index: 3; }
+@media (max-width: 760px) {   /* phones: closer crop, no chips, words under the picture on dusk */
+  .hero-p-chips { display: none; }
+  .hero-p-frame::before { background: linear-gradient(180deg, rgba(7, 43, 40, .55) 0%, rgba(7, 43, 40, 0) 22%, rgba(11, 59, 55, 0) 70%, var(--dusk) 100%); }
+  .hero-p-brand { position: relative; right: auto; bottom: auto; margin-top: -36px; padding: 0 var(--gutter) 76px; }
+  .hero-p-name { gap: 12px; font-size: 44px; }
+  .hero-p-name svg { width: 48px; height: 48px; }
+  .hero-p-script { margin-top: 10px; padding-bottom: 8px; font-size: 34px; }
+  .hero-p-script .swoosh { height: 12px; }
+  .hero-p-line { margin: 10px 0 22px; font-size: 18px; }
+}
+/* Visible only to screen readers and search engines */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* ---------------------------------------------------------------- bright home page (Nov 2026)
+   The raw riverside photo with the name and line over a soft haze on the left (sized in cqw, 1% of
+   the picture's width, so they keep their place), then the five icons as a row that wraps. */
+.home .hero-l { padding: 0 0 clamp(8px, 2vw, 24px); background: #FDFDFA; }
+.hero-l-frame { position: relative; container-type: inline-size; }
+.hero-l-frame img { display: block; width: 100%; height: auto; }
+.hero-l-frame::before {   /* haze that makes room for the words on the left */
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(90deg, rgba(253,253,250,.95) 0%, rgba(253,253,250,.86) 24%, rgba(253,253,250,.4) 38%, rgba(253,253,250,0) 50%);
+}
+.hero-l-text { position: absolute; z-index: 2; left: 4.2%; top: 20%; width: 34cqw; color: #0B3B30; }
+.hero-l-text h1 { margin: 0 0 1.4cqw; font: 700 6.2cqw/1 var(--display); letter-spacing: -.025em; color: #0A4535; }
+.hero-l-text p { position: relative; margin: 0; padding-bottom: 1.6cqw; font: 600 clamp(15px, 1.9cqw, 30px)/1.3 var(--display); color: #10372E; }
+.hero-l-text p [lang="bn"] { line-height: 1.5; }
+.hero-l-text .swoosh { left: 14cqw; right: auto; width: 13cqw; height: 1.4cqw; stroke-width: 5; }
+.hero-l-wave { position: absolute; z-index: 1; left: 0; right: 0; bottom: -1px; width: 100%; height: 5.4cqw; fill: #FDFDFA; }
+.hero-l-row {   /* five icons: one row on wide screens, wraps to fit narrow ones */
+  position: relative; z-index: 2; list-style: none; display: flex; flex-wrap: wrap; justify-content: center;
+  gap: clamp(10px, 2.4vw, 40px); width: min(980px, 100% - 2 * var(--gutter)); margin: clamp(-64px, -4vw, -20px) auto 0;
+  padding: clamp(14px, 1.8vw, 22px) clamp(14px, 2.4vw, 32px); text-align: center;
+  background: #fff; border-radius: 22px; box-shadow: 0 10px 30px rgba(14, 59, 48, .10);
+}
+.hero-l-row li { flex: 1 1 96px; max-width: 150px; }
+.hero-l-row img { display: block; width: clamp(52px, 5.4vw, 74px); height: auto; aspect-ratio: 1; margin: 0 auto 8px; }
+.hero-l-row span { display: block; font: 700 clamp(12px, 1.1vw, 15px)/1.25 var(--display); color: #0E3B30; }
+@media (max-width: 760px) {   /* phones: the friends close up, then the words, then the icons */
+  .hero-l-frame { display: flex; flex-direction: column; container-type: normal; }
+  .hero-l-frame::before { display: none; }
+  .hero-l-text { position: static; width: auto; padding: 18px var(--gutter) 0; order: 2; }
+  .hero-l-text h1 { margin-bottom: 10px; font-size: clamp(40px, 12vw, 52px); }
+  .hero-l-text p { padding-bottom: 14px; font-size: 19px; }
+  .hero-l-text .swoosh { left: 40%; width: 46%; height: 14px; }
+  .hero-l-wave { top: calc(100vw * 647 / 1080 - 28px); bottom: auto; height: 30px; }
+  .hero-l-row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 18px; gap: 4px; padding: 16px 6px; }
+  .hero-l-row li { max-width: none; }   /* always five across; the words wrap instead */
+  .hero-l-row img { width: 46px; margin-bottom: 6px; }
+  .hero-l-row span { font-size: 11px; }
+}
+/* How it works: three steps with drawings, over the green skyline */
+.home .how-l { position: relative; padding-top: clamp(8px, 2vw, 28px); padding-bottom: 0; background: #FDFDFA; text-align: center; }
+.home .how-l h2 { display: inline-flex; align-items: center; gap: 14px; margin: 0 0 clamp(26px, 4vw, 44px); font-size: clamp(30px, 3.6vw, 48px); color: #0A4535; }
+.how-l h2 .spark:last-child { transform: scaleX(-1); }
+.how-l ol {
+  list-style: none; margin: 0 auto; padding: 0; max-width: var(--page); counter-reset: hs;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; text-align: left;
+}
+.how-l li { counter-increment: hs; display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: start; }
+.how-l li::before {
+  content: counter(hs); display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+  background: #22A86E; color: #fff; font: 700 22px/1 var(--display);
+}
+html[data-lang="bn"] .how-l li::before { content: counter(hs, bengali); }
+.how-l h3 { margin: 6px 0 6px; font: 700 21px/1.25 var(--display); color: #0B3B30; }
+.how-l li p { margin: 0; color: #2E3B37; }
+.how-l li img { width: clamp(84px, 8vw, 124px); height: auto; }
+.skyline-strip { display: block; width: 100vw; max-width: none; height: auto; margin: clamp(10px, 2vw, 24px) 0 0 calc(50% - 50vw); }   /* edge to edge */
+@media (max-width: 860px) {
+  .how-l ol { grid-template-columns: 1fr; gap: 22px; }
+  .how-l li img { width: 100px; }
+  .home .how-l h2 { gap: 8px; } .how-l h2 .spark { width: 24px; height: 24px; }
+}
