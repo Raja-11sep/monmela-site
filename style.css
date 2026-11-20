@@ -606,8 +606,8 @@ html[data-lang="bn"] .home section h2 { line-height: 1.22; }
   list-style: none; margin: 0; padding: 0; counter-reset: how;
   display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--how-gap);
 }
-.home .how { --how-bg: #F3DECB; background: var(--how-bg); }   /* terracotta clay, as on Bishnupur's temples */
-.home .how h2 { color: #7A3417; }
+.home .how { --how-bg: var(--paper); background: var(--how-bg); }   /* page cream (Nov 2026: two light colours only, cream + haldi) */
+.home .how h2 { color: #0A4535; }
 .how-item { counter-increment: how; position: relative; padding-top: 68px; text-align: center; }
 .how-item::before {
   content: counter(how); position: absolute; z-index: 1; top: 0; left: 50%; transform: translateX(-50%);
@@ -621,8 +621,8 @@ html[data-lang="bn"] .how-item::before { content: counter(how, bengali); }
 }
 .how-thread::before { content: ""; position: absolute; inset: 0; border-top: 2.5px dashed rgba(122, 52, 23, .45); }
 .how-item .phone { width: min(100%, 248px); margin: 0 auto 24px; }
-.how-cap h3 { margin: 0 0 6px; font: 600 20px/1.35 var(--sans); color: #3B2418; }
-.how-cap p { margin: 0 auto; max-width: 17em; color: #6E4B38; font-size: 16px; }
+.how-cap h3 { margin: 0 0 6px; font: 600 20px/1.35 var(--sans); color: var(--ink); }
+.how-cap p { margin: 0 auto; max-width: 17em; color: var(--muted); font-size: 16px; }
 .how-then {
   display: flex; align-items: center; justify-content: center; gap: 14px;
   width: fit-content; margin: 56px auto 0; padding: 12px 22px 12px 14px; border-radius: 999px;
@@ -751,7 +751,7 @@ html[data-lang="bn"] .how-item::before { content: counter(how, bengali); }
    to tap; open, it becomes a sent bubble and Mon Mela "types" for a moment (motion.js), then replies
    next to the logo. Still native <details>: works without JavaScript, and search engines read every answer. */
 .home .ask {
-  background: var(--mint); grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  background: var(--paper); grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
   grid-template-areas: "head chat" "more chat"; grid-template-rows: auto 1fr; align-content: start; row-gap: 22px;
 }
 .ask-head { grid-area: head; }
@@ -981,7 +981,7 @@ html[data-lang="bn"] .play-steps li::before { content: counter(ps, bengali); }
 .join-art .adda-card { color: var(--ink); }   /* the intro sets cream text for the dusk; cards are paper */
 .join .steps h3 { margin: 0 0 6px; font: 700 21px/1.25 var(--display); color: var(--teal-deep); }
 /* What you get: icon + title + line, two or three to a row */
-.perks { background: var(--mint); }
+.perks { background: var(--paper); }   /* Nov 2026: pages use cream + dusk green only */
 .perks ul, .partner-kinds ul {
   list-style: none; margin: 0; padding: 0; display: grid; gap: 28px 40px;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -1160,19 +1160,19 @@ html[data-lang="bn"] .play-steps li::before { content: counter(ps, bengali); }
 /* ---------------------------------------------------------------- bright home page (Nov 2026)
    The raw riverside photo with the name and line over a soft haze on the left (sized in cqw, 1% of
    the picture's width, so they keep their place), then the five icons as a row that wraps. */
-.home .hero-l { padding: 0 0 clamp(8px, 2vw, 24px); background: #FDFDFA; }
+.home .hero-l { padding: 0 0 clamp(8px, 2vw, 24px); background: var(--paper); }
 .hero-l-frame { position: relative; container-type: inline-size; }
 .hero-l-frame img { display: block; width: 100%; height: auto; }
 .hero-l-frame::before {   /* haze that makes room for the words on the left */
   content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: linear-gradient(90deg, rgba(253,253,250,.95) 0%, rgba(253,253,250,.86) 24%, rgba(253,253,250,.4) 38%, rgba(253,253,250,0) 50%);
+  background: linear-gradient(90deg, rgba(255,251,243,.95) 0%, rgba(255,251,243,.86) 24%, rgba(255,251,243,.4) 38%, rgba(255,251,243,0) 50%);
 }
 .hero-l-text { position: absolute; z-index: 2; left: 4.2%; top: 20%; width: 34cqw; color: #0B3B30; }
 .hero-l-text h1 { margin: 0 0 1.4cqw; font: 700 6.2cqw/1 var(--display); letter-spacing: -.025em; color: #0A4535; }
 .hero-l-text p { position: relative; margin: 0; padding-bottom: 1.6cqw; font: 600 clamp(15px, 1.9cqw, 30px)/1.3 var(--display); color: #10372E; }
 .hero-l-text p [lang="bn"] { line-height: 1.5; }
 .hero-l-text .swoosh { left: 14cqw; right: auto; width: 13cqw; height: 1.4cqw; stroke-width: 5; }
-.hero-l-wave { position: absolute; z-index: 1; left: 0; right: 0; bottom: -1px; width: 100%; height: 5.4cqw; fill: #FDFDFA; }
+.hero-l-wave { position: absolute; z-index: 1; left: 0; right: 0; bottom: -1px; width: 100%; height: 5.4cqw; fill: var(--paper); }
 .hero-l-row {   /* five icons: one row on wide screens, wraps to fit narrow ones */
   position: relative; z-index: 2; list-style: none; display: flex; flex-wrap: wrap; justify-content: center;
   gap: clamp(10px, 2.4vw, 40px); width: min(980px, 100% - 2 * var(--gutter)); margin: clamp(-64px, -4vw, -20px) auto 0;
@@ -1196,7 +1196,7 @@ html[data-lang="bn"] .play-steps li::before { content: counter(ps, bengali); }
   .hero-l-row span { font-size: 11px; }
 }
 /* How it works: three steps with drawings, over the green skyline */
-.home .how-l { position: relative; padding-top: clamp(8px, 2vw, 28px); padding-bottom: 0; background: #FDFDFA; text-align: center; }
+.home .how-l { position: relative; padding-top: clamp(8px, 2vw, 28px); padding-bottom: 0; background: var(--paper); text-align: center; }
 .home .how-l h2 { display: inline-flex; align-items: center; gap: 14px; margin: 0 0 clamp(26px, 4vw, 44px); font-size: clamp(30px, 3.6vw, 48px); color: #0A4535; }
 .how-l h2 .spark:last-child { transform: scaleX(-1); }
 .how-l ol {
@@ -1211,8 +1211,8 @@ html[data-lang="bn"] .play-steps li::before { content: counter(ps, bengali); }
 html[data-lang="bn"] .how-l li::before { content: counter(hs, bengali); }
 .how-l h3 { margin: 6px 0 6px; font: 700 21px/1.25 var(--display); color: #0B3B30; }
 .how-l li p { margin: 0; color: #2E3B37; }
-.how-l li img { width: clamp(84px, 8vw, 124px); height: auto; }
-.skyline-strip { display: block; width: 100vw; max-width: none; height: auto; margin: clamp(10px, 2vw, 24px) 0 0 calc(50% - 50vw); }   /* edge to edge */
+.how-l li img { width: clamp(84px, 8vw, 124px); height: auto; mix-blend-mode: multiply; }   /* their white backdrop takes the cream */
+.skyline-strip { mix-blend-mode: multiply; display: block; width: 100vw; max-width: none; height: auto; margin: clamp(10px, 2vw, 24px) 0 0 calc(50% - 50vw); }   /* edge to edge */
 @media (max-width: 860px) {
   .how-l ol { grid-template-columns: 1fr; gap: 22px; }
   .how-l li img { width: 100px; }
