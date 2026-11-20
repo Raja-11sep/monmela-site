@@ -15,9 +15,9 @@ from art import LOGO, alpana_tile, festoon, hero_art
 ROOT = pathlib.Path(__file__).resolve().parent.parent      # the site folder (built files go here)
 PAGES = pathlib.Path(__file__).resolve().parent / "pages"  # legal page bodies
 SITE = "https://monmela.in"
-# Being retired: the pages stay online (Play Store privacy / delete-account links, testers'
-# download link) but ask Google to drop them from search (a "noindex" tag on every page).
-NOINDEX = True
+# Mon Mela is the brand for good (20 Nov 2026), so Google may list every page again.
+# True = a "noindex" tag on every page and no sitemap (asks Google to drop the site).
+NOINDEX = False
 UPDATED_EN = "11 November 2026"
 UPDATED_BN = "১১ নভেম্বর ২০২৬"
 EMAIL = "monmela.team@gmail.com"
@@ -917,7 +917,7 @@ def adda():
     get_url = PLAY_URL or TEST_PLAY_URL or f"{SITE}/download"  # people without the app
     html = f"""{head("You're invited to an adda", "আপনাকে একটা আড্ডায় ডাকা হয়েছে",
                     "Someone shared an Adda Table on Mon Mela. Open it in the app to see who's going.",
-                    "adda", script("adda.js"))}
+                    "adda", '<meta name="robots" content="noindex">' + chr(10) + script("adda.js"))}
 <body class="home dl">
 {header()}
 <section class="intro">
