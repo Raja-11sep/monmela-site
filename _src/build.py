@@ -370,6 +370,9 @@ def icon(name):
         "cup": '<path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 11h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5c0 1.5 1.5 1.5 1.5 3M12 3.5c0 1.5 1.5 1.5 1.5 3"/>',
         "ball": '<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17M3.5 12h17M6 6c3 2 3 10 0 12M18 6c-3 2-3 10 0 12"/>',
         "fest": '<path d="M4 20l4-12 8 8z"/><path d="M14 4v2M18 6l-1.5 1.5M20 10h-2"/>',
+        "music": '<path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',
+        "food": '<path d="M7 3v8M4.5 3v5a2.5 2.5 0 0 0 5 0V3M7 11v10M17 21V3c-2.5 1.5-3.5 4.5-3.5 8h3.5"/>',
+        "travel": '<path d="M3 14l18-7-4 13-5-5-4 2 1-4z"/>',
         "book": '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5"/>',
     }
     return f'<svg viewBox="0 0 24 24" class="icon" aria-hidden="true">{paths[name]}</svg>'
@@ -644,6 +647,38 @@ def home_hero_light():
 </section>"""
 
 
+def home_match():
+    """Matched by what you share: the words and a strip of common interests on the left, two
+    profile cards with their match % on the right (img/match-cards.webp, a transparent picture),
+    and the line that says what they share. Same dusk green as the story and the footer."""
+    interests = [("book", "Bengali<br>books", "বাংলা<br>বই"), ("music", "Music &amp;<br>movies", "গান আর<br>সিনেমা"),
+                 ("food", "Food<br>lovers", "খেতে<br>ভালোবাসি"), ("ball", "Football", "ফুটবল"),
+                 ("travel", "Travel<br>in WB", "বাংলায়<br>ঘোরা")]
+    chips = "".join(f"<li>{icon(i)}<span>{both(en, bn)}</span></li>" for i, en, bn in interests)
+    return f"""<section class="match2" aria-labelledby="match-h">
+    <img class="match2-city" src="{asset("img/match-city.webp")}" alt="" width="1080" height="686" loading="lazy">
+    <div class="match2-inner">
+      <div class="match2-text">
+        <h2 id="match-h">{both("Matched by what you share", "মিল খুঁজে দেয় আপনার উত্তর")}{SWOOSH}</h2>
+        <p>{both("From adda topics to favourite music, we find people in West Bengal who share your vibe. "
+                 "Every suggestion shows a match % and what you have in common, so the first message is easy.",
+                 "আড্ডার বিষয় থেকে প্রিয় গান, পশ্চিমবঙ্গে আপনার মনের মতো মানুষ খুঁজে দিই আমরা। প্রতিটি সাজেশনে "
+                 "থাকে মিলের % আর কোথায় কোথায় মিল, তাই প্রথম মেসেজটা লেখা সহজ।")}</p>
+        <div class="interests"><b>{both("Common <br>interests:", "যেসব <br>মিল খুঁজি:")}</b><ul>{chips}</ul></div>
+      </div>
+      <figure class="match2-art">
+        <picture>
+          <source media="(max-width: 760px)" srcset="{asset("img/match-cards-m.webp")}">
+          <img src="{asset("img/match-cards.webp")}" width="1316" height="895" loading="lazy"
+               alt="Two profile cards, Arka and Mousumi from Kolkata, with an 86% match between them">
+        </picture>
+        <figcaption><span class="pill">{both("You both love adda and Kolkata!",
+                                 "আপনাদের দুজনেরই প্রিয় আড্ডা আর কলকাতা!")}</span></figcaption>
+      </figure>
+    </div>
+  </section>"""
+
+
 def home_how():
     """How it works in three steps, each with its drawing, over the green Kolkata skyline."""
     steps = [
@@ -789,7 +824,7 @@ def home():
 
     # Title and description: the words people actually search for (Bengali friendship app,
     # Kolkata, West Bengal, adda), in under ~60 and ~155 characters so Google shows them whole.
-    html = f"""{head(HOME_TITLE_EN, HOME_TITLE_BN, HOME_DESCRIPTION, "", script("story.js") + script("motion.js") + script("match.js") + home_schema(faq))}
+    html = f"""{head(HOME_TITLE_EN, HOME_TITLE_BN, HOME_DESCRIPTION, "", script("story.js") + script("motion.js") + home_schema(faq))}
 <body class="home">
 {header(on_home=True)}
 {home_hero_light() if HERO_STYLE == "light" else home_hero_poster() if HERO_STYLE == "poster" else home_hero()}
@@ -806,16 +841,7 @@ def home():
                                                   "<b>তারপর কানেক্ট।</b> দুজনেই রাজি হলে তবেই চ্যাট খোলে।")}</span></p>
   </section>
 
-  <section class="match" aria-labelledby="match-h">
-    <div class="match-inner">
-      <div class="match-text">
-        <h2 id="match-h">{both("Matched by what you share", "মিল খুঁজে দেয় আপনার উত্তর")}</h2>
-        <p>{both("Every suggestion shows a match % and the answers you have in common, so the first message is easy.",
-                 "প্রতিটি সাজেশনে থাকে মিলের % আর কোন কোন উত্তরে মিল, তাই প্রথম মেসেজটা লেখা সহজ।")}</p>
-      </div>
-      {venn()}
-    </div>
-  </section>
+{home_match()}
 
   <section class="adda" aria-labelledby="adda-h">
     <div class="adda-text">

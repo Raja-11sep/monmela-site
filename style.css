@@ -437,6 +437,51 @@ html[data-lang="bn"] .home section h2 { line-height: 1.22; }
   .venn svg { max-width: 400px; }
 }
 
+/* ---------- match (Nov 2026): words and common interests on the left, two profile cards on the right,
+   on the same dusk green as the story and the footer */
+.home .match2 { position: relative; overflow: clip; color: var(--on-dusk); background: var(--dusk); }
+.match2::before, .match2::after {   /* two soft rings of light, like the mockup's background circles */
+  content: ""; position: absolute; border-radius: 50%; pointer-events: none; background: rgba(255, 246, 229, .04);
+}
+.match2::before { width: 420px; height: 420px; left: -180px; top: -160px; }
+.match2::after { width: 360px; height: 360px; right: -140px; bottom: -120px; }
+.match2-inner { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1.05fr; gap: clamp(28px, 4vw, 56px); align-items: center; }
+.home .match2 h2 { position: relative; display: inline-block; margin: 0 0 26px; padding-bottom: 14px; color: #fff; font-size: clamp(36px, 4.6vw, 64px); line-height: 1.05; }
+.match2 h2 .swoosh { left: 0; width: 46%; height: 14px; bottom: -4px; }
+.match2-text p { margin: 0 0 30px; max-width: 30em; font-size: clamp(17px, 1.4vw, 20px); color: rgba(255, 246, 229, .86); }
+.match2-city {   /* gold line drawing of Victoria Memorial and a boat, low on the left */
+  position: absolute; left: 0; bottom: 0; width: clamp(220px, 24vw, 360px); height: auto; opacity: .35; pointer-events: none;
+}
+.interests {
+  display: inline-flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 22px;
+  background: #FFF6E5; color: var(--ink); box-shadow: 0 18px 40px -24px rgba(0, 0, 0, .6);
+}
+.interests > b { flex: none; font: 700 15px/1.2 var(--display); color: #0A4535; }
+.interests ul { list-style: none; margin: 0; padding: 0; display: flex; flex: 1; }
+.interests li { display: flex; align-items: center; gap: 6px; padding: 2px 8px; font: 600 13px/1.2 var(--sans); color: #0A4535; white-space: nowrap; }
+.interests li + li { border-left: 1px solid rgba(10, 69, 53, .16); }
+.interests .icon { flex: none; width: 24px; height: 24px; padding: 0; background: none; box-shadow: none; stroke: #0A4535; }
+.interests .icon svg { display: block; width: 24px; height: 24px; }
+.match2-art { margin: 0; text-align: center; }
+.match2-art img { display: block; width: 100%; height: auto; }
+.match2-art figcaption { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: -6px; }
+.match2-art figcaption::before, .match2-art figcaption::after { content: ""; width: 28px; height: 3px; border-radius: 3px; background: var(--marigold); }
+.match2-art .pill { padding: 12px 24px; border-radius: 999px; background: #FFF6E5; color: #0A4535; font: 700 15px/1.3 var(--sans); }
+@media (max-width: 980px) {
+  .match2-inner { grid-template-columns: 1fr; }
+  .match2-art { max-width: 620px; margin: 0 auto; }
+}
+@media (max-width: 640px) {   /* phones: the interests become a 3 + 2 grid under their label */
+  .interests { display: flex; flex-direction: column; align-items: stretch; gap: 10px; padding: 14px; }
+  .interests > b br { display: none; }
+  .match2-city { opacity: .3; }
+  .interests ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 0; }
+  .interests li { flex-direction: column; text-align: center; gap: 4px; padding: 0 4px; white-space: normal; }
+  .interests li:nth-child(4) { border-left: 0; }
+  .match2-art figcaption::before, .match2-art figcaption::after { display: none; }
+  .match2-art .pill { font-size: 14px; padding: 10px 18px; }
+}
+
 /* ---------- a story of friendship: six chapters (pictures: img/story-1…6.webp, landscape photos shown at 3:2).
    Phones / no JavaScript: a picture card per chapter. Wide screens with story.js (.is-live):
    one sticky frame on the right cross-fades as each chapter reaches the middle of the screen. */
