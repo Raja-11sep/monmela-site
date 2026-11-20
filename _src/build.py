@@ -148,11 +148,13 @@ def head(title_en, title_bn, description, path="", extra=""):
 
 
 def header(on_home=False):
-    """Floating top bar on every page: logo, section links (wide screens), language switch, Download.
+    """Floating top bar on every page: logo, section links, language switch, Download.
+    Wide screens: the links sit in the bar. Narrower: a second row under the logo. Phones drop
+    Safety (class "wide-only") so the other four fit in one row.
     On the home page the links only scroll; elsewhere they open the home page at that section."""
     prefix = "" if on_home else "./"
     links = '<nav class="top-nav" aria-label="Sections">' + "".join(
-        f'<a href="{prefix}#{anchor}">{both(en, bn)}</a>'
+        f'<a href="{prefix}#{anchor}"{' class="wide-only"' if anchor == "safe" else ""}>{both(en, bn)}</a>'
         for anchor, en, bn in [("how", "How it works", "কীভাবে"), ("adda-h", "Adda Tables", "আড্ডা টেবিল"),
                                ("safe", "Safety", "নিরাপত্তা"), ("qa", "Questions", "প্রশ্ন")]) + \
         f'<a href="join.html">{both("Join us", "যুক্ত হোন")}</a></nav>'

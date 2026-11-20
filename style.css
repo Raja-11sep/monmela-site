@@ -168,7 +168,21 @@ h3 { text-wrap: balance; }
 }
 .lang-switch button[aria-pressed="true"] { background: var(--on-dusk); color: var(--dusk); }
 @media (max-width: 1180px) { .top-nav a { padding: 9px 12px; } }
-@media (max-width: 1060px) { .top-nav { display: none; } }
+@media (max-width: 1060px) {   /* narrower screens: the links move to a second row under the logo */
+  .top-inner { flex-wrap: wrap; row-gap: 6px; border-radius: 26px; }
+  .top-nav {
+    order: 3; flex-basis: 100%; justify-content: center; overflow-x: auto; scrollbar-width: none;
+    margin: 0 4px 2px 0; padding-top: 6px; border-top: 1px solid rgba(255, 246, 229, .1); font-size: 15px;
+  }
+  .top-nav::-webkit-scrollbar { display: none; }
+  .top-nav a { flex: none; padding: 7px 12px; }
+}
+@media (max-width: 560px) {   /* phones: four links (Safety stays in the page), spread across the row */
+  .top-nav { justify-content: space-between; font-size: 14px; }
+  .top-nav a { padding: 6px 8px; }
+  .top-nav .wide-only { display: none; }
+}
+@media (max-width: 400px) { .top-nav { font-size: 13px; } .top-nav a { padding: 6px 4px; } }   /* small phones: still one row */
 @media (max-width: 560px) { .top { padding: 10px 10px 4px; } .top-inner { padding: 6px 6px 6px 12px; } .top-inner::after { left: 22px; right: 22px; } }
 /* The smallest phones (about 320 px, e.g. the first iPhone SE): a little tighter so Download still fits */
 @media (max-width: 340px) {
