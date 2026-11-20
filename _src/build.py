@@ -33,6 +33,12 @@ PLAY_URL = ""
 TEST_GROUP_URL = "https://groups.google.com/g/mon-mela-testers"
 TEST_JOIN_URL = "https://play.google.com/apps/testing/com.monmela.app"
 
+# Shared adda links open the app (Android App Links). APP_SHA256: the app signing key and the
+# upload key fingerprints from Play Console → Test and release → App integrity → App signing.
+# Public values, not secrets. Empty = no assetlinks.json (links then open this site's adda page).
+APP_ID = "com.monmela.app"
+APP_SHA256 = []
+
 # Our social pages: linked in the footer and listed in the structured data ("sameAs"),
 # which tells Google these pages belong to the same Mon Mela.
 INSTAGRAM_URL = "https://www.instagram.com/monmela.in/"
@@ -891,6 +897,76 @@ def download():
     (ROOT / "download.html").write_text(html, encoding="utf-8")
 
 
+def adda():
+    """monmela.in/adda?id=…: where a shared Adda Table link lands when the app can't open it
+    (no app yet, iPhone, computer). With the app on Android, the link opens the table in the app
+    directly (App Links: .well-known/assetlinks.json) and this page never shows.
+    GitHub Pages serves adda.html at /adda. Not in the sitemap and noindex: it has no content of its own."""
+    get_url = PLAY_URL or f"{SITE}/download"  # people without the app
+    html = f"""{head("You're invited to an adda", "আপনাকে একটা আড্ডায় ডাকা হয়েছে",
+                    "Someone shared an Adda Table on Mon Mela. Open it in the app to see who's going.",
+                    "adda", script("adda.js"))}
+<body class="home dl">
+{header()}
+<section class="intro">
+  {festoon()}
+  <div class="intro-inner">
+    <div>
+      <h1>{both("You're invited to an adda", "আপনাকে একটা আড্ডায় ডাকা হয়েছে")}</h1>
+      <p class="lede">{both(
+          "Someone shared an Adda Table with you. Open it in the Mon Mela app to see the topic, "
+          "who's going, and ask for a seat.",
+          "কেউ আপনার সঙ্গে একটা আড্ডা টেবিল শেয়ার করেছেন। বিষয়, কারা যাচ্ছেন দেখতে আর জায়গা চাইতে "
+          "মনমেলা অ্যাপে খুলুন।")}</p>
+
+      <!-- adda.js shows this on Android when the link has a table id. Without the app installed,
+           Android opens get_url instead. -->
+      <div class="actions" id="open" hidden>
+        <a class="btn btn-primary btn-big" id="open-btn" href="{get_url}"
+           data-host="monmela.in" data-fallback="{get_url}">{both("Open in the app", "অ্যাপে খুলুন")}</a>
+      </div>
+      <p class="dl-meta" id="open-hint" hidden>{both(
+          "Don't have the app yet? The button takes you to Google Play.",
+          "অ্যাপ নেই? বোতামটা আপনাকে Google Play-তে নিয়ে যাবে।")}</p>
+
+      <div class="actions" id="get">
+        <a class="btn btn-ghost" href="{get_url}">{both("Get the app", "অ্যাপ নিন")}</a>
+      </div>
+
+      <!-- Shown by adda.js on iPhone and iPad -->
+      <div class="dl-note" id="ios" hidden>
+        <p>{both("Mon Mela is on Android for now. The iPhone version comes later.",
+                 "মনমেলা এখন শুধু অ্যান্ড্রয়েডে। iPhone ভার্সন পরে আসবে।")}</p>
+      </div>
+      <p class="not-dating">{both("For friendship, not dating. Adults 18+ only.", "বন্ধুত্বের জন্য, ডেটিংয়ের জন্য নয়। শুধু ১৮+।")}</p>
+    </div>
+
+    <div class="dl-visual">
+      {phone("welcome", lazy=False)}
+    </div>
+  </div>
+</section>
+{footer()}
+</body>
+</html>
+"""
+    (ROOT / "adda.html").write_text(html, encoding="utf-8")
+
+
+def assetlinks():
+    """.well-known/assetlinks.json: proves to Android that this site belongs to the app, so
+    /adda links open the app without asking. Needs the app's SHA-256 signing fingerprints
+    (Play Console → App integrity). Written only once APP_SHA256 is filled in."""
+    if not APP_SHA256:
+        return
+    data = [{"relation": ["delegate_permission/common.handle_all_urls"],
+             "target": {"namespace": "android_app", "package_name": APP_ID,
+                        "sha256_cert_fingerprints": APP_SHA256}}]
+    folder = ROOT / ".well-known"
+    folder.mkdir(exist_ok=True)
+    (folder / "assetlinks.json").write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+
 (ROOT / "img" / "alpana.svg").write_text(alpana_tile(), encoding="utf-8")
 home()
 download()
@@ -906,5 +982,7 @@ page("delete-account.html", "Delete your account", "অ্যাকাউন্�
 page("child-safety.html", "Child Safety Standards", "শিশু সুরক্ষা নীতি",
      f"Last updated: {UPDATED_EN}", f"সর্বশেষ আপডেট: {UPDATED_BN}",
      load("child.en.html"), load("child.bn.html"))
+adda()
+assetlinks()
 sitemap()
 print("built")
