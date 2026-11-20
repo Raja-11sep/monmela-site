@@ -68,7 +68,6 @@ ROLES = {
     "partner": "Venue or event partner",
     "creator": "Creator",
     "host": "Adda host",
-    "launch": "Launch updates",
 }
 
 # Our social pages: linked in the footer and listed in the structured data ("sameAs"),
@@ -1496,7 +1495,6 @@ def card_picture(story_file):
 def join_hub():
     """monmela.in/join: every way to be part of Mon Mela, one card each. Linked from the header
     and footer ("Join us"). Tried here first, then moved to monmela.in."""
-    href, target = form_link("launch", "Name:\nCity or area:\nPhone or e-mail:\n")
     roles = [
         ("cap", "img/story-4.webp", "Campus ambassador", "ক্যাম্পাস অ্যাম্বাসাডর",
          "College students who want to start addas on their campus.",
@@ -1510,9 +1508,6 @@ def join_hub():
         ("people", "img/story-5.webp", "Adda host", "আড্ডার হোস্ট",
          "Club leads, group admins and hobby groups who bring people together.",
          "ক্লাবের দায়িত্বে থাকা মানুষ, গ্রুপ অ্যাডমিন আর শখের দল, যাঁরা মানুষকে একসঙ্গে আনেন।", "host.html", None),
-        ("spark", "img/story-6.webp", "Just tell me at launch", "লঞ্চ হলে জানান",
-         "Not ready to do more? Leave your details and we'll message you when the app opens to everyone.",
-         "এখনই আর কিছু নয়? নিজের তথ্য দিয়ে রাখুন, অ্যাপ সবার জন্য খুললে আমরা জানাব।", href, target),
     ]
     # Picture cards: the picture fills the card, a dusk shade rises from the bottom under the words,
     # the icon sits in a white disc top left. The pictures are decorative (alt=""): the words say it all.
