@@ -177,7 +177,7 @@ h3 { text-wrap: balance; }
   .top-nav::-webkit-scrollbar { display: none; }
   .top-nav a { flex: none; padding: 7px 12px; }
 }
-@media (max-width: 560px) {   /* phones: four links (Safety stays in the page), spread across the row */
+@media (max-width: 560px) {   /* phones: four links (Questions stays in the page and footer), spread across the row */
   .top-nav { justify-content: space-between; font-size: 14px; }
   .top-nav a { padding: 6px 8px; }
   .top-nav .wide-only { display: none; }
