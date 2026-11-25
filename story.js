@@ -1,5 +1,5 @@
 // Home page, "A story of friendship".
-//  - Wide screens: the six pictures sit in one sticky frame, and the picture changes as each
+//  - Wide screens: the pictures sit in one sticky frame, and the picture changes as each
 //    chapter reaches the middle of the screen.
 //  - Phones: the chapters are a row of cards to swipe through (CSS); this adds the dots under the
 //    row, which follow the swipe and jump to a chapter when tapped.

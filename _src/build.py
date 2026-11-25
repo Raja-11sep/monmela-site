@@ -49,7 +49,7 @@ APP_SHA256 = []
 HOME_BRAND = None
 # The hero's photo (wide, friends, no text on it). Until our own arrives: story photo 6, the ghat at sunset.
 HERO_PHOTO = "img/hero-friends.webp"
-HERO_PHOTO_FALLBACK = "img/story-6.webp"
+HERO_PHOTO_FALLBACK = "img/story-3.webp"
 # HERO_STYLE "poster": the friends-on-the-ghat poster (img/hero-poster.webp; its old logo and words removed)
 # with our own chips, logo and words laid over it. "photo": the photo on the right, words on the left.
 HERO_STYLE = "light"   # "light": the bright riverside home page (Nov 2026); "poster" / "photo": earlier versions
@@ -426,7 +426,8 @@ def adda_card(cls, title_en, title_bn, when_en, when_bn, taken, seats, tag=None,
 </div>"""
 
 
-# The story section: six moments of one friendship. Pictures: img/story-1…6.webp, 1600 x 900 photos
+# The story section: three moments of one friendship (cut from six, Nov 2026, to keep the page short).
+# Pictures: img/story-1…3.webp, 1600 x 900 photos
 # (supplied Nov 2026; they replaced the drawings by tools/make_story.py). Also used on the Join us cards.
 # (big title in Bengali, its English line, text in English, text in Bengali, picture alt text)
 STORY = [
@@ -442,18 +443,6 @@ STORY = [
      "Saturday, 5 pm, the para tea stall. Two cups of cha became six, and nobody looked at the time.",
      "শনিবার, বিকেল ৫টা, পাড়ার চায়ের দোকান। দু'ভাঁড় চা গড়াল ছ'ভাঁড়ে, ঘড়ি দেখল না কেউ।",
      "Six friends on a bench at a lit tea stall in the evening, a tram passing behind"),
-    ("বইমেলা", "Boi Mela",
-     "An Adda Table at the Book Fair: four people, too many books, and one shared jhola.",
-     "বইমেলায় একটা আড্ডা টেবিল: চারজন মানুষ, অনেক বেশি বই, আর একটাই ঝোলা।",
-     "Four friends walking in through the Kolkata Book Fair gate"),
-    ("মেলার রাত", "A night at the mela",
-     "Lights, the nagordola and phuchka. Now there's always someone to say \u201ccholo\u201d.",
-     "আলো, নাগরদোলা আর ফুচকা। এখন \u201cচলো\u201d বলার লোক সবসময় আছে।",
-     "Friends at a fair at night, pointing up at a lit giant wheel"),
-    ("ঘাটে সন্ধে", "Evenings at the ghat",
-     "The city doesn't feel new any more. It feels like home. Find your people on Mon Mela.",
-     "শহরটা আর নতুন লাগে না, ঘর মনে হয়। মনমেলায় খুঁজে নিন আপনার মানুষদের।",
-     "Five friends sitting on a ghat of the Ganga at sunset, Howrah Bridge and a boat in front of them"),
 ]
 
 
@@ -476,7 +465,7 @@ def music_player():
 
 
 def story_section():
-    """Six chapters. Phones (and no JavaScript): each chapter is a picture card with its text.
+    """Three chapters. Phones (and no JavaScript): each chapter is a picture card with its text.
     Wide screens with story.js: the pictures sit in one sticky frame on the right and cross-fade
     as each chapter scrolls past on the left."""
     chapters, frame, dots = [], [], []
@@ -496,7 +485,7 @@ def story_section():
     return f"""<section class="story" aria-labelledby="story-h">
     <div class="story-head">
       <h2 id="story-h">{both("A story of friendship", "একটা বন্ধুত্বের গল্প")}</h2>
-      <p>{both("Six small moments, the way friendships start in Bengal.", "ছ'টা ছোট মুহূর্ত, বাংলায় যেভাবে বন্ধুত্ব শুরু হয়।")}</p>
+      <p>{both("Three small moments, the way friendships start in Bengal.", "তিনটে ছোট মুহূর্ত, বাংলায় যেভাবে বন্ধুত্ব শুরু হয়।")}</p>
       {music_button()}
       <p class="music-tune" hidden>{both("Tune: Purano Sei Diner Kotha", "সুর: পুরানো সেই দিনের কথা")}</p>
     </div>
@@ -1496,7 +1485,7 @@ def join_hub():
     """monmela.in/join: every way to be part of Mon Mela, one card each. Linked from the header
     and footer ("Join us"). Tried here first, then moved to monmela.in."""
     roles = [
-        ("cap", "img/story-4.webp", "Campus ambassador", "ক্যাম্পাস অ্যাম্বাসাডর",
+        ("cap", "img/join-4.webp", "Campus ambassador", "ক্যাম্পাস অ্যাম্বাসাডর",
          "College students who want to start addas on their campus.",
          "যে কলেজ পড়ুয়ারা নিজের ক্যাম্পাসে আড্ডা শুরু করতে চান।", "ambassador.html", None),
         ("cup", "img/story-3.webp", "Venue or event partner", "জায়গা বা অনুষ্ঠানের পার্টনার",
@@ -1505,7 +1494,7 @@ def join_hub():
         ("star", "img/story-2.webp", "Creator", "ক্রিয়েটর",
          "Bengali creators on Instagram, YouTube and meme pages.",
          "Instagram, YouTube আর মিম পেজের বাঙালি ক্রিয়েটর।", "creators.html", None),
-        ("people", "img/story-5.webp", "Adda host", "আড্ডার হোস্ট",
+        ("people", "img/join-5.webp", "Adda host", "আড্ডার হোস্ট",
          "Club leads, group admins and hobby groups who bring people together.",
          "ক্লাবের দায়িত্বে থাকা মানুষ, গ্রুপ অ্যাডমিন আর শখের দল, যাঁরা মানুষকে একসঙ্গে আনেন।", "host.html", None),
     ]

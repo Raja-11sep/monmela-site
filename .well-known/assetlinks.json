@@ -1,0 +1,15 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.monmela.app",
+      "sha256_cert_fingerprints": [
+        "A1:C8:A7:67:06:A4:41:77:07:08:84:5B:2E:B8:61:96:3F:52:1D:CE:32:EB:40:FF:33:DD:5A:06:75:5A:F3:10",
+        "39:85:61:37:2C:E3:2D:7E:09:F7:45:42:EB:5D:C7:DD:05:62:D9:FC:B5:8D:DE:C0:55:C4:BD:A1:B7:A6:74:94",
+        "67:BE:EA:FE:EB:DA:FE:0A:77:BF:52:3F:46:1E:6E:23:18:58:39:9D:1A:2C:56:0F:A9:19:09:DF:06:05:B8:2C",
+        "B0:F3:D6:02:A3:7D:C6:6A:BB:47:69:13:8B:6D:00:F5:CA:5F:A8:76:E8:B2:69:DE:9A:E5:4B:44:99:3F:C7:B9"
+      ]
+    }
+  }
+]
