@@ -742,31 +742,9 @@ def with_home_brand(html):
 
 
 def home():
-    # How it works: four app screens in a row (a swipeable row on phones), then one line about chatting.
-    steps = [
-        ("welcome", "Sign in with Google", "Google দিয়ে লগইন",
-         "One tap, no password. We never post anything for you.",
-         "এক ট্যাপে, পাসওয়ার্ড ছাড়া। আপনার হয়ে কিছু পোস্ট হয় না।"),
-        ("looking", "Say what you're looking for", "কী খুঁজছেন, বলুন",
-         "Adda, a study partner, a gym buddy, the Puja gang: pick up to five.",
-         "আড্ডা, পড়ার সঙ্গী, জিমের সঙ্গী, পুজোর দল: পাঁচটা পর্যন্ত বেছে নিন।"),
-        ("quiz", "Answer the friendship quiz", "বন্ধুত্বের কুইজ",
-         "Twelve easy questions. Your answers stay private; they only work out your match %.",
-         "বারোটা সহজ প্রশ্ন। উত্তর গোপন থাকে, শুধু মিলের % হিসেব হয়।"),
-        ("picks", "Meet today's picks", "আজকের মানুষেরা",
-         "New people every morning, each with a match % and why you match.",
-         "প্রতিদিন সকালে নতুন মানুষ, সঙ্গে মিলের % আর কেন মিল।"),
-    ]
-    # .how-thread: the kantha stitch to the next step (motion.js sews it in; static dashes without JS)
-    thread = '<span class="how-thread" aria-hidden="true"></span>'
-    steps_html = "".join(
-        f'<li class="how-item">{thread if i < len(steps) - 1 else ""}{phone(k)}'
-        f'<div class="how-cap"><h3>{both(t_en, t_bn)}</h3><p>{both(d_en, d_bn)}</p></div></li>'
-        for i, (k, t_en, t_bn, d_en, d_bn) in enumerate(steps))
-
     safety = [
-        ("chat", "Nobody can message you unless you accept their request.",
-         "আপনি অনুরোধ না মানলে কেউ মেসেজ করতে পারে না।"),
+        ("chat", "The chat opens only when both of you say yes. Until then, nobody can message you.",
+         "দুজনেই রাজি হলে তবেই চ্যাট খোলে। তার আগে কেউ আপনাকে মেসেজ করতে পারে না।"),
         ("people", "Want to meet only people of your own gender? Turn it on, and only they will see you.",
          "শুধু নিজের লিঙ্গের মানুষের সঙ্গে আলাপ করতে চান? চালু করুন, তখন শুধু তাঁরাই আপনাকে দেখবেন।"),
         ("badge", "A ✓ Photo verified badge shows who has matched a live selfie to their photos.",
@@ -775,8 +753,8 @@ def home():
          "দু-ট্যাপে ব্লক বা রিপোর্ট। রিপোর্ট আমাদের টিম খতিয়ে দেখে।"),
         ("phone", "Call 112 (emergency) or 181 (women's helpline) straight from any chat.",
          "যেকোনো চ্যাট থেকে সরাসরি ১১২ (জরুরি) বা ১৮১ (মহিলা হেল্পলাইন)-এ ফোন।"),
-        ("pin", "Others see only your district, never your exact location.",
-         "অন্যরা শুধু আপনার জেলা দেখেন, সঠিক লোকেশন কখনও নয়।"),
+        ("lock", "Screenshots and screen recording are blocked in the app, and others see only your district, never your exact location.",
+         "অ্যাপে স্ক্রিনশট আর স্ক্রিন রেকর্ডিং বন্ধ, আর অন্যরা শুধু আপনার জেলা দেখেন, সঠিক লোকেশন কখনও নয়।"),
     ]
     safety_html = "".join(f'<li>{icon(i)}<p>{both(en, bn)}</p></li>' for i, en, bn in safety)
 
@@ -821,13 +799,6 @@ def home():
   {home_how() if HERO_STYLE == "light" else home_gives()}
 
   {story_section()}
-
-  <section class="how" aria-labelledby="inside">
-    <h2 id="inside">{both("Inside the app", "অ্যাপের ভেতরে")}</h2>
-    <ol class="how-row">{steps_html}</ol>
-    <p class="how-then">{icon("chat")}<span>{both("<b>Then connect.</b> The chat opens only when both of you say yes.",
-                                                  "<b>তারপর কানেক্ট।</b> দুজনেই রাজি হলে তবেই চ্যাট খোলে।")}</span></p>
-  </section>
 
 {home_match()}
 
