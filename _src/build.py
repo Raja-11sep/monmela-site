@@ -213,7 +213,6 @@ def footer(on_home=False):
         ("terms.html", "Terms", "শর্তাবলি"), ("privacy.html", "Privacy", "প্রাইভেসি"),
         ("child-safety.html", "Child safety", "শিশু সুরক্ষা"), ("delete-account.html", "Delete account", "অ্যাকাউন্ট মুছুন")])
     return f"""<footer class="site-foot">
-  <div class="alpana" aria-hidden="true"></div>
   <div class="foot-inner">
     <div class="foot-brand">
       <a class="brand" href="./">{LOGO}{both("Mon Mela", "মনমেলা")}</a>
@@ -230,10 +229,6 @@ def footer(on_home=False):
         {social_links()}
       </div>
     </nav>
-  </div>
-  <div class="foot-night" aria-hidden="true">
-    <div class="foot-lights">{festoon(swags=5, per_swag=9, width=1800)}</div>
-    <p class="foot-word">মনমেলা</p>
   </div>
   <div class="foot-base">
     <p>{both("© 2026 Mon Mela. Made in West Bengal.", "© ২০২৬ মনমেলা। পশ্চিমবঙ্গে তৈরি।")}</p>
@@ -360,6 +355,7 @@ def icon(name):
         "flag": '<path d="M6 21V4M6 4h11l-2.5 4L17 12H6"/>',
         "phone": '<path d="M7 3h3l1.5 4.5-2 1.3a11 11 0 0 0 5.7 5.7l1.3-2L21 14v3a2 2 0 0 1-2 2A16 16 0 0 1 5 5a2 2 0 0 1 2-2z"/>',
         "pin": '<path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/>',
+        "heart": '<path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.4a4.2 4.2 0 0 1 7.5 2.4C19.5 15.4 12 20 12 20z"/>',
         "lock": '<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
         "adult": '<circle cx="12" cy="12" r="9.5"/><text x="12" y="15" text-anchor="middle">18+</text>',
         "cap": '<path d="M2.5 9.5L12 5l9.5 4.5L12 14z"/><path d="M6.5 11.5v4c1.5 1.5 3.5 2.2 5.5 2.2s4-.7 5.5-2.2v-4M21.5 9.5v5"/>',
@@ -448,7 +444,7 @@ STORY = [
 
 def music_button(cls="", play=("Play with music", "গান চালিয়ে দেখুন")):
     """A music on/off button (music.js shows it; without JavaScript there's no music).
-    The story has one under its title; every page has the floating one (music_player)."""
+    The story has one under its title."""
     return (f'<button class="music-btn {cls}" type="button" aria-pressed="false" hidden>'
             f'<span class="mb-icon" aria-hidden="true"><i></i><i></i><i></i></span>'
             f'<span class="mb-play">{both(*play)}</span>'
@@ -456,12 +452,9 @@ def music_button(cls="", play=("Play with music", "গান চালিয়�
 
 
 def music_player():
-    """The site's music, on every page: the floating button and the track (loaded only when it plays).
-    The floating button also carries the "Tap for music" nudge that music.js shows when a page opens
-    and the browser hasn't allowed sound yet."""
-    nudge = f'<span class="mb-nudge">{both("Tap for music", "গান শুনতে ট্যাপ করুন")}</span>'
-    return (music_button("music-float", ("Play music", "গান চালান")).replace("</button>", nudge + "</button>") +
-            f'<audio class="site-audio" src="{asset("audio/story-theme.mp3")}" preload="none" loop></audio>')
+    """The site's music track (loaded only when it plays). Only the story's own button plays it;
+    the floating button on every page was retired (Nov 2026) for a calmer look."""
+    return f'<audio class="site-audio" src="{asset("audio/story-theme.mp3")}" preload="none" loop></audio>'
 
 
 def story_section():
@@ -474,7 +467,7 @@ def story_section():
     for i, (title_bn, title_en, en, bn, alt) in enumerate(STORY):
         src = asset(f"img/story-{i + 1}.webp")
         pos = f' style="object-position: {focus[i]}"'
-        cta = f'<div class="actions">{get_app_button()}</div>' if i == len(STORY) - 1 else ""
+        cta = ""
         chapters.append(
             f'<li class="chapter" data-i="{i}">'
             f'<figure class="ch-pic"><img src="{src}" alt="{alt}" width="1600" height="900"{pos} loading="lazy" decoding="async"></figure>'
@@ -609,14 +602,13 @@ def home_hero_light():
     round icons as a real HTML row under the picture, so they wrap to fit any screen."""
     # (icon file number, English, Bengali)
     icons = [
-        (1, "Find your<br>people", "নিজের<br>মানুষ খুঁজুন"),
-        (2, "Join<br>addas", "আড্ডায়<br>যোগ দিন"),
-        (3, "Explore<br>your city", "নিজের শহর<br>ঘুরে দেখুন"),
-        (4, "Safe and<br>trusted", "নিরাপদ আর<br>ভরসার"),
-        (5, "Feel at<br>home", "আপন<br>মনে হবে"),
+        ("people", "Find your<br>people", "নিজের<br>মানুষ খুঁজুন"),
+        ("cup", "Join<br>addas", "আড্ডায়<br>যোগ দিন"),
+        ("pin", "Explore<br>your city", "নিজের শহর<br>ঘুরে দেখুন"),
+        ("badge", "Safe and<br>trusted", "নিরাপদ আর<br>ভরসার"),
+        ("heart", "Feel at<br>home", "আপন<br>মনে হবে"),
     ]
-    row = "".join(f'<li><img src="{asset(f"img/home-icon-{n}.png")}" alt="" width="74" height="74"><span>{both(en, bn)}</span></li>'
-                  for n, en, bn in icons)
+    row = "".join(f'<li>{icon(i)}<span>{both(en, bn)}</span></li>' for i, en, bn in icons)
     return f"""<section class="hero-l">
   <div class="hero-l-frame">
     <picture>
@@ -677,12 +669,10 @@ def home_how():
         ("how-3", "Make new friends", "নতুন বন্ধু পান",
          "Chat, meet and enjoy great conversations.", "চ্যাট করুন, দেখা করুন, জমিয়ে আড্ডা দিন।"),
     ]
-    lis = "".join(
-        f"""<li><div><h3>{both(t_en, t_bn)}</h3><p>{both(d_en, d_bn)}</p></div>
-      <img src="{asset(f"img/{img}.webp")}" alt="" loading="lazy"></li>"""
-        for img, t_en, t_bn, d_en, d_bn in steps)
+    lis = "".join(f"<li><div><h3>{both(t_en, t_bn)}</h3><p>{both(d_en, d_bn)}</p></div></li>"
+                  for _, t_en, t_bn, d_en, d_bn in steps)
     return f"""<section class="how-l" id="how" aria-labelledby="how-h">
-    <h2 id="how-h">{SPARK}<span>{both("How Mon Mela works", "মনমেলা কীভাবে কাজ করে")}</span>{SPARK}</h2>
+    <h2 id="how-h">{both("How Mon Mela works", "মনমেলা কীভাবে কাজ করে")}</h2>
     <ol>{lis}</ol>
     <img class="skyline-strip" src="{asset("img/skyline-strip.webp")}" alt="" loading="lazy" width="1672" height="103">
   </section>"""

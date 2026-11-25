@@ -64,15 +64,8 @@
       if (!queued) { queued = true; requestAnimationFrame(followSwipe); }
     }, { passive: true });
 
-    var wide = window.matchMedia(WIDE);
-    function setup() {
-      observer.disconnect();
-      story.classList.toggle('is-live', wide.matches); // CSS: sticky frame on, inline cards off
-      if (!wide.matches) { shownCard = -1; followSwipe(); return; }
-      chapters.forEach(function (c) { observer.observe(c); });
-      if (current < 0) show(0);
-    }
-    setup();
-    if (wide.addEventListener) wide.addEventListener('change', setup); else wide.addListener(setup);
+    // Nov 2026: wide screens show the three chapters side by side (CSS), so the sticky frame
+    // (is-live) is no longer switched on; only the phone's swipe dots are kept.
+    followSwipe();
   });
 })();
